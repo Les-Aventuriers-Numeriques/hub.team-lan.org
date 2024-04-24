@@ -8,23 +8,67 @@
     text-align: center;
 }
 
+.mb-0 {
+    margin-bottom: 0;
+}
 /************************************************************************
  * En-tête */
 
 body > header {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    column-gap: var(--pico-grid-column-gap);
+    row-gap: var(--pico-grid-row-gap);
     border-bottom: var(--pico-border-width) solid var(--pico-muted-border-color);
-    text-align: center;
 }
 
 body > header a {
     text-decoration: none;
+}
+
+body > header a img {
+    border: var(--pico-border-width) solid var(--pico-muted-border-color);
+    border-radius: var(--pico-border-radius);
+}
+
+body > header > div {
+    text-align: center;
+}
+
+body > header > div > a {
     font-weight: 700;
     font-size: 2rem;
     line-height: 1.125;
 }
 
+body > header > div > div {
+    color: var(--pico-muted-color);
+    font-size: 1rem;
+}
+
 @media (min-width: 768px) {
     body > header {
+        flex-direction: row;
+        justify-content: start;
+    }
+
+    body > header > div {
         text-align: left;
     }
+}
+
+/************************************************************************
+ * Contenu */
+
+body > main h1:before,
+body > main h2:before {
+    content: '• ';
+    color: var(--pico-primary);
+}
+
+body > main article > header,
+body > main details > summary {
+    font-weight: bolder;
 }

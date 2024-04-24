@@ -35,7 +35,7 @@ app.config.update(
     COMPRESS_REGISTER=env.bool('COMPRESS_REGISTER', default=False),
     COMPRESS_MIN_SIZE=env.int('COMPRESS_MIN_SIZE', 512),
 
-    SQLALCHEMY_DATABASE_URI=env.str('SQLALCHEMY_DATABASE_URI', default='sqlite:///db.sqlite'),
+    SQLALCHEMY_DATABASE_URI=env.str('SQLALCHEMY_DATABASE_URI', default='postgresql+psycopg2://postgre:postgre@localhost/postgre'),
 
     # Config values that cannot be overwritten
     PERMANENT_SESSION_LIFETIME=timedelta(days=365),
@@ -151,3 +151,4 @@ def http_error_handler(e: HTTPException) -> Tuple[str, int]:
 # After-bootstrap imports
 
 import hub.routes
+import hub.commands

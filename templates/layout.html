@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
 
-    <title>{% block title %}{% endblock title %}{{ ' • ' if self.title() }}Intranet Les Aventuriers Numériques</title>
+    <title>{% block title %}{% endblock title %}{{ ' • ' if self.title() }}Hub Les Aventuriers Numériques</title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="light dark">
@@ -18,7 +18,11 @@
 </head>
 <body>
     <header class="container">
-        <a href="{{ url_for('home') }}">Intranet</a>
+        <a href="{{ url_for('home') }}"><img src="{{ url_for('static', filename='/images/logo_120.png') }}" alt="Logo de la team Les Aventuriers Numériques" width="120" height="120"></a>
+        <div>
+            <a href="{{ url_for('home') }}">Hub</a>
+            <div>Les Aventuriers Numériques</div>
+        </div>
     </header>
 
     <main class="container">
