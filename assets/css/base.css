@@ -1,0 +1,30 @@
+/************************************************************************
+ * Styles de base */
+
+/************************************************************************
+ * Styles globaux */
+
+.text-center {
+    text-align: center;
+}
+
+/************************************************************************
+ * En-tête */
+
+body > header {
+    border-bottom: var(--pico-border-width) solid var(--pico-muted-border-color);
+    text-align: center;
+}
+
+body > header a {
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 2rem;
+    line-height: 1.125;
+}
+
+@media (min-width: 768px) {
+    body > header {
+        text-align: left;
+    }
+}
