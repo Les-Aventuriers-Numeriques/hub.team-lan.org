@@ -3,9 +3,34 @@
 {% block title %}Jeux{% endblock %}
 
 {% block cssfiles %}
-    {% assets 'css_base' %}<link rel="stylesheet" href="{{ ASSET_URL }}">{% endassets %}
+    {% assets 'css_games' %}<link rel="stylesheet" href="{{ ASSET_URL }}">{% endassets %}
+{% endblock %}
+
+{% block jsfiles %}
+    <script defer src="https://cdn.jsdelivr.net/npm/htmx.org@1.9.12/dist/htmx.min.js"></script>
 {% endblock %}
 
 {% block content %}
-    <p>TODO</p>
+    <p>Le choix des jeux principaux pour la LAN, c'est ici que ça se passe : propose et vote pour des jeux. Tu as accès à l'entièreté du catalogue Steam.</p>
+
+    <div class="games">
+        <article>
+            <header>Proposer</header>
+
+            <input
+                type="search"
+                placeholder="Tape le nom d'un jeu..."
+                hx-post="{{ url_for('games_search') }}"
+                hx-trigger="input changed delay:500ms, search"
+                hx-target="next .results"
+            >
+
+            <div class="results"></div>
+        </article>
+        <article>
+            <header>Voter</header>
+
+            <p>TODO</p>
+        </article>
+    </div>
 {% endblock %}

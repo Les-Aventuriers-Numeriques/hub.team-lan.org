@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, session
+from sqlalchemy_searchable import make_searchable
 from werkzeug.exceptions import HTTPException
 from flask_assets import Environment, Bundle
 from sqlalchemy.orm import DeclarativeBase
@@ -39,13 +40,12 @@ app.config.update(
 
     DISCORD_CLIENT_ID=env.int('DISCORD_OAUTH_CLIENT_ID'),
     DISCORD_CLIENT_SECRET=env.str('DISCORD_OAUTH_CLIENT_SECRET'),
-    DISCORD_GUILD_ID=env.str('DISCORD_GUILD_ID'),
-    DISCORD_ROLE_ID=env.str('DISCORD_ROLE_ID'),
+    DISCORD_GUILD_ID=env.int('DISCORD_GUILD_ID'),
+    DISCORD_ROLE_ID=env.int('DISCORD_ROLE_ID'),
+    DISCORD_WEBHOOK_ID=env.int('DISCORD_WEBHOOK_ID'),
+    DISCORD_WEBHOOK_TOKEN=env.str('DISCORD_WEBHOOK_TOKEN'),
 
     # Valeurs de configuration qui ne peuvent pas être surchargées
-    DISCORD_SCOPES=('identify', 'guilds.members.read'),
-    DISCORD_AUTHORIZE_URL='https://discord.com/oauth2/authorize',
-    DISCORD_TOKEN_URL='https://discord.com/api/oauth2/token',
     PERMANENT_SESSION_LIFETIME=timedelta(days=365),
     BUNDLE_ERRORS=True,
     USE_SESSION_FOR_NEXT=True
@@ -102,6 +102,7 @@ assets = Environment(app)
 assets.append_path('assets')
 
 assets.register('css_base', Bundle('css/base.css', filters='cssutils', output='css/base.min.css'))
+assets.register('css_games', Bundle('css/base.css', 'css/games.css', filters='cssutils', output='css/games.min.css'))
 
 
 # Flask-SQLAlchemy
@@ -110,6 +111,8 @@ class AppDeclarativeBase(DeclarativeBase):
 
 
 db = SQLAlchemy(app, model_class=AppDeclarativeBase)
+
+make_searchable(db.metadata)
 
 import hub.models
 

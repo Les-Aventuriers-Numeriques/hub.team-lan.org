@@ -1,0 +1,10 @@
+{% for game in games %}
+    <div>
+        <a href="https://store.steampowered.com/app/{{ game.steam_appid }}" target="_blank">
+            <img src="https://cdn.cloudflare.steamstatic.com/steam/apps/{{ game.steam_appid }}/capsule_231x87.jpg" alt="Illustration {{ game.name }}" title="{{ game.name }}" width="231" height="87">
+        </a>
+        <button class="outline">
+            Ajouter
+        </button>
+    </div>
+{% endfor %}

@@ -1,14 +1,10 @@
 from flask import render_template, redirect, url_for, flash, session, request
 from flask_login import login_required, current_user, logout_user, login_user
-from urllib.parse import urlencode
 from werkzeug import Response
 from hub.models import User
 from typing import Union
 from app import app, db
-import requests
-import secrets
-
-requests = requests.Session()
+import hub.discord as discord
 
 
 @app.route('/connexion')
@@ -16,19 +12,9 @@ def login() -> Union[str, Response]:
     if current_user.is_authenticated:
         return redirect(url_for('home'))
 
-    session['oauth2_state'] = secrets.token_urlsafe(16)
-
-    discord_qs = urlencode({
-        'client_id': app.config['DISCORD_CLIENT_ID'],
-        'redirect_uri': url_for('login_callback', _external=True),
-        'response_type': 'code',
-        'scope': ' '.join(app.config['DISCORD_SCOPES']),
-        'state': session.get('oauth2_state'),
-    })
-
     return render_template(
         'login.html',
-        login_discord_url=app.config['DISCORD_AUTHORIZE_URL'] + '?' + discord_qs
+        login_discord_url=discord.generate_authorize_url()
     )
 
 
@@ -42,7 +28,7 @@ def login_callback() -> Union[str, Response]:
     if error:
         error_description = request.args.get('error_description', 'aucune')
 
-        flash(f'Erreur lors de la connexion (code : {error} ; description : {error_description}).', 'error')
+        flash(f'Erreur lors de la connexion avec Discord (code : {error} ; description : {error_description}).', 'error')
 
         return redirect(url_for('login'))
 
@@ -50,34 +36,23 @@ def login_callback() -> Union[str, Response]:
     code = request.args.get('code')
 
     if state != session.pop('oauth2_state', None) or not code:
-        flash('Etat invalide ou code introuvable.', 'error')
+        flash('Etat invalide ou code OAuth introuvable.', 'error')
 
         return redirect(url_for('login'))
 
-    response = requests.post(app.config['DISCORD_TOKEN_URL'], data={
-        'client_id': app.config['DISCORD_CLIENT_ID'],
-        'client_secret': app.config['DISCORD_CLIENT_SECRET'],
-        'code': code,
-        'grant_type': 'authorization_code',
-        'redirect_uri': url_for('login_callback', _external=True),
-    }, headers={'Accept': 'application/json'})
+    response = discord.get_oauth_token(code)
 
     if response.status_code != 200:
-        flash('Erreur lors de la récupération du token.', 'error')
+        flash('Erreur lors de la récupération du token auprès de Discord.', 'error')
 
         return redirect(url_for('login'))
 
     token = response.json()
 
-    guild_id = app.config['DISCORD_GUILD_ID']
-
-    response = requests.get(f'https://discord.com/api/users/@me/guilds/{guild_id}/member', headers={
-        'Authorization': '{token_type} {access_token}'.format(**token),
-        'Accept': 'application/json',
-    })
+    response = discord.get_membership_info(token)
 
     if response.status_code != 200:
-        flash('Erreur lors de la récupération de tes informations.', 'error')
+        flash('Tu n\'est pas membre de notre serveur Discord.', 'error')
 
         return redirect(url_for('login'))
 
@@ -85,7 +60,7 @@ def login_callback() -> Union[str, Response]:
     user_roles =  membership_info.get('roles', [])
 
     if app.config['DISCORD_ROLE_ID'] not in user_roles:
-        flash('Tu n\'as pas accès à ce site.', 'error')
+        flash('Tu ne participe pas à notre LAN.', 'error')
 
         return redirect(url_for('login'))
 
@@ -107,6 +82,8 @@ def login_callback() -> Union[str, Response]:
     user_avatar_hash = user_info.get('avatar')
 
     if member_avatar_hash:
+        guild_id = app.config['DISCORD_GUILD_ID']
+
         user.avatar_url = f'https://cdn.discordapp.com/guilds/{guild_id}/users/{discord_id}/avatars/{member_avatar_hash}.png'
     elif user_avatar_hash:
         user.avatar_url = f'https://cdn.discordapp.com/avatars/{discord_id}/{user_avatar_hash}.png'
@@ -140,4 +117,44 @@ def home() -> str:
 @app.route('/jeux')
 @login_required
 def games() -> str:
+    # print(discord.send_message(
+    #     f'**Lan.Epoc** a proposé un nouveau jeu :',
+    #     [
+    #         {
+    #             'type': 'rich',
+    #             'title': 'RUNNING WITH RIFLES',
+    #             'color': 0xf56b3d,
+    #             'url': url_for('games', _external=True),
+    #             'image': {
+    #                 'url': 'https://cdn.cloudflare.steamstatic.com/steam/apps/270150/capsule_231x87.jpg',
+    #             }
+    #         }
+    #     ]
+    # ).text)
+
     return render_template('games.html')
+
+
+@app.route('/jeux/recherche', methods=['POST'])
+@login_required
+def games_search() -> str:
+    games = [
+        {
+            'steam_appid': 270150,
+            'name': 'RUNNING WITH RIFLES',
+        },
+        {
+            'steam_appid': 270150,
+            'name': 'RUNNING WITH RIFLES',
+        },
+        {
+            'steam_appid': 270150,
+            'name': 'RUNNING WITH RIFLES',
+        },
+        {
+            'steam_appid': 270150,
+            'name': 'RUNNING WITH RIFLES',
+        },
+    ]
+
+    return render_template('partials/games_search_results.html', games=games)

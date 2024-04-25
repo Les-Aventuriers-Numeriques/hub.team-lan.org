@@ -1,4 +1,6 @@
-from app import app
+from sqlalchemy.dialects.postgresql import insert
+from hub.models import Game
+from app import app, db
 import requests
 import click
 
@@ -11,12 +13,17 @@ def update_steam_apps() -> None:
     response = requests.get('https://api.steampowered.com/ISteamApps/GetAppList/v2/')
     response.raise_for_status()
 
-    apps = response.json()['applist']['apps']
+    games = [
+        {
+            'steam_appid': app['appid'],
+            'name': app['name'],
+        } for app in response.json()['applist']['apps'] if app['name']
+    ]
 
-    for app in apps:
-        if not app['name']:
-            continue
+    ins = insert(Game).values(games)
+    ins.on_conflict_do_nothing()
 
-        print(app['name'])
+    db.session.execute(ins)
+    db.session.commit()
 
     click.secho('Effectué', fg='green')

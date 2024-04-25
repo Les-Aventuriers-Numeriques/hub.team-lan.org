@@ -1,0 +1,34 @@
+/************************************************************************
+ * Jeux */
+
+body > main .games {
+    display: grid;
+    grid-template-columns: 420px 1fr;
+    column-gap: var(--pico-grid-column-gap);
+    row-gap: var(--pico-grid-row-gap);
+}
+
+body > main .games > article {
+    margin-bottom: 0;
+}
+
+body > main .games .results {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    column-gap: var(--pico-grid-column-gap);
+    row-gap: var(--pico-grid-row-gap);
+}
+
+body > main .games .results img {
+    border: var(--pico-border-width) solid var(--pico-muted-border-color);
+    border-radius: var(--pico-border-radius);
+}
+
+body > main .games .results > div {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    column-gap: var(--pico-grid-column-gap);
+    row-gap: var(--pico-grid-row-gap);
+}
