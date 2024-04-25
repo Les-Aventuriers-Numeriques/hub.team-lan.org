@@ -19,13 +19,15 @@
 
             <input
                 type="search"
+                class="mb-0"
                 placeholder="Tape le nom d'un jeu..."
-                hx-post="{{ url_for('games_search') }}"
+                hx-get="{{ url_for('games_search') }}"
+                hx-params="*"
                 hx-trigger="input changed delay:500ms, search"
-                hx-target="next .results"
+                hx-target="#search-results"
             >
 
-            <div class="results"></div>
+            <div id="search-results"></div>
         </article>
         <article>
             <header>Voter</header>

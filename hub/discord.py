@@ -36,7 +36,7 @@ def generate_authorize_url() -> str:
 def get_oauth_token(code: str) -> Response:
     return requests.post(
         f'{API_BASE_URL}/oauth2/token',
-        json={
+        data={
             'client_id': app.config['DISCORD_CLIENT_ID'],
             'client_secret': app.config['DISCORD_CLIENT_SECRET'],
             'code': code,

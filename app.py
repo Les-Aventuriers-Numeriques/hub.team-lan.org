@@ -38,8 +38,8 @@ app.config.update(
 
     SQLALCHEMY_DATABASE_URI=env.str('SQLALCHEMY_DATABASE_URI', default='postgresql+psycopg2://postgres:postgres@localhost/postgres'),
 
-    DISCORD_CLIENT_ID=env.int('DISCORD_OAUTH_CLIENT_ID'),
-    DISCORD_CLIENT_SECRET=env.str('DISCORD_OAUTH_CLIENT_SECRET'),
+    DISCORD_CLIENT_ID=env.int('DISCORD_CLIENT_ID'),
+    DISCORD_CLIENT_SECRET=env.str('DISCORD_CLIENT_SECRET'),
     DISCORD_GUILD_ID=env.int('DISCORD_GUILD_ID'),
     DISCORD_ROLE_ID=env.int('DISCORD_ROLE_ID'),
     DISCORD_WEBHOOK_ID=env.int('DISCORD_WEBHOOK_ID'),

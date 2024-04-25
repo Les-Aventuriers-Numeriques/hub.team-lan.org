@@ -18,6 +18,7 @@ body > main .games .results {
     justify-content: center;
     column-gap: var(--pico-grid-column-gap);
     row-gap: var(--pico-grid-row-gap);
+    margin-top: var(--pico-block-spacing-vertical);
 }
 
 body > main .games .results img {
@@ -31,4 +32,8 @@ body > main .games .results > div {
     justify-content: space-between;
     column-gap: var(--pico-grid-column-gap);
     row-gap: var(--pico-grid-row-gap);
+}
+
+body > main .games .no-results {
+    margin-top: var(--pico-block-spacing-vertical);
 }

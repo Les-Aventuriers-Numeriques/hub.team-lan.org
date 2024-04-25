@@ -1,7 +1,8 @@
 from flask import render_template, redirect, url_for, flash, session, request
 from flask_login import login_required, current_user, logout_user, login_user
+from sqlalchemy_searchable import search
+from hub.models import User, Game
 from werkzeug import Response
-from hub.models import User
 from typing import Union
 from app import app, db
 import hub.discord as discord
@@ -59,7 +60,7 @@ def login_callback() -> Union[str, Response]:
     membership_info = response.json()
     user_roles =  membership_info.get('roles', [])
 
-    if app.config['DISCORD_ROLE_ID'] not in user_roles:
+    if str(app.config['DISCORD_ROLE_ID']) not in user_roles:
         flash('Tu ne participe pas à notre LAN.', 'error')
 
         return redirect(url_for('login'))
@@ -135,26 +136,9 @@ def games() -> str:
     return render_template('games.html')
 
 
-@app.route('/jeux/recherche', methods=['POST'])
+@app.route('/jeux/recherche')
 @login_required
 def games_search() -> str:
-    games = [
-        {
-            'steam_appid': 270150,
-            'name': 'RUNNING WITH RIFLES',
-        },
-        {
-            'steam_appid': 270150,
-            'name': 'RUNNING WITH RIFLES',
-        },
-        {
-            'steam_appid': 270150,
-            'name': 'RUNNING WITH RIFLES',
-        },
-        {
-            'steam_appid': 270150,
-            'name': 'RUNNING WITH RIFLES',
-        },
-    ]
+    games = db.session.execute(search(db.select(Game), 'test')).scalars()
 
     return render_template('partials/games_search_results.html', games=games)
