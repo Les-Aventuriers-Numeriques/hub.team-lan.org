@@ -2,15 +2,15 @@ from flask import Flask, render_template, request, session
 from werkzeug.exceptions import HTTPException
 from flask_assets import Environment, Bundle
 from sqlalchemy.orm import DeclarativeBase
-from datetime import timedelta
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_migrate import Migrate
+from datetime import timedelta
 from typing import Tuple
 from environs import Env
 
 # -----------------------------------------------------------
-# App bootstrap
+# Initialisation de l'application
 
 env = Env()
 env.read_env()
@@ -18,7 +18,7 @@ env.read_env()
 app = Flask(__name__)
 
 app.config.update(
-    # Default config values that may be overwritten by environment values
+    # Valeurs de configuration par défaut qui peuvent être surchargées par des variables d'environnement
     SECRET_KEY=env.str('SECRET_KEY'),
     SERVER_NAME=env.str('SERVER_NAME', default='localhost:8080'),
     PREFERRED_URL_SCHEME=env.str('PREFERRED_URL_SCHEME', default='http'),
@@ -35,22 +35,26 @@ app.config.update(
     COMPRESS_REGISTER=env.bool('COMPRESS_REGISTER', default=False),
     COMPRESS_MIN_SIZE=env.int('COMPRESS_MIN_SIZE', 512),
 
-    SQLALCHEMY_DATABASE_URI=env.str('SQLALCHEMY_DATABASE_URI', default='postgresql+psycopg2://postgre:postgre@localhost/postgre'),
+    SQLALCHEMY_DATABASE_URI=env.str('SQLALCHEMY_DATABASE_URI', default='postgresql+psycopg2://postgres:postgres@localhost/postgres'),
 
-    # Config values that cannot be overwritten
+    DISCORD_CLIENT_ID=env.int('DISCORD_OAUTH_CLIENT_ID'),
+    DISCORD_CLIENT_SECRET=env.str('DISCORD_OAUTH_CLIENT_SECRET'),
+    DISCORD_GUILD_ID=env.str('DISCORD_GUILD_ID'),
+    DISCORD_ROLE_ID=env.str('DISCORD_ROLE_ID'),
+
+    # Valeurs de configuration qui ne peuvent pas être surchargées
+    DISCORD_SCOPES=('identify', 'guilds.members.read'),
+    DISCORD_AUTHORIZE_URL='https://discord.com/oauth2/authorize',
+    DISCORD_TOKEN_URL='https://discord.com/api/oauth2/token',
     PERMANENT_SESSION_LIFETIME=timedelta(days=365),
-    SESSION_PROTECTION='basic',
     BUNDLE_ERRORS=True,
+    USE_SESSION_FOR_NEXT=True
 )
 
 # -----------------------------------------------------------
-# Debugging-related behaviours
+# Comportements relatifs au debug
 
-if app.config['DEBUG']:
-    import logging
-
-    logging.basicConfig(level=logging.DEBUG)
-elif app.config['SENTRY_DSN']:
+if app.config['SENTRY_DSN']:
     try:
         from sentry_sdk.integrations.flask import FlaskIntegration
         import sentry_sdk
@@ -66,7 +70,7 @@ elif app.config['SENTRY_DSN']:
         pass
 
 # -----------------------------------------------------------
-# Flask extensions initialization and configuration
+# Initialisation et configuration des extensions Flask
 
 # Flask-DebugToolbar
 if app.config['DEBUG']:
@@ -113,19 +117,19 @@ import hub.models
 migrate = Migrate(app, db)
 
 # Flask-Login
-# login_manager = LoginManager(app)
-# login_manager.login_message_category = 'success'
+login_manager = LoginManager(app)
+login_manager.login_view = 'login'
+login_manager.login_message = 'Merci de te connecter afin d\'accéder à cette page, on se revoit ensuite.'
+login_manager.login_message_category = 'error'
 
 
-# @login_manager.user_loader
-# def load_user(user_id: str):
-#     from hub.models import User
-#
-#     return db.session.get(User, user_id)
+@login_manager.user_loader
+def load_user(user_id: str):
+    return db.session.get(hub.models.User, user_id)
 
 
 # -----------------------------------------------------------
-# Pre-request hooks
+# Ecouteurs pré-requête
 
 @app.before_request
 def before_request():
@@ -136,7 +140,7 @@ def before_request():
 
 
 # -----------------------------------------------------------
-# Error pages
+# Page d'erreur
 
 @app.errorhandler(HTTPException)
 def http_error_handler(e: HTTPException) -> Tuple[str, int]:
@@ -148,7 +152,7 @@ def http_error_handler(e: HTTPException) -> Tuple[str, int]:
 
 
 # -----------------------------------------------------------
-# After-bootstrap imports
+# Imports post-initialisation
 
 import hub.routes
 import hub.commands

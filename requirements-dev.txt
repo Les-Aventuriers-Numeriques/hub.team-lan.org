@@ -1,4 +1,4 @@
 -r requirements.txt
-Flask-DebugToolbar==0.14.1
+https://github.com/pallets-eco/flask-debugtoolbar/archive/0.15.0.tar.gz#egg=Flask-DebugToolbar
 python-dotenv==1.0.1
 watchdog==4.0.0

@@ -11,7 +11,9 @@ def update_steam_apps() -> None:
     response = requests.get('https://api.steampowered.com/ISteamApps/GetAppList/v2/')
     response.raise_for_status()
 
-    for app in response.json()['applist']['apps']:
+    apps = response.json()['applist']['apps']
+
+    for app in apps:
         if not app['name']:
             continue
 

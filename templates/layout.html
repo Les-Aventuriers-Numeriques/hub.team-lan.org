@@ -13,22 +13,42 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2.0.6/css/pico.orange.min.css">
     {% block cssfiles %}{% endblock %}
-
-    {% block head %}{% endblock %}
 </head>
 <body>
     <header class="container">
-        <a href="{{ url_for('home') }}"><img src="{{ url_for('static', filename='/images/logo_120.png') }}" alt="Logo de la team Les Aventuriers Numériques" width="120" height="120"></a>
         <div>
-            <a href="{{ url_for('home') }}">Hub</a>
-            <div>Les Aventuriers Numériques</div>
+            <a href="{{ url_for('home') }}">
+                <img src="{{ url_for('static', filename='images/logo_120.png') }}" alt="Logo de la team Les Aventuriers Numériques" width="120" height="120">
+            </a>
+            <div>
+                <a href="{{ url_for('home') }}">Hub</a>
+                <div>Les Aventuriers Numériques</div>
+            </div>
         </div>
+
+        {% if current_user.is_authenticated %}
+            <nav>
+                <ul>
+                    <li>{% if current_user.avatar_url %}<img src="{{ current_user.avatar_url }}?size=32" width="32" height="32"> {% endif %}<strong>{{ current_user.display_name }}</strong></li>
+                    <li><a href="{{ url_for('games') }}">Jeux</a></li>
+                    <li><a href="{{ url_for('logout') }}">Déconnexion</a></li>
+                </ul>
+            </nav>
+        {% endif %}
     </header>
 
     <main class="container">
         {% if self.title() %}
             <h1>{{ self.title() }}</h1>
         {% endif %}
+
+        {% with flash_messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in flash_messages %}
+                <p class="alert {{ category }}">
+                    {{ message }}
+                </p>
+            {% endfor %}
+        {% endwith %}
 
         {% block content %}{% endblock %}
     </main>

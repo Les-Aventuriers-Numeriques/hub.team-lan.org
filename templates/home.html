@@ -1,11 +1,11 @@
 {% extends 'layout.html' %}
 
-{% block title %}{{ title }}{% endblock %}
+{% block title %}Accueil{% endblock %}
 
 {% block cssfiles %}
     {% assets 'css_base' %}<link rel="stylesheet" href="{{ ASSET_URL }}">{% endassets %}
 {% endblock %}
 
 {% block content %}
-    <p>{{ text }}</p>
+    <p>Bienvenue sur notre intranet, utilisé pour les LAN parties que nous organisons.</p>
 {% endblock %}

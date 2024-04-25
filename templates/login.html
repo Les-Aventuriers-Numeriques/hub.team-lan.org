@@ -1,11 +1,13 @@
 {% extends 'layout.html' %}
 
-{% block title %}{{ title }}{% endblock %}
+{% block title %}Connexion{% endblock %}
 
 {% block cssfiles %}
     {% assets 'css_base' %}<link rel="stylesheet" href="{{ ASSET_URL }}">{% endassets %}
 {% endblock %}
 
 {% block content %}
-    <p>{{ text }}</p>
+    <p class="text-center">
+        <a href="{{ login_discord_url }}" role="button" class="outline">Se connecter avec Discord</a>
+    </p>
 {% endblock %}

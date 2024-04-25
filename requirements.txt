@@ -4,7 +4,6 @@ Flask-SQLAlchemy==3.1.1
 Flask-Migrate==4.0.7
 Flask-Login==0.6.3
 Flask-WTF==1.2.1
-Flask-Dance[sqla]==7.1.0
 SQLAlchemy-Searchable==2.1.0
 environs==11.0.0
 cssutils==2.10.2
