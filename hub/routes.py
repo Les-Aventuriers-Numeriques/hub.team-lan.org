@@ -75,7 +75,7 @@ def login_callback() -> Union[str, Response]:
 
     if not user:
         user = User()
-        user.discord_id = discord_id
+        user.id = discord_id
 
         new_user = True
 

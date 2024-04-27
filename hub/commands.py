@@ -15,7 +15,7 @@ def update_steam_apps() -> None:
 
     games = [
         {
-            'steam_id': app['appid'],
+            'id': app['appid'],
             'name': app['name'],
         } for app in response.json()['applist']['apps'] if app['name']
     ]
