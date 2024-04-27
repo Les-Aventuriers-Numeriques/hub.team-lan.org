@@ -1,7 +1,6 @@
 from sqlalchemy.orm import mapped_column, relationship
 from sqlalchemy_utils.types import TSVectorType
 from datetime import UTC, datetime
-from sqlalchemy import ForeignKey
 from flask_login import UserMixin
 from app import db
 
@@ -49,8 +48,12 @@ class Game(db.Model):
 class GameProposal(CreatedAtMixin, db.Model):
     __tablename__ = 'game_proposals'
 
-    discord_id = mapped_column(db.BigInteger, primary_key=True, autoincrement=False)
-    steam_id = mapped_column(db.BigInteger, primary_key=True, autoincrement=False)
+    __table_args__ = (
+        db.UniqueConstraint('discord_id', 'steam_id'),
+    )
+
+    discord_id = mapped_column(db.BigInteger, db.ForeignKey('users.discord_id'), primary_key=True, autoincrement=False)
+    steam_id = mapped_column(db.BigInteger, db.ForeignKey('games.steam_id'), primary_key=True, autoincrement=False)
 
     # game = relationship('Game')
     # proposed_by = relationship('User', back_populates='game_proposals')
@@ -62,10 +65,14 @@ class GameProposal(CreatedAtMixin, db.Model):
 class GameProposalVote(CreatedAtMixin, db.Model):
     __tablename__ = 'game_proposal_votes'
 
+    __table_args__ = (
+        db.ForeignKeyConstraint(
+            ['discord_id', 'steam_id'], ['game_proposals.discord_id', 'game_proposals.steam_id']
+        ),
+    )
+
     discord_id = mapped_column(db.BigInteger, primary_key=True, autoincrement=False)
     steam_id = mapped_column(db.BigInteger, primary_key=True, autoincrement=False)
-
-    # TODO Contrainte de clef étrangère composite sur discord_id+steam_id vers game_proposals.discord_id+game_proposals.steam_id
 
     # voted_by = relationship('User', back_populates='game_proposal_votes')
 
