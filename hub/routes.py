@@ -58,9 +58,11 @@ def login_callback() -> Union[str, Response]:
         return redirect(url_for('login'))
 
     membership_info = response.json()
-    user_roles =  membership_info.get('roles', [])
+    user_roles = membership_info.get('roles', [])
+    is_participating = str(app.config['DISCORD_PARTICIPANT_ROLE_ID']) in user_roles
+    is_admin = str(app.config['DISCORD_ADMIN_ROLE_ID']) in user_roles
 
-    if str(app.config['DISCORD_ROLE_ID']) not in user_roles:
+    if not is_participating and not is_admin:
         flash('Tu ne participe pas à notre LAN.', 'error')
 
         return redirect(url_for('login'))
@@ -88,6 +90,8 @@ def login_callback() -> Union[str, Response]:
         user.avatar_url = f'https://cdn.discordapp.com/guilds/{guild_id}/users/{discord_id}/avatars/{member_avatar_hash}.png'
     elif user_avatar_hash:
         user.avatar_url = f'https://cdn.discordapp.com/avatars/{discord_id}/{user_avatar_hash}.png'
+
+    user.is_admin = is_admin
 
     db.session.add(user)
     db.session.commit()
@@ -139,6 +143,6 @@ def games() -> str:
 @app.route('/jeux/recherche')
 @login_required
 def games_search() -> str:
-    games = db.session.execute(search(db.select(Game), 'test')).scalars()
+    games = [] # db.session.execute(search(db.select(Game), 'test')).scalars()
 
     return render_template('partials/games_search_results.html', games=games)

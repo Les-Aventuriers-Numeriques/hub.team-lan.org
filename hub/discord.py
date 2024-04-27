@@ -27,7 +27,7 @@ def generate_authorize_url() -> str:
         'redirect_uri': url_for('login_callback', _external=True),
         'response_type': 'code',
         'scope': ' '.join(SCOPES),
-        'state': session.get('oauth2_state'),
+        'state': session['oauth2_state'],
     })
 
     return 'https://discord.com/oauth2/authorize?' + discord_qs
