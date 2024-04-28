@@ -52,6 +52,7 @@ def upgrade():
     op.create_table('lan_game_proposal_votes',
     sa.Column('game_proposal_game_id', sa.BigInteger(), autoincrement=False, nullable=False),
     sa.Column('user_id', sa.BigInteger(), autoincrement=False, nullable=False),
+    sa.Column('type', sa.Enum('YES', 'NO', 'NEUTRAL', name='langameproposalvotetype'), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.ForeignKeyConstraint(['game_proposal_game_id'], ['lan_game_proposals.game_id'], ondelete='cascade'),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='cascade'),
