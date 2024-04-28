@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, flash, session, request
+from flask import render_template, redirect, url_for, flash, session, request, abort
 from flask_login import login_required, current_user, logout_user, login_user
 from sqlalchemy_searchable import search
 from hub.models import User, Game
@@ -121,7 +121,7 @@ def home() -> str:
 @app.route('/lan/jeux')
 @login_required
 def lan_games() -> Union[str, Response]:
-    if not current_user.is_lan_participant and not current_user.is_admin:
+    if not current_user.can_access_lan_section:
         flash('Désolé, tu ne fait pas partie des participants à la LAN.', 'error')
 
         return redirect(url_for('home'))
@@ -147,6 +147,9 @@ def lan_games() -> Union[str, Response]:
 @app.route('/lan/jeux/recherche', methods=['POST'])
 @login_required
 def lan_games_search() -> str:
+    if not current_user.can_access_lan_section:
+        abort(403)
+
     games = [] # db.session.execute(search(db.select(Game), 'test')).scalars()
 
     return render_template('lan/partials/games_search_results.html', games=games)
