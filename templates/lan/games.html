@@ -1,9 +1,9 @@
 {% extends 'layout.html' %}
 
-{% block title %}Jeux{% endblock %}
+{% block title %}Jeux de la LAN{% endblock %}
 
 {% block cssfiles %}
-    {% assets 'css_games' %}<link rel="stylesheet" href="{{ ASSET_URL }}">{% endassets %}
+    {% assets 'css_lan_games' %}<link rel="stylesheet" href="{{ ASSET_URL }}">{% endassets %}
 {% endblock %}
 
 {% block jsfiles %}
@@ -21,7 +21,7 @@
                 type="search"
                 class="mb-0"
                 placeholder="Tape le nom d'un jeu..."
-                hx-get="{{ url_for('games_search') }}"
+                hx-post="{{ url_for('lan_games_search') }}"
                 hx-params="*"
                 hx-trigger="input changed delay:500ms, search"
                 hx-target="#search-results"

@@ -53,17 +53,15 @@ def login_callback() -> Union[str, Response]:
     response = discord.get_membership_info(token)
 
     if response.status_code != 200:
-        flash('Tu n\'est pas membre de notre serveur Discord.', 'error')
+        flash('Tu n\'est pas présent sur notre serveur Discord.', 'error')
 
         return redirect(url_for('login'))
 
     membership_info = response.json()
     user_roles = membership_info.get('roles', [])
-    is_participating = str(app.config['DISCORD_PARTICIPANT_ROLE_ID']) in user_roles
-    is_admin = str(app.config['DISCORD_ADMIN_ROLE_ID']) in user_roles
 
-    if not is_participating and not is_admin:
-        flash('Tu ne participe pas à notre LAN.', 'error')
+    if not str(app.config['DISCORD_MEMBER_ROLE_ID']) in user_roles:
+        flash('Seuls les membres de la team peuvent accéder à notre intranet.', 'error')
 
         return redirect(url_for('login'))
 
@@ -91,7 +89,8 @@ def login_callback() -> Union[str, Response]:
     elif user_avatar_hash:
         user.avatar_url = f'https://cdn.discordapp.com/avatars/{discord_id}/{user_avatar_hash}.png'
 
-    user.is_admin = is_admin
+    user.is_lan_participant = str(app.config['DISCORD_LAN_PARTICIPANT_ROLE_ID']) in user_roles
+    user.is_admin = str(app.config['DISCORD_ADMIN_ROLE_ID']) in user_roles
 
     db.session.add(user)
     db.session.commit()
@@ -119,9 +118,14 @@ def home() -> str:
     return render_template('home.html')
 
 
-@app.route('/jeux')
+@app.route('/lan/jeux')
 @login_required
-def games() -> str:
+def lan_games() -> Union[str, Response]:
+    if not current_user.is_lan_participant and not current_user.is_admin:
+        flash('Désolé, tu ne fait pas partie des participants à la LAN.', 'error')
+
+        return redirect(url_for('home'))
+
     # print(discord.send_message(
     #     f'**Lan.Epoc** a proposé un nouveau jeu :',
     #     [
@@ -137,12 +141,12 @@ def games() -> str:
     #     ]
     # ).text)
 
-    return render_template('games.html')
+    return render_template('lan/games.html')
 
 
-@app.route('/jeux/recherche')
+@app.route('/lan/jeux/recherche', methods=['POST'])
 @login_required
-def games_search() -> str:
+def lan_games_search() -> str:
     games = [] # db.session.execute(search(db.select(Game), 'test')).scalars()
 
-    return render_template('partials/games_search_results.html', games=games)
+    return render_template('lan/partials/games_search_results.html', games=games)

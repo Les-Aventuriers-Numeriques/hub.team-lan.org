@@ -4,10 +4,10 @@ from werkzeug.exceptions import HTTPException
 from flask_assets import Environment, Bundle
 from sqlalchemy.orm import DeclarativeBase
 from flask_sqlalchemy import SQLAlchemy
+from datetime import timedelta, date
 from flask_login import LoginManager
 from flask_migrate import Migrate
-from datetime import timedelta
-from typing import Tuple
+from typing import Tuple, Dict
 from environs import Env
 
 # -----------------------------------------------------------
@@ -41,8 +41,9 @@ app.config.update(
     DISCORD_CLIENT_ID=env.int('DISCORD_CLIENT_ID'),
     DISCORD_CLIENT_SECRET=env.str('DISCORD_CLIENT_SECRET'),
     DISCORD_GUILD_ID=env.int('DISCORD_GUILD_ID'),
+    DISCORD_MEMBER_ROLE_ID=env.int('DISCORD_MEMBER_ROLE_ID'),
+    DISCORD_LAN_PARTICIPANT_ROLE_ID=env.int('DISCORD_LAN_PARTICIPANT_ROLE_ID'),
     DISCORD_ADMIN_ROLE_ID=env.int('DISCORD_ADMIN_ROLE_ID'),
-    DISCORD_PARTICIPANT_ROLE_ID=env.int('DISCORD_PARTICIPANT_ROLE_ID'),
     DISCORD_WEBHOOK_ID=env.int('DISCORD_WEBHOOK_ID'),
     DISCORD_WEBHOOK_TOKEN=env.str('DISCORD_WEBHOOK_TOKEN'),
 
@@ -103,7 +104,7 @@ assets = Environment(app)
 assets.append_path('assets')
 
 assets.register('css_base', Bundle('css/base.css', filters='cssutils', output='css/base.min.css'))
-assets.register('css_games', Bundle('css/base.css', 'css/games.css', filters='cssutils', output='css/games.min.css'))
+assets.register('css_lan_games', Bundle('css/base.css', 'css/lan_games.css', filters='cssutils', output='css/lan_games.min.css'))
 
 
 # Flask-SQLAlchemy
@@ -141,6 +142,16 @@ def before_request():
         return
 
     session.permanent = True
+
+
+# -----------------------------------------------------------
+# Pré-processeurs de contexte
+
+@app.context_processor
+def context_processor() -> Dict:
+    return {
+        'today': date.today(),
+    }
 
 
 # -----------------------------------------------------------

@@ -93,3 +93,11 @@ body > main details > summary {
 .alert.error {
     border-color: var(--pico-form-element-invalid-active-border-color);
 }
+
+/************************************************************************
+ * Pied de page */
+
+body > footer {
+    font-size: 0.7em;
+    border-top: var(--pico-border-width) solid var(--pico-muted-border-color);
+}

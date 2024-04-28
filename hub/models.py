@@ -20,10 +20,8 @@ class User(CreatedAtMixin, UpdatedAtMixin, UserMixin, db.Model):
 
     display_name = mapped_column(db.String(255), nullable=False)
     avatar_url = mapped_column(db.String(255))
+    is_lan_participant = mapped_column(db.Boolean, nullable=False, default=False)
     is_admin = mapped_column(db.Boolean, nullable=False, default=False)
-
-    game_proposals = relationship('GameProposal', back_populates='user')
-    game_proposal_votes = relationship('GameProposalVote', back_populates='user')
 
     def __repr__(self) -> str:
         return f'User:{self.id}'
@@ -35,44 +33,38 @@ class Game(db.Model):
     id = mapped_column(db.BigInteger, primary_key=True, autoincrement=False)
 
     name = mapped_column(db.String(255), nullable=False)
-
-    # search_vector = db.Column(TSVectorType('name'))
-
-    proposals = relationship('GameProposal', back_populates='game')
-    # votes = relationship('GameProposalVote', back_populates='game')
+    search_vector = db.Column(TSVectorType('name'))
 
     def __repr__(self) -> str:
         return f'Game:{self.id}'
 
 
-class GameProposal(CreatedAtMixin, db.Model):
-    __tablename__ = 'game_proposals'
+class LanGameProposal(CreatedAtMixin, db.Model):
+    __tablename__ = 'lan_game_proposals'
 
     game_id = mapped_column(db.BigInteger, db.ForeignKey('games.id', ondelete='cascade'), primary_key=True, autoincrement=False)
     user_id = mapped_column(db.BigInteger, db.ForeignKey('users.id', ondelete='cascade'), nullable=False)
 
-    votes = relationship('GameProposalVote', back_populates='proposal')
-
-    game = relationship('Game', back_populates='proposals')
-    user = relationship('User', back_populates='game_proposals')
+    votes = relationship('LanGameProposalVote', back_populates='proposal')
+    game = relationship('Game')
+    user = relationship('User')
 
     def __repr__(self) -> str:
-        return f'GameProposal:{self.game_id}'
+        return f'LanGameProposal:{self.game_id}'
 
 
-class GameProposalVote(CreatedAtMixin, db.Model):
-    __tablename__ = 'game_proposal_votes'
+class LanGameProposalVote(CreatedAtMixin, db.Model):
+    __tablename__ = 'lan_game_proposal_votes'
 
-    game_proposal_game_id = mapped_column(db.BigInteger, db.ForeignKey('game_proposals.game_id', ondelete='cascade'), primary_key=True, autoincrement=False)
+    game_proposal_game_id = mapped_column(db.BigInteger, db.ForeignKey('lan_game_proposals.game_id', ondelete='cascade'), primary_key=True, autoincrement=False)
     user_id = mapped_column(db.BigInteger, db.ForeignKey('users.id', ondelete='cascade'), primary_key=True, autoincrement=False)
 
-    proposal = relationship('GameProposal', back_populates='votes')
+    proposal = relationship('LanGameProposal', back_populates='votes')
 
-    # game = relationship('Game', back_populates='votes', foreign_keys='GameProposalVote.game_proposal_game_id')
-    user = relationship('User', back_populates='game_proposal_votes')
+    user = relationship('User')
 
     def __repr__(self) -> str:
-        return f'GameProposalVote:{self.game_proposal_game_id}+{self.user_id}'
+        return f'LanGameProposalVote:{self.game_proposal_game_id}+{self.user_id}'
 
 
 db.configure_mappers()
