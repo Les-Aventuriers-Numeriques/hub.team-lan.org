@@ -6,7 +6,7 @@
 
 body > main .games {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     column-gap: var(--pico-grid-column-gap);
     row-gap: var(--pico-grid-row-gap);
 }
@@ -21,7 +21,7 @@ body > main .games > * {
     row-gap: var(--pico-grid-row-gap);
 }
 
-body > main .games > *.already-proposed {
+body > main .games > .already-proposed img {
     filter: grayscale(100%);
 }
 

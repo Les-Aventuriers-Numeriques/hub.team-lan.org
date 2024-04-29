@@ -3,5 +3,5 @@ from flask_wtf import FlaskForm
 import wtforms.validators as validators
 
 
-class LanGamesProposeSearchForm(FlaskForm):
+class LanGamesProposalSearchForm(FlaskForm):
     terms = SearchField('Nom du jeu', [validators.DataRequired(), validators.Length(min=2)])

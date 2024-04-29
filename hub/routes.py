@@ -1,6 +1,6 @@
 from flask import render_template, redirect, url_for, flash, session, request
 from flask_login import login_required, current_user, logout_user, login_user
-from hub.forms import LanGamesProposeSearchForm
+from hub.forms import LanGamesProposalSearchForm
 from sqlalchemy_searchable import search
 from hub.models import User, Game
 from sqlalchemy import select
@@ -161,21 +161,29 @@ def lan_games() -> Union[str, Response]:
 
 @app.route('/lan/jeux/proposer')
 @login_required
-def lan_games_propose() -> Union[str, Response]:
+def lan_games_proposal() -> Union[str, Response]:
     if not current_user.can_access_lan_section:
         flash('Désolé, tu ne fait pas partie des participants à la LAN.', 'error')
 
         return redirect(url_for('home'))
 
-    form = LanGamesProposeSearchForm(request.args, meta={'csrf': False})
+    form = LanGamesProposalSearchForm(request.args, meta={'csrf': False})
 
     submitted = 'terms' in request.args
     validated = submitted and form.validate()
 
-    games = db.session.execute(search(select(Game), form.terms.data)).scalars().all() if validated else []
+    games = []
+
+    if validated:
+        games = db.session.execute(
+            search(
+                select(Game).limit(21),
+                form.terms.data
+            )
+        ).scalars().all()
 
     return render_template(
-        'lan/games_propose.html',
+        'lan/games_proposal.html',
         form=form,
         validated=validated,
         games=games

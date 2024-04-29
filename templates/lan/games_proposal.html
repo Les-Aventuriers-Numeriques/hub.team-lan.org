@@ -3,15 +3,15 @@
 {% block title %}Proposer des jeux{% endblock %}
 
 {% block cssfiles %}
-    {% assets 'css_lan_games_propose' %}<link rel="stylesheet" href="{{ ASSET_URL }}">{% endassets %}
+    {% assets 'css_lan_games_proposal' %}<link rel="stylesheet" href="{{ ASSET_URL }}">{% endassets %}
 {% endblock %}
 
 {% block content %}
     <p>Propose ici des jeux pour la LAN. Tu as accès à l'entièreté du catalogue Steam. <a href="{{ url_for('lan_games') }}">Pour voter pour des jeux, c'est par là</a>.</p>
 
-    <form method="get" action="{{ url_for('lan_games_propose') }}">
+    <form method="get" action="{{ url_for('lan_games_proposal') }}">
         <div>
-            {{ form.terms(placeholder='Tape le nom d\'un jeu...', aria_invalid='true' if form.terms.errors else '') }}
+            {{ form.terms(placeholder='Tape le nom d\'un jeu...', aria_invalid='true' if form.terms.errors else '', class='mb-0' if not validated) }}
 
             {% if form.terms.errors %}
                 <small class="mb-0">
@@ -26,8 +26,8 @@
             <div class="games">
                 {% for game in games %}
                     <div>
-                        <a href="https://store.steampowered.com/app/{{ game.steam_appid }}" target="_blank">
-                            <img src="https://cdn.cloudflare.steamstatic.com/steam/apps/{{ game.steam_appid }}/capsule_231x87.jpg" alt="Illustration {{ game.name }}" title="{{ game.name }}" width="231" height="87">
+                        <a href="https://store.steampowered.com/app/{{ game.id }}" target="_blank">
+                            <img src="https://cdn.cloudflare.steamstatic.com/steam/apps/{{ game.id }}/capsule_231x87.jpg" alt="Illustration {{ game.name }}" title="{{ game.name }}" width="231" height="87">
                         </a>
                         <button class="outline">
                             Proposer

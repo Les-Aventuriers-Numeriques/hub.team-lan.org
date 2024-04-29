@@ -6,7 +6,7 @@ import click
 
 
 @app.cli.command()
-def update_steam_games() -> None:
+def update_games() -> None:
     """Met à jour la base de données interne des jeux Steam."""
     click.echo('Mise à jour des jeux Steam...')
 
@@ -21,9 +21,8 @@ def update_steam_games() -> None:
     ]
 
     ins = insert(Game).values(games)
-    ins.on_conflict_do_nothing()
 
-    db.session.execute(ins)
+    db.session.execute(ins.on_conflict_do_nothing())
     db.session.commit()
 
     click.secho('Effectué', fg='green')
