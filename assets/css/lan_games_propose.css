@@ -21,6 +21,10 @@ body > main .games > * {
     row-gap: var(--pico-grid-row-gap);
 }
 
+body > main .games > *.already-proposed {
+    filter: grayscale(100%);
+}
+
 body > main .games img {
     border: var(--pico-border-width) solid var(--pico-muted-border-color);
     border-radius: var(--pico-border-radius);

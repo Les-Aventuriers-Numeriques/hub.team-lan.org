@@ -159,7 +159,7 @@ def lan_games() -> Union[str, Response]:
     return render_template('lan/games.html')
 
 
-@app.route('/lan/jeux/proposer', methods=['GET', 'POST'])
+@app.route('/lan/jeux/proposer')
 @login_required
 def lan_games_propose() -> Union[str, Response]:
     if not current_user.can_access_lan_section:
@@ -167,12 +167,12 @@ def lan_games_propose() -> Union[str, Response]:
 
         return redirect(url_for('home'))
 
-    form = LanGamesProposeSearchForm()
-    validated = form.validate_on_submit()
-    games = []
+    form = LanGamesProposeSearchForm(request.args, meta={'csrf': False})
 
-    if validated:
-        games = db.session.scalars(search(select(Game), form.search_terms.data))
+    submitted = 'terms' in request.args
+    validated = submitted and form.validate()
+
+    games = db.session.execute(search(select(Game), form.terms.data)).scalars().all() if validated else []
 
     return render_template(
         'lan/games_propose.html',

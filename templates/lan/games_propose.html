@@ -7,17 +7,15 @@
 {% endblock %}
 
 {% block content %}
-    <p>Propose ici des jeux pour la LAN. Tu as accès à l'entièreté du catalogue Steam. Les jeux déjà proposés n'apparaîtront pas. <a href="{{ url_for('lan_games') }}">Pour voter pour des jeux, c'est par là</a>.</p>
+    <p>Propose ici des jeux pour la LAN. Tu as accès à l'entièreté du catalogue Steam. <a href="{{ url_for('lan_games') }}">Pour voter pour des jeux, c'est par là</a>.</p>
 
-    <form method="post" action="{{ url_for('lan_games_propose') }}">
-        {{ form.csrf_token }}
-
+    <form method="get" action="{{ url_for('lan_games_propose') }}">
         <div>
-            {{ form.search_terms(placeholder='Tape le nom d\'un jeu...', aria_invalid='true' if form.search_terms.errors else '') }}
+            {{ form.terms(placeholder='Tape le nom d\'un jeu...', aria_invalid='true' if form.terms.errors else '') }}
 
-            {% if form.search_terms.errors %}
+            {% if form.terms.errors %}
                 <small class="mb-0">
-                    {{ form.search_terms.errors|join('<br>') }}
+                    {{ form.terms.errors|join('<br>') }}
                 </small>
             {% endif %}
         </div>
@@ -32,7 +30,7 @@
                             <img src="https://cdn.cloudflare.steamstatic.com/steam/apps/{{ game.steam_appid }}/capsule_231x87.jpg" alt="Illustration {{ game.name }}" title="{{ game.name }}" width="231" height="87">
                         </a>
                         <button class="outline">
-                            Proposer ce jeu
+                            Proposer
                         </button>
                     </div>
                 {% endfor %}

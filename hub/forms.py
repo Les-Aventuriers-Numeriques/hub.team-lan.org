@@ -4,4 +4,4 @@ import wtforms.validators as validators
 
 
 class LanGamesProposeSearchForm(FlaskForm):
-    search_terms = SearchField('Nom du jeu', [validators.DataRequired(), validators.Length(min=2)])
+    terms = SearchField('Nom du jeu', [validators.DataRequired(), validators.Length(min=2)])
