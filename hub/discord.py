@@ -55,11 +55,15 @@ def get_membership_info(token: Dict) -> Response:
     )
 
 
-def send_message(content: str, embeds: Optional[List] = None) -> Response:
+def send_message(content: str, embeds: Optional[List] = None, components: Optional[List] = None) -> Response:
     return requests.post(
-        '{API_BASE_URL}/webhooks/{DISCORD_WEBHOOK_ID}/{DISCORD_WEBHOOK_TOKEN}'.format(API_BASE_URL=API_BASE_URL, **app.config),
+        '{API_BASE_URL}/channels/{DISCORD_LAN_CHANNEL_ID}/messages'.format(API_BASE_URL=API_BASE_URL, **app.config),
         json={
             'content': content,
             'embeds': embeds,
+            'components': components,
+        },
+        headers={
+            'Authorization': 'Bot {DISCORD_BOT_TOKEN}'.format(**app.config),
         }
     )

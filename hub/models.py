@@ -59,6 +59,7 @@ class LanGameProposal(CreatedAtMixin, db.Model):
         return f'LanGameProposal:{self.game_id}'
 
 
+# ATTENTION : Ne jamais modifier cette liste. Il est possible d'ajouter des éléments uniquement.
 class LanGameProposalVoteType(PythonEnum):
     YES = 'YES'
     NO = 'NO'

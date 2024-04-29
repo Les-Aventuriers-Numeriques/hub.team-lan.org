@@ -3,6 +3,7 @@ from sqlalchemy_searchable import make_searchable
 from werkzeug.exceptions import HTTPException
 from flask_assets import Environment, Bundle
 from sqlalchemy.orm import DeclarativeBase
+from flask_babel import Babel, get_locale
 from flask_sqlalchemy import SQLAlchemy
 from datetime import timedelta, date
 from flask_login import LoginManager
@@ -36,16 +37,19 @@ app.config.update(
     COMPRESS_REGISTER=env.bool('COMPRESS_REGISTER', default=False),
     COMPRESS_MIN_SIZE=env.int('COMPRESS_MIN_SIZE', 512),
 
+    BABEL_DEFAULT_LOCALE=env.str('BABEL_DEFAULT_LOCALE', default='fr'),
+    BABEL_DEFAULT_TIMEZONE=env.str('BABEL_DEFAULT_TIMEZONE', default='Europe/Paris'),
+
     SQLALCHEMY_DATABASE_URI=env.str('SQLALCHEMY_DATABASE_URI', default='postgresql+psycopg2://postgres:postgres@localhost/postgres'),
 
     DISCORD_CLIENT_ID=env.int('DISCORD_CLIENT_ID'),
     DISCORD_CLIENT_SECRET=env.str('DISCORD_CLIENT_SECRET'),
+    DISCORD_BOT_TOKEN=env.str('DISCORD_BOT_TOKEN'),
     DISCORD_GUILD_ID=env.int('DISCORD_GUILD_ID'),
     DISCORD_MEMBER_ROLE_ID=env.int('DISCORD_MEMBER_ROLE_ID'),
     DISCORD_LAN_PARTICIPANT_ROLE_ID=env.int('DISCORD_LAN_PARTICIPANT_ROLE_ID'),
     DISCORD_ADMIN_ROLE_ID=env.int('DISCORD_ADMIN_ROLE_ID'),
-    DISCORD_WEBHOOK_ID=env.int('DISCORD_WEBHOOK_ID'),
-    DISCORD_WEBHOOK_TOKEN=env.str('DISCORD_WEBHOOK_TOKEN'),
+    DISCORD_LAN_CHANNEL_ID=env.int('DISCORD_LAN_CHANNEL_ID'),
 
     # Valeurs de configuration qui ne peuvent pas être surchargées
     PERMANENT_SESSION_LIFETIME=timedelta(days=365),
@@ -105,7 +109,10 @@ assets.append_path('assets')
 
 assets.register('css_base', Bundle('css/base.css', filters='cssutils', output='css/base.min.css'))
 assets.register('css_lan_games', Bundle('css/base.css', 'css/lan_games.css', filters='cssutils', output='css/lan_games.min.css'))
+assets.register('css_lan_games_propose', Bundle('css/base.css', 'css/lan_games_propose.css', filters='cssutils', output='css/lan_games_propose.min.css'))
 
+# Flask-Babel
+babel = Babel(app)
 
 # Flask-SQLAlchemy
 class AppDeclarativeBase(DeclarativeBase):
@@ -150,6 +157,7 @@ def before_request():
 @app.context_processor
 def context_processor() -> Dict:
     return {
+        'current_locale': get_locale,
         'today': date.today(),
     }
 

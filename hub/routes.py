@@ -1,5 +1,6 @@
-from flask import render_template, redirect, url_for, flash, session, request, abort
+from flask import render_template, redirect, url_for, flash, session, request
 from flask_login import login_required, current_user, logout_user, login_user
+from hub.forms import LanGamesProposeSearchForm
 from sqlalchemy_searchable import search
 from hub.models import User, Game
 from werkzeug import Response
@@ -127,16 +128,29 @@ def lan_games() -> Union[str, Response]:
         return redirect(url_for('home'))
 
     # print(discord.send_message(
-    #     f'**Lan.Epoc** a proposé un nouveau jeu :',
+    #     f'<@{current_user.id}> a proposé un nouveau jeu :',
     #     [
     #         {
     #             'type': 'rich',
     #             'title': 'RUNNING WITH RIFLES',
     #             'color': 0xf56b3d,
-    #             'url': url_for('games', _external=True),
+    #             'url': 'https://store.steampowered.com/app/270150/RUNNING_WITH_RIFLES/',
     #             'image': {
     #                 'url': 'https://cdn.cloudflare.steamstatic.com/steam/apps/270150/capsule_231x87.jpg',
     #             }
+    #         }
+    #     ],
+    #     [
+    #         {
+    #             'type': 1,
+    #             'components': [
+    #                 {
+    #                     'type': 2,
+    #                     'label': 'Voter !',
+    #                     'style': 5,
+    #                     'url': url_for('lan_games', _external=True),
+    #                 }
+    #             ]
     #         }
     #     ]
     # ).text)
@@ -144,12 +158,18 @@ def lan_games() -> Union[str, Response]:
     return render_template('lan/games.html')
 
 
-@app.route('/lan/jeux/recherche', methods=['POST'])
+@app.route('/lan/jeux/proposer', methods=['GET', 'POST'])
 @login_required
-def lan_games_search() -> str:
+def lan_games_propose() -> Union[str, Response]:
     if not current_user.can_access_lan_section:
-        abort(403)
+        flash('Désolé, tu ne fait pas partie des participants à la LAN.', 'error')
 
-    games = [] # db.session.execute(search(db.select(Game), 'test')).scalars()
+        return redirect(url_for('home'))
 
-    return render_template('lan/partials/games_search_results.html', games=games)
+    form = LanGamesProposeSearchForm()
+    validated = form.validate_on_submit()
+
+    if validated:
+        games = []  # db.session.execute(search(db.select(Game), 'kill')).scalars()
+
+    return render_template('lan/games_propose.html', form=form, validated=validated)
