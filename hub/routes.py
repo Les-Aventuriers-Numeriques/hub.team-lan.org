@@ -3,6 +3,7 @@ from flask_login import login_required, current_user, logout_user, login_user
 from hub.forms import LanGamesProposeSearchForm
 from sqlalchemy_searchable import search
 from hub.models import User, Game
+from sqlalchemy import select
 from werkzeug import Response
 from typing import Union
 from app import app, db
@@ -168,8 +169,14 @@ def lan_games_propose() -> Union[str, Response]:
 
     form = LanGamesProposeSearchForm()
     validated = form.validate_on_submit()
+    games = []
 
     if validated:
-        games = []  # db.session.execute(search(db.select(Game), 'kill')).scalars()
+        games = db.session.scalars(search(select(Game), form.search_terms.data))
 
-    return render_template('lan/games_propose.html', form=form, validated=validated)
+    return render_template(
+        'lan/games_propose.html',
+        form=form,
+        validated=validated,
+        games=games
+    )

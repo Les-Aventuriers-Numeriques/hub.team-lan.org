@@ -71,7 +71,7 @@ class LanGameProposalVote(CreatedAtMixin, db.Model):
 
     game_proposal_game_id = mapped_column(BigInteger, ForeignKey('lan_game_proposals.game_id', ondelete='cascade'), primary_key=True, autoincrement=False)
     user_id = mapped_column(BigInteger, ForeignKey('users.id', ondelete='cascade'), primary_key=True, autoincrement=False)
-    type = db.Column(Enum(LanGameProposalVoteType), nullable=False)
+    type = Column(Enum(LanGameProposalVoteType), nullable=False)
 
     proposal = relationship('LanGameProposal', back_populates='votes')
 
