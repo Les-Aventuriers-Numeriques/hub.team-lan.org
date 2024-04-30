@@ -3,9 +3,9 @@ from flask_login import login_required, current_user, logout_user, login_user
 from hub.forms import LanGamesProposalSearchForm
 from sqlalchemy_searchable import search
 from hub.models import User, Game
-from sqlalchemy import select
 from werkzeug import Response
 from typing import Union
+import sqlalchemy as sa
 from app import app, db
 import hub.discord as discord
 
@@ -177,10 +177,12 @@ def lan_games_proposal() -> Union[str, Response]:
     if validated:
         games = db.session.execute(
             search(
-                select(Game).limit(21),
+                sa.select(Game.id, Game.name).limit(21).order_by(
+                    sa.desc(sa.func.ts_rank_cd(Game.search_vector, sa.func.parse_websearch(form.terms.data), 2))
+                ),
                 form.terms.data
             )
-        ).scalars().all()
+        ).all()
 
     return render_template(
         'lan/games_proposal.html',

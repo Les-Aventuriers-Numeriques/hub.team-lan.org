@@ -1,26 +1,41 @@
-from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy.dialects import postgresql
+from os import makedirs, path
 from hub.models import Game
 from app import app, db
 import requests
 import click
+import csv
 
 
 @app.cli.command()
 def update_games() -> None:
     """Met à jour la base de données interne des jeux Steam."""
-    click.echo('Mise à jour des jeux Steam...')
+    click.echo('Téléchargement jeux Steam...')
 
-    response = requests.get('https://api.steampowered.com/ISteamApps/GetAppList/v2/')
+    games_csv = 'data/games.csv'
+
+    makedirs(path.dirname(games_csv), exist_ok=True)
+
+    response = requests.get('https://huggingface.co/datasets/FronkonGames/steam-games-dataset/resolve/main/games.csv', stream=True)
     response.raise_for_status()
 
-    games = [
-        {
-            'id': app['appid'],
-            'name': app['name'],
-        } for app in response.json()['applist']['apps'] if app['name']
-    ]
+    with open(games_csv, 'wb') as f:
+        for chunk in response.iter_content(1024):
+            f.write(chunk)
 
-    ins = insert(Game).values(games)
+    click.echo('Mise à jour des jeux Steam...')
+
+    with open(games_csv, 'r', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+
+        games = [
+            {
+                'id': game['AppID'],
+                'name': game['Name'],
+            } for game in reader
+        ]
+
+    ins = postgresql.insert(Game).values(games)
 
     db.session.execute(ins.on_conflict_do_nothing())
     db.session.commit()

@@ -14,9 +14,10 @@ Il s'agit d'une application web propulsée par [Flask](https://flask.palletsproj
 ## Installation
 
   1. Clonez ce dépôt quelque part 
-  2. Copiez `.env.example` vers `.env` et remplissez les variables requises / souhaitées. Elles peuvent également être définies dans l'environnement
-  3. `pip install -r requirements-dev.txt`. `requirements-prod.txt` est à utiliser dans un environnement de production
+  2. Copiez `.env.example` vers `.env` et remplissez les variables requises / souhaitées. Voir ci-dessous pour les détails (elles peuvent également être définies dans l'environnement)
+  3. `pip install -r requirements-dev.txt` (`requirements-prod.txt` est à utiliser dans un environnement de production)
   4. `flask db upgrade`
+  5. `flask update-games`
 
 ## Configuration
 
