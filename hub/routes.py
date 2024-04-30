@@ -1,14 +1,16 @@
+from hub.models import User, Game, LanGameProposal, LanGameProposalVote, LanGameProposalVoteType
 from flask import render_template, redirect, url_for, flash, session, request
 from flask_login import login_required, current_user, logout_user, login_user
-from hub.models import User, Game, LanGameProposal
 from hub.forms import LanGamesProposalSearchForm
 from sqlalchemy.exc import IntegrityError
+from werkzeug.exceptions import NotFound
 from sqlalchemy_searchable import search
-from typing import Union, Optional
 from werkzeug import Response
-import sqlalchemy as sa
+from typing import Union
 from app import app, db
+import sqlalchemy.orm as sa_orm
 import hub.discord as discord
+import sqlalchemy as sa
 
 
 @app.route('/connexion')
@@ -129,19 +131,115 @@ def lan_games() -> Union[str, Response]:
 
         return redirect(url_for('home'))
 
-    return render_template('lan/games.html')
+    proposals = db.session.execute(
+        sa.select(LanGameProposal)
+        .options(
+            sa_orm.selectinload(LanGameProposal.game),
+            sa_orm.selectinload(LanGameProposal.user),
+            sa_orm.selectinload(LanGameProposal.votes)
+        )
+    ).scalars().all()
+
+    return render_template('lan/games.html', proposals=proposals)
 
 
-@app.route('/lan/jeux/proposer')
-@app.route('/lan/jeux/proposer/<int:game_id>')
+@app.route('/lan/jeux/annuler-vote/<int:game_id>')
 @login_required
-def lan_games_proposal(game_id: Optional[int] = None) -> Union[str, Response]:
+def lan_games_proposal_cancel_vote(game_id: int) -> Response:
     if not current_user.can_access_lan_section:
         flash('Désolé, tu ne fait pas partie des participants à la LAN.', 'error')
 
         return redirect(url_for('home'))
 
-    if game_id:  # Proposition d'un jeu
+    result = db.session.execute(
+        sa.delete(LanGameProposalVote)
+        .where(
+            LanGameProposalVote.game_proposal_game_id == game_id,
+            LanGameProposalVote.user_id == current_user.id
+        )
+    )
+
+    db.session.commit()
+
+    if result.rowcount == 1:
+        flash('Ton vote a été annulé.', 'success')
+    else:
+        flash('Aucun vote à annuler.', 'error')
+
+    return redirect(url_for('lan_games'))
+
+
+@app.route('/lan/jeux/voter/<int:game_id>/<any({}):vote_type>'.format(','.join(LanGameProposalVoteType.values())))
+@login_required
+def lan_games_proposal_vote(game_id: int, vote_type: str) -> Response:
+    if not current_user.can_access_lan_section:
+        flash('Désolé, tu ne fait pas partie des participants à la LAN.', 'error')
+
+        return redirect(url_for('home'))
+
+    try:
+        vote = LanGameProposalVote()
+        vote.game_proposal_game_id = game_id
+        vote.user_id = current_user.id
+        vote.type = LanGameProposalVoteType(vote_type)
+
+        db.session.add(vote)
+        db.session.commit()
+
+        flash('A voté !', 'success')
+    except IntegrityError:
+        flash('Tu as déjà voté pour ce jeu ou identifiant de jeu invalide.', 'error')
+
+    return redirect(url_for('lan_games'))
+
+
+@app.route('/lan/jeux/proposer')
+@login_required
+def lan_games_proposal() -> Union[str, Response]:
+    if not current_user.can_access_lan_section:
+        flash('Désolé, tu ne fait pas partie des participants à la LAN.', 'error')
+
+        return redirect(url_for('home'))
+
+    form = LanGamesProposalSearchForm(request.args, meta={'csrf': False})
+    validated = len(request.args) > 0 and form.validate()
+
+    games = []
+
+    if validated:
+        games = db.session.execute(
+            search(
+                sa.select(Game)
+                .options(
+                    sa_orm.selectinload(Game.proposal)
+                )
+                .limit(20)
+                .order_by(
+                    sa.desc(
+                        sa.func.ts_rank_cd(Game.search_vector, sa.func.parse_websearch(form.terms.data), 2)
+                    )
+                ),
+                form.terms.data
+            )
+        ).scalars().all()
+
+    return render_template(
+        'lan/games_proposal.html',
+        form=form,
+        validated=validated,
+        games=games
+    )
+
+
+@app.route('/lan/jeux/proposer/<int:game_id>')
+@login_required
+def lan_games_proposal_submit(game_id: int) -> Response:
+    if not current_user.can_access_lan_section:
+        flash('Désolé, tu ne fait pas partie des participants à la LAN.', 'error')
+
+        return redirect(url_for('home'))
+
+    try:
         game = db.get_or_404(Game, game_id)
 
         proposal = LanGameProposal()
@@ -149,67 +247,40 @@ def lan_games_proposal(game_id: Optional[int] = None) -> Union[str, Response]:
         proposal.user_id = current_user.id
 
         db.session.add(proposal)
+        db.session.commit()
 
-        try:
-            db.session.commit()
-
-            discord.send_message(
-                f'<@{current_user.id}> a proposé un nouveau jeu :',
-                [
-                    {
-                        'type': 'rich',
-                        'title': game.name,
-                        'color': 0xf56b3d,
-                        'url': f'https://store.steampowered.com/app/{game.id}',
-                        'image': {
-                            'url': f'https://cdn.cloudflare.steamstatic.com/steam/apps/{game.id}/capsule_231x87.jpg',
+        discord.send_message(
+            f'**{current_user.display_name}** a proposé un nouveau jeu :',
+            [
+                {
+                    'type': 'rich',
+                    'title': game.name,
+                    'color': 0xf56b3d,
+                    'url': f'https://store.steampowered.com/app/{game.id}',
+                    'image': {
+                        'url': f'https://cdn.cloudflare.steamstatic.com/steam/apps/{game.id}/capsule_231x87.jpg',
+                    }
+                }
+            ],
+            [
+                {
+                    'type': 1,
+                    'components': [
+                        {
+                            'type': 2,
+                            'label': 'Voter !',
+                            'style': 5,
+                            'url': url_for('lan_games', _external=True),
                         }
-                    }
-                ],
-                [
-                    {
-                        'type': 1,
-                        'components': [
-                            {
-                                'type': 2,
-                                'label': 'Voter !',
-                                'style': 5,
-                                'url': url_for('lan_games', _external=True),
-                            }
-                        ]
-                    }
-                ]
-            )
-
-            flash(f'Ta proposition ({game.name}) a bien été enregistrée !', 'success')
-        except IntegrityError:
-            flash(f'Ce jeu ({game.name}) a déjà été proposé.', 'error')
-
-        return redirect(url_for('lan_games_proposal', **request.args))
-    else:  # Recherche d'un jeu
-        form = LanGamesProposalSearchForm(request.args, meta={'csrf': False})
-        validated = len(request.args) > 0 and form.validate()
-
-        games = []
-
-        if validated:
-            games = db.session.execute(
-                search(
-                    sa.select(Game.id, Game.name, LanGameProposal.user_id.is_not(None).label('is_already_proposed'))
-                    .outerjoin(Game.proposals)
-                    .limit(21)
-                    .order_by(
-                        sa.desc(
-                            sa.func.ts_rank_cd(Game.search_vector, sa.func.parse_websearch(form.terms.data), 2)
-                        )
-                    ),
-                    form.terms.data
-                )
-            ).all()
-
-        return render_template(
-            'lan/games_proposal.html',
-            form=form,
-            validated=validated,
-            games=games
+                    ]
+                }
+            ]
         )
+
+        flash('Ta proposition a bien été enregistrée !', 'success')
+    except IntegrityError:
+        flash('Ce jeu a déjà été proposé.', 'error')
+    except NotFound:
+        flash('Identifiant de jeu invalide.', 'error')
+
+    return redirect(url_for('lan_games_proposal', **request.args))

@@ -25,24 +25,24 @@
         {% if games %}
             <div class="games">
                 {% for game in games %}
-                    <div class="{{ 'already-proposed' if game.is_already_proposed }}">
-                        <a href="https://store.steampowered.com/app/{{ game.id }}" target="_blank" data-tooltip="{{ game.name }}">
+                    <article class="{{ 'already-proposed' if game.proposal }}">
+                        <a href="https://store.steampowered.com/app/{{ game.id }}" target="_blank" data-tooltip="{{ game.name }}{{ ' [déjà proposé]' if game.proposal }}">
                             <img src="https://cdn.cloudflare.steamstatic.com/steam/apps/{{ game.id }}/capsule_231x87.jpg" alt="Illustration {{ game.name }}" width="231" height="87">
                         </a>
-                        {% if game.is_already_proposed %}
-                            <button class="outline" disabled>
-                                Proposer
-                            </button>
-                        {% else %}
-                            <a href="{{ url_for('lan_games_proposal', game_id=game.id, **request.args) }}" role="button" class="outline">
-                                Proposer
+
+                        {% if not game.proposal %}
+                            <a href="{{ url_for('lan_games_proposal_submit', game_id=game.id, **request.args) }}">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bag-plus" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M8 7.5a.5.5 0 0 1 .5.5v1.5H10a.5.5 0 0 1 0 1H8.5V12a.5.5 0 0 1-1 0v-1.5H6a.5.5 0 0 1 0-1h1.5V8a.5.5 0 0 1 .5-.5"/>
+                                    <path d="M8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1m3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4zM2 5h12v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1z"/>
+                                </svg>
                             </a>
                         {% endif %}
-                    </div>
+                    </article>
                 {% endfor %}
             </div>
         {% else %}
-            <div class="alert error">Aucun résultat.</div>
+            <div><strong>Aucun résultat.</strong></div>
         {% endif %}
     {% endif %}
 {% endblock %}

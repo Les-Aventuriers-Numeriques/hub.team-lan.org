@@ -12,20 +12,21 @@ def update_games() -> None:
     """Met à jour la base de données interne des jeux Steam."""
     click.echo('Téléchargement jeux Steam...')
 
-    games_csv = 'data/games.csv'
+    local_csv = 'data/games.csv'
+    remote_csv = 'https://huggingface.co/datasets/FronkonGames/steam-games-dataset/resolve/main/games.csv'
 
-    makedirs(path.dirname(games_csv), exist_ok=True)
+    makedirs(path.dirname(local_csv), exist_ok=True)
 
-    response = requests.get('https://huggingface.co/datasets/FronkonGames/steam-games-dataset/resolve/main/games.csv', stream=True)
-    response.raise_for_status()
+    with requests.get(remote_csv, stream=True) as response:
+        response.raise_for_status()
 
-    with open(games_csv, 'wb') as f:
-        for chunk in response.iter_content(1024):
-            f.write(chunk)
+        with open(local_csv, 'wb') as f:
+            for chunk in response.iter_content(1024):
+                f.write(chunk)
 
     click.echo('Mise à jour des jeux Steam...')
 
-    with open(games_csv, 'r', encoding='utf-8') as f:
+    with open(local_csv, 'r', encoding='utf-8') as f:
         reader = csv.DictReader(f)
 
         games = [

@@ -1,34 +1,13 @@
 /************************************************************************
- * Jeux de la LAN */
+ * Proposition de jeux pour la LAN */
 
 /************************************************************************
  * Liste des jeux */
 
-body > main .games {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    column-gap: var(--pico-grid-column-gap);
-    row-gap: var(--pico-grid-row-gap);
-}
-
 body > main .games > * {
-    justify-self: center;
-    min-width: 0;
-    display: flex;
     flex-direction: row;
-    column-gap: var(--pico-grid-column-gap);
-    row-gap: var(--pico-grid-row-gap);
-}
-
-body > main .games > * > * {
-    align-self: center;
 }
 
 body > main .games > .already-proposed img {
     filter: grayscale(100%);
-}
-
-body > main .games img {
-    border: var(--pico-border-width) solid var(--pico-muted-border-color);
-    border-radius: var(--pico-border-radius);
 }

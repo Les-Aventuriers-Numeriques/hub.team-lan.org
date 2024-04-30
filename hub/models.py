@@ -3,6 +3,7 @@ from sqlalchemy_utils.types import TSVectorType
 from enum import Enum as PythonEnum
 from datetime import UTC, datetime
 from flask_login import UserMixin
+from typing import List
 import sqlalchemy as sa
 from app import db
 
@@ -41,7 +42,7 @@ class Game(db.Model):
     name = mapped_column(sa.String(255), nullable=False)
     search_vector = sa.Column(TSVectorType('name'))
 
-    proposals = relationship('LanGameProposal', back_populates='game')
+    proposal = relationship('LanGameProposal', back_populates='game')
 
     def __repr__(self) -> str:
         return f'Game:{self.id}'
@@ -54,7 +55,7 @@ class LanGameProposal(CreatedAtMixin, db.Model):
     user_id = mapped_column(sa.BigInteger, sa.ForeignKey('users.id', ondelete='cascade'), nullable=False)
 
     votes = relationship('LanGameProposalVote', back_populates='proposal')
-    game = relationship('Game', back_populates='proposals')
+    game = relationship('Game', back_populates='proposal')
     user = relationship('User')
 
     def __repr__(self) -> str:
@@ -66,6 +67,10 @@ class LanGameProposalVoteType(PythonEnum):
     YES = 'YES'
     NO = 'NO'
     NEUTRAL = 'NEUTRAL'
+
+    @classmethod
+    def values(cls) -> List:
+        return list(map(lambda c: c.value, cls))
 
 
 class LanGameProposalVote(CreatedAtMixin, db.Model):
