@@ -25,13 +25,19 @@
         {% if games %}
             <div class="games">
                 {% for game in games %}
-                    <div>
+                    <div class="{{ 'already-proposed' if game.is_already_proposed }}">
                         <a href="https://store.steampowered.com/app/{{ game.id }}" target="_blank" data-tooltip="{{ game.name }}">
                             <img src="https://cdn.cloudflare.steamstatic.com/steam/apps/{{ game.id }}/capsule_231x87.jpg" alt="Illustration {{ game.name }}" width="231" height="87">
                         </a>
-                        <button class="outline">
-                            Proposer
-                        </button>
+                        {% if game.is_already_proposed %}
+                            <button class="outline" disabled>
+                                Proposer
+                            </button>
+                        {% else %}
+                            <a href="{{ url_for('lan_games_proposal', game_id=game.id, **request.args) }}" role="button" class="outline">
+                                Proposer
+                            </a>
+                        {% endif %}
                     </div>
                 {% endfor %}
             </div>

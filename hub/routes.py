@@ -1,10 +1,11 @@
 from flask import render_template, redirect, url_for, flash, session, request
 from flask_login import login_required, current_user, logout_user, login_user
+from hub.models import User, Game, LanGameProposal
 from hub.forms import LanGamesProposalSearchForm
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy_searchable import search
-from hub.models import User, Game
+from typing import Union, Optional
 from werkzeug import Response
-from typing import Union
 import sqlalchemy as sa
 from app import app, db
 import hub.discord as discord
@@ -160,33 +161,53 @@ def lan_games() -> Union[str, Response]:
 
 
 @app.route('/lan/jeux/proposer')
+@app.route('/lan/jeux/proposer/<int:game_id>')
 @login_required
-def lan_games_proposal() -> Union[str, Response]:
+def lan_games_proposal(game_id: Optional[int] = None) -> Union[str, Response]:
     if not current_user.can_access_lan_section:
         flash('Désolé, tu ne fait pas partie des participants à la LAN.', 'error')
 
         return redirect(url_for('home'))
 
-    form = LanGamesProposalSearchForm(request.args, meta={'csrf': False})
+    if game_id:  # Proposition d'un jeu
+        proposal = LanGameProposal()
+        proposal.game_id = game_id
+        proposal.user_id = current_user.id
 
-    submitted = 'terms' in request.args
-    validated = submitted and form.validate()
+        db.session.add(proposal)
 
-    games = []
+        try:
+            db.session.commit()
 
-    if validated:
-        games = db.session.execute(
-            search(
-                sa.select(Game.id, Game.name).limit(21).order_by(
-                    sa.desc(sa.func.ts_rank_cd(Game.search_vector, sa.func.parse_websearch(form.terms.data), 2))
-                ),
-                form.terms.data
-            )
-        ).all()
+            flash('Ta proposition a bien été enregistrée !', 'success')
+        except IntegrityError:
+            flash('Ce jeu a déjà été proposé.', 'error')
 
-    return render_template(
-        'lan/games_proposal.html',
-        form=form,
-        validated=validated,
-        games=games
-    )
+        return redirect(url_for('lan_games_proposal', **request.args))
+    else:  # Recherche d'un jeu
+        form = LanGamesProposalSearchForm(request.args, meta={'csrf': False})
+        validated = len(request.args) > 0 and form.validate()
+
+        games = []
+
+        if validated:
+            games = db.session.execute(
+                search(
+                    sa.select(Game.id, Game.name, LanGameProposal.user_id.is_not(None).label('is_already_proposed'))
+                    .outerjoin(Game.proposals)
+                    .limit(21)
+                    .order_by(
+                        sa.desc(
+                            sa.func.ts_rank_cd(Game.search_vector, sa.func.parse_websearch(form.terms.data), 2)
+                        )
+                    ),
+                    form.terms.data
+                )
+            ).all()
+
+        return render_template(
+            'lan/games_proposal.html',
+            form=form,
+            validated=validated,
+            games=games
+        )

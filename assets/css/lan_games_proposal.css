@@ -16,9 +16,12 @@ body > main .games > * {
     min-width: 0;
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
     column-gap: var(--pico-grid-column-gap);
     row-gap: var(--pico-grid-row-gap);
+}
+
+body > main .games > * > * {
+    align-self: center;
 }
 
 body > main .games > .already-proposed img {
