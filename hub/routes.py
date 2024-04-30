@@ -129,34 +129,6 @@ def lan_games() -> Union[str, Response]:
 
         return redirect(url_for('home'))
 
-    # print(discord.send_message(
-    #     f'<@{current_user.id}> a proposé un nouveau jeu :',
-    #     [
-    #         {
-    #             'type': 'rich',
-    #             'title': 'RUNNING WITH RIFLES',
-    #             'color': 0xf56b3d,
-    #             'url': 'https://store.steampowered.com/app/270150/RUNNING_WITH_RIFLES/',
-    #             'image': {
-    #                 'url': 'https://cdn.cloudflare.steamstatic.com/steam/apps/270150/capsule_231x87.jpg',
-    #             }
-    #         }
-    #     ],
-    #     [
-    #         {
-    #             'type': 1,
-    #             'components': [
-    #                 {
-    #                     'type': 2,
-    #                     'label': 'Voter !',
-    #                     'style': 5,
-    #                     'url': url_for('lan_games', _external=True),
-    #                 }
-    #             ]
-    #         }
-    #     ]
-    # ).text)
-
     return render_template('lan/games.html')
 
 
@@ -170,6 +142,8 @@ def lan_games_proposal(game_id: Optional[int] = None) -> Union[str, Response]:
         return redirect(url_for('home'))
 
     if game_id:  # Proposition d'un jeu
+        game = db.get_or_404(Game, game_id)
+
         proposal = LanGameProposal()
         proposal.game_id = game_id
         proposal.user_id = current_user.id
@@ -179,9 +153,37 @@ def lan_games_proposal(game_id: Optional[int] = None) -> Union[str, Response]:
         try:
             db.session.commit()
 
-            flash('Ta proposition a bien été enregistrée !', 'success')
+            discord.send_message(
+                f'<@{current_user.id}> a proposé un nouveau jeu :',
+                [
+                    {
+                        'type': 'rich',
+                        'title': game.name,
+                        'color': 0xf56b3d,
+                        'url': f'https://store.steampowered.com/app/{game.id}',
+                        'image': {
+                            'url': f'https://cdn.cloudflare.steamstatic.com/steam/apps/{game.id}/capsule_231x87.jpg',
+                        }
+                    }
+                ],
+                [
+                    {
+                        'type': 1,
+                        'components': [
+                            {
+                                'type': 2,
+                                'label': 'Voter !',
+                                'style': 5,
+                                'url': url_for('lan_games', _external=True),
+                            }
+                        ]
+                    }
+                ]
+            )
+
+            flash(f'Ta proposition ({game.name}) a bien été enregistrée !', 'success')
         except IntegrityError:
-            flash('Ce jeu a déjà été proposé.', 'error')
+            flash(f'Ce jeu ({game.name}) a déjà été proposé.', 'error')
 
         return redirect(url_for('lan_games_proposal', **request.args))
     else:  # Recherche d'un jeu
