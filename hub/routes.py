@@ -211,7 +211,7 @@ def lan_games_proposal() -> Union[str, Response]:
             search(
                 sa.select(Game)
                 .options(
-                    sa_orm.selectinload(Game.proposal)
+                    sa_orm.selectinload(Game.proposal).selectinload(LanGameProposal.user)
                 )
                 .limit(20)
                 .order_by(

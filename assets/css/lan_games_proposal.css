@@ -7,7 +7,3 @@
 body > main .games > * {
     flex-direction: row;
 }
-
-body > main .games > .already-proposed img {
-    filter: grayscale(100%);
-}

@@ -25,8 +25,8 @@
         {% if games %}
             <div class="games">
                 {% for game in games %}
-                    <article class="{{ 'already-proposed' if game.proposal }}">
-                        <a href="https://store.steampowered.com/app/{{ game.id }}" target="_blank" data-tooltip="{{ game.name }}{{ ' [déjà proposé]' if game.proposal }}">
+                    <article>
+                        <a href="https://store.steampowered.com/app/{{ game.id }}" target="_blank" data-tooltip="{{ game.name }}{% if game.proposal %} [déjà proposé par {{ game.proposal.user.display_name }}]{% endif %}">
                             <img src="https://cdn.cloudflare.steamstatic.com/steam/apps/{{ game.id }}/capsule_231x87.jpg" alt="Illustration {{ game.name }}" width="231" height="87">
                         </a>
 

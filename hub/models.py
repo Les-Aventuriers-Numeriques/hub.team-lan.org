@@ -42,7 +42,7 @@ class Game(db.Model):
     name = mapped_column(sa.String(255), nullable=False)
     search_vector = sa.Column(TSVectorType('name'))
 
-    proposal = relationship('LanGameProposal', back_populates='game')
+    proposal = relationship('LanGameProposal', uselist=False, back_populates='game')
 
     def __repr__(self) -> str:
         return f'Game:{self.id}'
@@ -55,8 +55,8 @@ class LanGameProposal(CreatedAtMixin, db.Model):
     user_id = mapped_column(sa.BigInteger, sa.ForeignKey('users.id', ondelete='cascade'), nullable=False)
 
     votes = relationship('LanGameProposalVote', back_populates='proposal')
-    game = relationship('Game', back_populates='proposal')
-    user = relationship('User')
+    game = relationship('Game', uselist=False, back_populates='proposal')
+    user = relationship('User', uselist=False)
 
     def __repr__(self) -> str:
         return f'LanGameProposal:{self.game_id}'
@@ -80,9 +80,9 @@ class LanGameProposalVote(CreatedAtMixin, db.Model):
     user_id = mapped_column(sa.BigInteger, sa.ForeignKey('users.id', ondelete='cascade'), primary_key=True, autoincrement=False)
     type = sa.Column(sa.Enum(LanGameProposalVoteType), nullable=False)
 
-    proposal = relationship('LanGameProposal', back_populates='votes')
+    proposal = relationship('LanGameProposal', uselist=False, back_populates='votes')
 
-    user = relationship('User')
+    user = relationship('User', uselist=False)
 
     def __repr__(self) -> str:
         return f'LanGameProposalVote:{self.game_proposal_game_id}+{self.user_id}'
