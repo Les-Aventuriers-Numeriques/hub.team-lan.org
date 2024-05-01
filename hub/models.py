@@ -23,8 +23,9 @@ class User(CreatedAtMixin, UpdatedAtMixin, UserMixin, db.Model):
 
     display_name = mapped_column(sa.String(255), nullable=False)
     avatar_url = mapped_column(sa.String(255))
-    is_lan_participant = mapped_column(sa.Boolean, nullable=False, default=False)
-    is_admin = mapped_column(sa.Boolean, nullable=False, default=False)
+    is_member = mapped_column(sa.Boolean, nullable=False, default=False, server_default=sa.text('false'))
+    is_lan_participant = mapped_column(sa.Boolean, nullable=False, default=sa.text('false'))
+    is_admin = mapped_column(sa.Boolean, nullable=False, default=sa.text('false'))
 
     @property
     def can_access_lan_section(self) -> bool:

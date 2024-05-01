@@ -10,7 +10,7 @@ import csv
 @app.cli.command()
 def update_games() -> None:
     """Met à jour la base de données interne des jeux Steam."""
-    click.echo('Téléchargement jeux Steam...')
+    click.echo('Téléchargement de la liste des jeux Steam...')
 
     local_csv = 'data/games.csv'
     remote_csv = 'https://huggingface.co/datasets/FronkonGames/steam-games-dataset/resolve/main/games.csv'

@@ -37,8 +37,9 @@ def upgrade():
     sa.Column('id', sa.BigInteger(), autoincrement=False, nullable=False),
     sa.Column('display_name', sa.String(length=255), nullable=False),
     sa.Column('avatar_url', sa.String(length=255), nullable=True),
-    sa.Column('is_lan_participant', sa.Boolean(), nullable=False),
-    sa.Column('is_admin', sa.Boolean(), nullable=False),
+    sa.Column('is_member', sa.Boolean(), server_default=sa.text('false'), nullable=False),
+    sa.Column('is_lan_participant', sa.Boolean(), server_default=sa.text('false'), nullable=False),
+    sa.Column('is_admin', sa.Boolean(), server_default=sa.text('false'), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
     sa.PrimaryKeyConstraint('id')

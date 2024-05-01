@@ -63,13 +63,6 @@ def login_callback() -> Union[str, Response]:
         return redirect(url_for('login'))
 
     membership_info = response.json()
-    user_roles = membership_info.get('roles', [])
-
-    if not str(app.config['DISCORD_MEMBER_ROLE_ID']) in user_roles:
-        flash('Seuls les membres de la team peuvent accéder à notre intranet.', 'error')
-
-        return redirect(url_for('login'))
-
     user_info = membership_info.get('user', {})
     discord_id = user_info.get('id')
 
@@ -94,6 +87,9 @@ def login_callback() -> Union[str, Response]:
     elif user_avatar_hash:
         user.avatar_url = f'https://cdn.discordapp.com/avatars/{discord_id}/{user_avatar_hash}.png'
 
+    user_roles = membership_info.get('roles', [])
+
+    user.is_member = str(app.config['DISCORD_MEMBER_ROLE_ID']) in user_roles
     user.is_lan_participant = str(app.config['DISCORD_LAN_PARTICIPANT_ROLE_ID']) in user_roles
     user.is_admin = str(app.config['DISCORD_ADMIN_ROLE_ID']) in user_roles
 
@@ -164,7 +160,7 @@ def lan_games_proposal_cancel_vote(game_id: int) -> Response:
     if result.rowcount == 1:
         flash('Ton vote a été annulé.', 'success')
     else:
-        flash('Aucun vote à annuler.', 'error')
+        flash('Aucun vote à annuler, arrête ça.', 'error')
 
     return redirect(url_for('lan_games'))
 
@@ -188,7 +184,7 @@ def lan_games_proposal_vote(game_id: int, vote_type: str) -> Response:
 
         flash('A voté !', 'success')
     except IntegrityError:
-        flash('Tu as déjà voté pour ce jeu ou identifiant de jeu invalide.', 'error')
+        flash('Tu as déjà voté pour ce jeu petit coquin (ou l\'identifiant de jeu est invalide).', 'error')
 
     return redirect(url_for('lan_games'))
 
@@ -279,7 +275,7 @@ def lan_games_proposal_submit(game_id: int) -> Response:
 
         flash('Ta proposition a bien été enregistrée !', 'success')
     except IntegrityError:
-        flash('Ce jeu a déjà été proposé.', 'error')
+        flash('Ce jeu a déjà été proposé, petit polisson.', 'error')
     except NotFound:
         flash('Identifiant de jeu invalide.', 'error')
 
