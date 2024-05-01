@@ -63,7 +63,19 @@ def login_callback() -> Union[str, Response]:
         return redirect(url_for('login'))
 
     membership_info = response.json()
+    user_roles = membership_info.get('roles', [])
+
+    is_member = str(app.config['DISCORD_MEMBER_ROLE_ID']) in user_roles
+    is_lan_participant = str(app.config['DISCORD_LAN_PARTICIPANT_ROLE_ID']) in user_roles
+    is_admin = str(app.config['DISCORD_ADMIN_ROLE_ID']) in user_roles
+
+    if not is_member and not is_lan_participant and not is_admin:
+        flash('Tu n\'as pas l\'autorisation d\'accéder à notre intranet.', 'error')
+
+        return redirect(url_for('login'))
+
     user_info = membership_info.get('user', {})
+
     discord_id = user_info.get('id')
 
     user = db.session.get(User, discord_id)
@@ -87,11 +99,9 @@ def login_callback() -> Union[str, Response]:
     elif user_avatar_hash:
         user.avatar_url = f'https://cdn.discordapp.com/avatars/{discord_id}/{user_avatar_hash}.png'
 
-    user_roles = membership_info.get('roles', [])
-
-    user.is_member = str(app.config['DISCORD_MEMBER_ROLE_ID']) in user_roles
-    user.is_lan_participant = str(app.config['DISCORD_LAN_PARTICIPANT_ROLE_ID']) in user_roles
-    user.is_admin = str(app.config['DISCORD_ADMIN_ROLE_ID']) in user_roles
+    user.is_member = is_member
+    user.is_lan_participant = is_lan_participant
+    user.is_admin = is_admin
 
     db.session.add(user)
     db.session.commit()
