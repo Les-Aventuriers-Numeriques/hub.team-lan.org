@@ -6,6 +6,7 @@ from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import NotFound
 from sqlalchemy_searchable import search
 from werkzeug import Response
+from functools import wraps
 from typing import Union
 from app import app, db
 import sqlalchemy.orm as sa_orm
@@ -13,11 +14,33 @@ import hub.discord as discord
 import sqlalchemy as sa
 
 
-@app.route('/connexion')
-def login() -> Union[str, Response]:
-    if current_user.is_authenticated:
-        return redirect(url_for('home'))
+def to_home_if_authenticated(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if current_user.is_authenticated:
+            return redirect(url_for('home'))
 
+        return f(*args, **kwargs)
+
+    return decorated
+
+
+def to_home_if_cannot_access_lan_section(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if not current_user.is_lan_participant or not current_user.is_admin:
+            flash('Désolé, tu ne fais pas partie des participants à la LAN.', 'error')
+
+            return redirect(url_for('home'))
+
+        return f(*args, **kwargs)
+
+    return decorated
+
+
+@app.route('/connexion')
+@to_home_if_authenticated
+def login() -> Union[str, Response]:
     return render_template(
         'login.html',
         login_discord_url=discord.generate_authorize_url()
@@ -25,10 +48,8 @@ def login() -> Union[str, Response]:
 
 
 @app.route('/connexion/callback')
+@to_home_if_authenticated
 def login_callback() -> Union[str, Response]:
-    if current_user.is_authenticated:
-        return redirect(url_for('home'))
-
     error = request.args.get('error')
 
     if error:
@@ -131,12 +152,8 @@ def home() -> str:
 
 @app.route('/lan/jeux')
 @login_required
+@to_home_if_cannot_access_lan_section
 def lan_games() -> Union[str, Response]:
-    if not current_user.can_access_lan_section:
-        flash('Désolé, tu ne fait pas partie des participants à la LAN.', 'error')
-
-        return redirect(url_for('home'))
-
     proposals = db.session.execute(
         sa.select(LanGameProposal)
         .options(
@@ -151,12 +168,8 @@ def lan_games() -> Union[str, Response]:
 
 @app.route('/lan/jeux/annuler-vote/<int:game_id>')
 @login_required
+@to_home_if_cannot_access_lan_section
 def lan_games_proposal_cancel_vote(game_id: int) -> Response:
-    if not current_user.can_access_lan_section:
-        flash('Désolé, tu ne fait pas partie des participants à la LAN.', 'error')
-
-        return redirect(url_for('home'))
-
     result = db.session.execute(
         sa.delete(LanGameProposalVote)
         .where(
@@ -177,12 +190,8 @@ def lan_games_proposal_cancel_vote(game_id: int) -> Response:
 
 @app.route('/lan/jeux/voter/<int:game_id>/<any({}):vote_type>'.format(','.join(LanGameProposalVoteType.values())))
 @login_required
+@to_home_if_cannot_access_lan_section
 def lan_games_proposal_vote(game_id: int, vote_type: str) -> Response:
-    if not current_user.can_access_lan_section:
-        flash('Désolé, tu ne fait pas partie des participants à la LAN.', 'error')
-
-        return redirect(url_for('home'))
-
     try:
         vote = LanGameProposalVote()
         vote.game_proposal_game_id = game_id
@@ -201,12 +210,8 @@ def lan_games_proposal_vote(game_id: int, vote_type: str) -> Response:
 
 @app.route('/lan/jeux/proposer')
 @login_required
+@to_home_if_cannot_access_lan_section
 def lan_games_proposal() -> Union[str, Response]:
-    if not current_user.can_access_lan_section:
-        flash('Désolé, tu ne fait pas partie des participants à la LAN.', 'error')
-
-        return redirect(url_for('home'))
-
     form = LanGamesProposalSearchForm(request.args, meta={'csrf': False})
     validated = len(request.args) > 0 and form.validate()
 
@@ -239,12 +244,8 @@ def lan_games_proposal() -> Union[str, Response]:
 
 @app.route('/lan/jeux/proposer/<int:game_id>')
 @login_required
+@to_home_if_cannot_access_lan_section
 def lan_games_proposal_submit(game_id: int) -> Response:
-    if not current_user.can_access_lan_section:
-        flash('Désolé, tu ne fait pas partie des participants à la LAN.', 'error')
-
-        return redirect(url_for('home'))
-
     try:
         game = db.get_or_404(Game, game_id)
 

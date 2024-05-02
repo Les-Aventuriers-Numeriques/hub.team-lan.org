@@ -27,10 +27,6 @@ class User(CreatedAtMixin, UpdatedAtMixin, UserMixin, db.Model):
     is_lan_participant = mapped_column(sa.Boolean, nullable=False, default=sa.text('false'))
     is_admin = mapped_column(sa.Boolean, nullable=False, default=sa.text('false'))
 
-    @property
-    def can_access_lan_section(self) -> bool:
-        return self.is_lan_participant or self.is_admin
-
     def __repr__(self) -> str:
         return f'User:{self.id}'
 
