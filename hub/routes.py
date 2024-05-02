@@ -86,6 +86,9 @@ def login_callback() -> Union[str, Response]:
         return redirect(url_for('login'))
 
     membership_info = response.json()
+
+    print(membership_info)
+
     user_roles = membership_info.get('roles', [])
 
     is_member = str(app.config['DISCORD_MEMBER_ROLE_ID']) in user_roles
@@ -110,7 +113,7 @@ def login_callback() -> Union[str, Response]:
 
         new_user = True
 
-    user.display_name = membership_info.get('nick', user_info.get('global_name', user_info.get('username')))
+    user.display_name = membership_info.get('nick') or user_info.get('global_name') or user_info.get('username')
 
     member_avatar_hash = membership_info.get('avatar')
     user_avatar_hash = user_info.get('avatar')
