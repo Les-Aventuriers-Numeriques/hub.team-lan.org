@@ -62,14 +62,10 @@ app.config.update(
 
 if app.config['SENTRY_DSN']:
     try:
-        from sentry_sdk.integrations.flask import FlaskIntegration
         import sentry_sdk
 
         sentry_sdk.init(
             dsn=app.config['SENTRY_DSN'],
-            integrations=[
-                FlaskIntegration(),
-            ],
             traces_sample_rate=app.config['SENTRY_TRACES_SAMPLE_RATE'],
             send_default_pii=True
         )
