@@ -42,6 +42,8 @@ app.config.update(
 
     SQLALCHEMY_DATABASE_URI=env.str('SQLALCHEMY_DATABASE_URI', default='postgresql+psycopg2://postgres:postgres@localhost/postgres'),
 
+    STEAM_API_KEY=env.str('STEAM_API_KEY'),
+
     DISCORD_CLIENT_ID=env.int('DISCORD_CLIENT_ID'),
     DISCORD_CLIENT_SECRET=env.str('DISCORD_CLIENT_SECRET'),
     DISCORD_BOT_TOKEN=env.str('DISCORD_BOT_TOKEN'),

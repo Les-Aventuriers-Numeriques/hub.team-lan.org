@@ -87,8 +87,6 @@ def login_callback() -> Union[str, Response]:
 
     membership_info = response.json()
 
-    print(membership_info)
-
     user_roles = membership_info.get('roles', [])
 
     is_member = str(app.config['DISCORD_MEMBER_ROLE_ID']) in user_roles
