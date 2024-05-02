@@ -45,6 +45,14 @@ class Game(db.Model):
 
     proposal = relationship('LanGameProposal', uselist=False, back_populates='game')
 
+    @property
+    def store_url(self) -> str:
+        return f'https://store.steampowered.com/app/{self.id}'
+
+    @property
+    def image_url(self) -> str:
+        return f'https://cdn.cloudflare.steamstatic.com/steam/apps/{self.id}/capsule_231x87.jpg'
+
     def __repr__(self) -> str:
         return f'Game:{self.id}'
 

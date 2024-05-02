@@ -26,8 +26,8 @@
             <div class="games">
                 {% for game in games %}
                     <article>
-                        <a href="https://store.steampowered.com/app/{{ game.id }}" target="_blank" data-tooltip="{{ game.name }}{% if game.proposal %} [déjà proposé par {{ game.proposal.user.display_name if game.proposal.user_id != current_user.id else 'toi' }}]{% endif %}">
-                            <img src="https://cdn.cloudflare.steamstatic.com/steam/apps/{{ game.id }}/capsule_231x87.jpg" alt="Illustration {{ game.name }}" width="231" height="87">
+                        <a href="{{ game.store_url }}" target="_blank" data-tooltip="{{ game.name }}{% if game.proposal %} [déjà proposé par {{ game.proposal.user.display_name if game.proposal.user_id != current_user.id else 'toi' }}]{% endif %}">
+                            <img src="{{ game.image_url }}" alt="Illustration {{ game.name }}" width="231" height="87">
                         </a>
 
                         {% if not game.proposal %}
