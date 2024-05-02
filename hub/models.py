@@ -4,7 +4,7 @@ from sqlalchemy_utils.types import TSVectorType
 from enum import Enum as PythonEnum
 from datetime import UTC, datetime
 from flask_login import UserMixin
-from typing import List, Optional
+from typing import Optional
 from app import db
 import sqlalchemy as sa
 
@@ -59,6 +59,19 @@ class LanGameProposal(CreatedAtMixin, db.Model):
     game = relationship('Game', uselist=False, back_populates='proposal')
     user = relationship('User', uselist=False)
 
+    def votes_count(self, type_: LanGameProposalVoteType) -> int:
+        return len([
+            vote for vote in self.votes if vote.type == type_
+        ])
+
+    def votes_percentage(self, type_: LanGameProposalVoteType) -> float:
+        votes_total = len(self.votes)
+
+        if votes_total == 0:
+            return 0.0
+
+        return self.votes_count(type_) / votes_total
+
     def __repr__(self) -> str:
         return f'LanGameProposal:{self.game_id}'
 
@@ -70,13 +83,13 @@ class LanGameProposalVoteType(PythonEnum):
     NO = 'NO'
 
     @classmethod
-    def values(cls) -> List:
-        return [
+    def cslist(cls) -> str:
+        return ','.join([
             e.value for e in cls
-        ]
+        ])
 
 
-class LanGameProposalVote(CreatedAtMixin, db.Model):
+class LanGameProposalVote(CreatedAtMixin, UpdatedAtMixin, db.Model):
     __tablename__ = 'lan_game_proposal_votes'
 
     game_proposal_game_id = mapped_column(sa.BigInteger, sa.ForeignKey('lan_game_proposals.game_id', ondelete='cascade'), primary_key=True, autoincrement=False)

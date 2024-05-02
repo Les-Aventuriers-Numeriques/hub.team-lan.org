@@ -30,7 +30,7 @@
             </a>
         {% endif %}
 
-        <span>5 (58%)</span>
+        <span>{{proposal.votes_count(vote_type) }} ({{ proposal.votes_percentage(vote_type)|percentformat }})</span>
     </div>
 {%- endmacro %}
 

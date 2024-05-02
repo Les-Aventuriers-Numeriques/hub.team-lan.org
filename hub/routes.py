@@ -6,6 +6,7 @@ from sqlalchemy.dialects import postgresql
 from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import NotFound
 from sqlalchemy_searchable import search
+from datetime import datetime, UTC
 from werkzeug import Response
 from functools import wraps
 from typing import Union
@@ -171,7 +172,7 @@ def lan_games() -> Union[str, Response]:
     )
 
 
-@app.route('/lan/jeux/voter/<int:game_id>/<any({}):vote_type>'.format(','.join(LanGameProposalVoteType.values())))
+@app.route('/lan/jeux/voter/<int:game_id>/<any({}):vote_type>'.format(LanGameProposalVoteType.cslist()))
 @login_required
 @to_home_if_cannot_access_lan_section
 def lan_games_proposal_vote(game_id: int, vote_type: str) -> Response:
@@ -187,7 +188,8 @@ def lan_games_proposal_vote(game_id: int, vote_type: str) -> Response:
             LanGameProposalVote.user_id,
         ],
         set_={
-            LanGameProposalVote.type: ins.excluded.type
+            LanGameProposalVote.type: ins.excluded.type,
+            LanGameProposalVote.updated_at: datetime.now(UTC)
         }
     ))
 

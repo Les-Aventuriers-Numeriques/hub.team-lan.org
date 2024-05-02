@@ -57,6 +57,7 @@ def upgrade():
     sa.Column('user_id', sa.BigInteger(), autoincrement=False, nullable=False),
     sa.Column('type', sa.Enum('YES', 'NEUTRAL', 'NO', name='langameproposalvotetype'), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), nullable=False),
     sa.ForeignKeyConstraint(['game_proposal_game_id'], ['lan_game_proposals.game_id'], ondelete='cascade'),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='cascade'),
     sa.PrimaryKeyConstraint('game_proposal_game_id', 'user_id')
