@@ -163,13 +163,13 @@ def context_processor() -> Dict:
 # -----------------------------------------------------------
 # Page d'erreur
 
-@app.errorhandler(HTTPException)
-def http_error_handler(e: HTTPException) -> Tuple[str, int]:
-    return render_template(
-        'error.html',
-        title=e.name,
-        text=e.description,
-    ), e.code
+# @app.errorhandler(HTTPException)
+# def http_error_handler(e: HTTPException) -> Tuple[str, int]:
+#     return render_template(
+#         'error.html',
+#         title=e.name,
+#         text=e.description,
+#     ), e.code
 
 
 # -----------------------------------------------------------

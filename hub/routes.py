@@ -138,13 +138,6 @@ def login_callback() -> Union[str, Response]:
     return redirect(url_for('home'))
 
 
-@app.route('/test')
-def test() -> str:
-    cac = 5 / 0
-
-    return 'test'
-
-
 @app.route('/deconnexion')
 @login_required
 def logout() -> Response:
