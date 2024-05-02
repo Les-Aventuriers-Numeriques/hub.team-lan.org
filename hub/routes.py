@@ -64,7 +64,7 @@ def login_callback() -> Union[str, Response]:
     state = request.args.get('state')
     code = request.args.get('code')
 
-    if state != session.pop('oauth2_state', None) or not code:
+    if state != session.get('oauth2_state') or not code:
         flash('Etat invalide ou code OAuth introuvable.', 'error')
 
         return redirect(url_for('login'))
@@ -128,6 +128,8 @@ def login_callback() -> Union[str, Response]:
 
     db.session.add(user)
     db.session.commit()
+
+    session.pop('oauth2_state', None)
 
     login_user(user, remember=True)
 
