@@ -1,0 +1,31 @@
+/************************************************************************
+ * Votes pour les jeux de la LAN */
+
+/************************************************************************
+ * Liste des jeux */
+
+body > main .games > * > div {
+    display: flex;
+    flex-direction: row;
+    column-gap: var(--pico-grid-column-gap);
+    row-gap: var(--pico-grid-row-gap);
+    justify-content: center;
+    align-items: center;}
+
+body > main .games > * > div > div {
+    display: flex;
+    flex-direction: column;
+    column-gap: var(--pico-grid-column-gap);
+    row-gap: var(--pico-grid-row-gap);
+    justify-content: center;
+    align-items: center;
+}
+
+/*body > main .games > * > div.voted a:not(.vote) {
+    --pico-color: var(--pico-muted-color);
+}*/
+
+body > main .games > * > div > div > span {
+    color: var(--pico-muted-color);
+    font-size: 0.7em;
+}

@@ -2,6 +2,7 @@ from hub.models import User, Game, LanGameProposal, LanGameProposalVote, LanGame
 from flask import render_template, redirect, url_for, flash, session, request
 from flask_login import login_required, current_user, logout_user, login_user
 from hub.forms import LanGamesProposalSearchForm
+from sqlalchemy.dialects import postgresql
 from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import NotFound
 from sqlalchemy_searchable import search
@@ -163,47 +164,36 @@ def lan_games() -> Union[str, Response]:
         )
     ).scalars().all()
 
-    return render_template('lan/games.html', proposals=proposals)
-
-
-@app.route('/lan/jeux/annuler-vote/<int:game_id>')
-@login_required
-@to_home_if_cannot_access_lan_section
-def lan_games_proposal_cancel_vote(game_id: int) -> Response:
-    result = db.session.execute(
-        sa.delete(LanGameProposalVote)
-        .where(
-            LanGameProposalVote.game_proposal_game_id == game_id,
-            LanGameProposalVote.user_id == current_user.id
-        )
+    return render_template(
+        'lan/games.html',
+        proposals=proposals,
+        vote_types=LanGameProposalVoteType
     )
-
-    db.session.commit()
-
-    if result.rowcount == 1:
-        flash('Ton vote a été annulé.', 'success')
-    else:
-        flash('Aucun vote à annuler, arrête ça.', 'error')
-
-    return redirect(url_for('lan_games'))
 
 
 @app.route('/lan/jeux/voter/<int:game_id>/<any({}):vote_type>'.format(','.join(LanGameProposalVoteType.values())))
 @login_required
 @to_home_if_cannot_access_lan_section
 def lan_games_proposal_vote(game_id: int, vote_type: str) -> Response:
-    try:
-        vote = LanGameProposalVote()
-        vote.game_proposal_game_id = game_id
-        vote.user_id = current_user.id
-        vote.type = LanGameProposalVoteType(vote_type)
+    ins = postgresql.insert(LanGameProposalVote).values(
+        game_proposal_game_id=game_id,
+        user_id=current_user.id,
+        type=LanGameProposalVoteType(vote_type)
+    )
 
-        db.session.add(vote)
-        db.session.commit()
+    db.session.execute(ins.on_conflict_do_update(
+        index_elements=[
+            LanGameProposalVote.game_proposal_game_id,
+            LanGameProposalVote.user_id,
+        ],
+        set_={
+            LanGameProposalVote.type: ins.excluded.type
+        }
+    ))
 
-        flash('A voté !', 'success')
-    except IntegrityError:
-        flash('Tu as déjà voté pour ce jeu petit coquin (ou l\'identifiant de jeu est invalide).', 'error')
+    db.session.commit()
+
+    flash('A voté !', 'success')
 
     return redirect(url_for('lan_games'))
 

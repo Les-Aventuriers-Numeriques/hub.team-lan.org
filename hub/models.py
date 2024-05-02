@@ -1,11 +1,12 @@
+from __future__ import annotations
 from sqlalchemy.orm import mapped_column, relationship
 from sqlalchemy_utils.types import TSVectorType
 from enum import Enum as PythonEnum
 from datetime import UTC, datetime
 from flask_login import UserMixin
-from typing import List
-import sqlalchemy as sa
+from typing import List, Optional
 from app import db
+import sqlalchemy as sa
 
 
 class CreatedAtMixin:
@@ -26,6 +27,9 @@ class User(CreatedAtMixin, UpdatedAtMixin, UserMixin, db.Model):
     is_member = mapped_column(sa.Boolean, nullable=False, default=False, server_default=sa.text('false'))
     is_lan_participant = mapped_column(sa.Boolean, nullable=False, default=sa.text('false'))
     is_admin = mapped_column(sa.Boolean, nullable=False, default=sa.text('false'))
+
+    def my_vote(self, proposal: LanGameProposal) -> Optional[LanGameProposalVote]:
+        return next((vote for vote in proposal.votes if vote.user_id == self.id), None)
 
     def __repr__(self) -> str:
         return f'User:{self.id}'
@@ -59,15 +63,17 @@ class LanGameProposal(CreatedAtMixin, db.Model):
         return f'LanGameProposal:{self.game_id}'
 
 
-# ATTENTION : Ne jamais modifier cette liste. Il est possible d'ajouter des éléments uniquement.
+# ATTENTION : Ne jamais modifier cette liste. Il est possible d'ajouter des éléments, à la fin de la liste uniquement.
 class LanGameProposalVoteType(PythonEnum):
     YES = 'YES'
-    NO = 'NO'
     NEUTRAL = 'NEUTRAL'
+    NO = 'NO'
 
     @classmethod
     def values(cls) -> List:
-        return list(map(lambda c: c.value, cls))
+        return [
+            e.value for e in cls
+        ]
 
 
 class LanGameProposalVote(CreatedAtMixin, db.Model):

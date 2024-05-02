@@ -1,5 +1,5 @@
 /************************************************************************
- * Votes pour les jeux de la LAN */
+ * Jeux de la LAN */
 
 /************************************************************************
  * Liste des jeux */
@@ -12,24 +12,16 @@ body > main .games {
 }
 
 body > main .games > * {
+    --pico-grid-row-gap: 0.5rem;
+
     min-width: 0;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    align-items: center;
     column-gap: var(--pico-grid-column-gap);
     row-gap: var(--pico-grid-row-gap);
     margin-bottom: 0;
-}
-
-body > main .games > * > * {
-    align-self: center;
-}
-
-body > main .games > * > div {
-    display: flex;
-    flex-direction: row;
-    column-gap: var(--pico-grid-column-gap);
-    row-gap: var(--pico-grid-row-gap);
 }
 
 body > main .games img {
