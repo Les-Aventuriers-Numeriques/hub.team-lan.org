@@ -219,13 +219,10 @@ def lan_games_proposal() -> Union[str, Response]:
                 .options(
                     sa_orm.selectinload(Game.proposal).selectinload(LanGameProposal.user)
                 )
-                .limit(20)
-                .order_by(
-                    sa.desc(
-                        sa.func.ts_rank_cd(Game.search_vector, sa.func.parse_websearch(form.terms.data), 2)
-                    )
-                ),
-                form.terms.data
+                .limit(20),
+                form.terms.data,
+                regconfig='english_nostop',
+                sort=True
             )
         ).scalars().all()
 

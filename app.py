@@ -40,6 +40,7 @@ app.config.update(
     BABEL_DEFAULT_LOCALE=env.str('BABEL_DEFAULT_LOCALE', default='fr'),
     BABEL_DEFAULT_TIMEZONE=env.str('BABEL_DEFAULT_TIMEZONE', default='Europe/Paris'),
 
+    SQLALCHEMY_SCHEMA_NAME=env.str('SQLALCHEMY_SCHEMA_NAME', default='postgres'),
     SQLALCHEMY_DATABASE_URI=env.str('SQLALCHEMY_DATABASE_URI', default='postgresql+psycopg2://postgres:postgres@localhost/postgres'),
 
     STEAM_API_KEY=env.str('STEAM_API_KEY'),
@@ -121,7 +122,7 @@ class AppDeclarativeBase(DeclarativeBase):
 
 db = SQLAlchemy(app, model_class=AppDeclarativeBase)
 
-make_searchable(db.metadata)
+make_searchable(db.metadata, options={'regconfig': app.config['SQLALCHEMY_SCHEMA_NAME'] + '.english_nostop'})
 
 import hub.models
 

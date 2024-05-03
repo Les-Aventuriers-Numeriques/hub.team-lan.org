@@ -41,7 +41,7 @@ class Game(db.Model):
     id = mapped_column(sa.BigInteger, primary_key=True, autoincrement=False)
 
     name = mapped_column(sa.String(255), nullable=False)
-    search_vector = sa.Column(TSVectorType('name'))
+    search_vector = sa.Column(TSVectorType('name', regconfig='english_nostop'))
 
     proposal = relationship('LanGameProposal', uselist=False, back_populates='game')
 

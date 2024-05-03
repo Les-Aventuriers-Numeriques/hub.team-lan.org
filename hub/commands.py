@@ -46,9 +46,10 @@ def update_games() -> None:
         have_more_results = json.get('have_more_results', False)
         last_appid = json.get('last_appid')
 
-    ins = postgresql.insert(Game).values(games)
+        ins = postgresql.insert(Game).values(games)
 
-    db.session.execute(ins.on_conflict_do_nothing())
+        db.session.execute(ins.on_conflict_do_nothing())
+
     db.session.commit()
 
     click.secho('Effectué', fg='green')
