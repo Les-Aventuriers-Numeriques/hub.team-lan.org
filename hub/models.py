@@ -112,4 +112,21 @@ class LanGameProposalVote(CreatedAtMixin, UpdatedAtMixin, db.Model):
         return f'LanGameProposalVote:{self.game_proposal_game_id}+{self.user_id}'
 
 
+class SettingType(PythonEnum):
+    INTEGER = 'INTEGER'
+    FLOAT = 'FLOAT'
+    STRING = 'STRING'
+    BOOL = 'BOOL'
+    ARROW = 'ARROW'
+    JSON = 'JSON'
+
+
+class Setting(CreatedAtMixin, UpdatedAtMixin, db.Model):
+    __tablename__ = 'settings'
+
+    name = mapped_column(sa.String(255), primary_key=True, autoincrement=False)
+    type = mapped_column(sa.Enum(SettingType), nullable=False)
+    value = mapped_column(sa.Text)
+
+
 db.configure_mappers()
