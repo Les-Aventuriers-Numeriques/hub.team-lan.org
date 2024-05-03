@@ -43,8 +43,8 @@ def update_games() -> None:
             } for game in json['apps'] if game['name']
         ])
 
-        have_more_results = json['have_more_results'] if 'last_appid' in json else False
-        last_appid = json['last_appid'] if 'last_appid' in json else None
+        have_more_results = json.get('have_more_results', False)
+        last_appid = json.get('last_appid')
 
     ins = postgresql.insert(Game).values(games)
 
