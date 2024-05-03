@@ -40,6 +40,19 @@ def to_home_if_cannot_access_lan_section(f):
     return decorated
 
 
+def to_home_if_not_admin(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if not current_user.is_admin:
+            flash('Tu n\'as pas accès à ceci.', 'error')
+
+            return redirect(url_for('home'))
+
+        return f(*args, **kwargs)
+
+    return decorated
+
+
 @app.route('/connexion')
 @to_home_if_authenticated
 def login() -> Union[str, Response]:
@@ -219,10 +232,14 @@ def lan_games_proposal() -> Union[str, Response]:
                 .options(
                     sa_orm.selectinload(Game.proposal).selectinload(LanGameProposal.user)
                 )
-                .limit(20),
+                .limit(20)
+                .order_by(
+                    sa.desc(
+                        sa.func.ts_rank_cd(Game.search_vector, sa.func.parse_websearch(form.terms.data), 2)
+                    )
+                ),
                 form.terms.data,
-                regconfig='english_nostop',
-                sort=True
+                regconfig='english_nostop'
             )
         ).scalars().all()
 
@@ -248,33 +265,33 @@ def lan_games_proposal_submit(game_id: int) -> Response:
         db.session.add(proposal)
         db.session.commit()
 
-        discord.send_message(
-            f'**{current_user.display_name}** a proposé un nouveau jeu :',
-            [
-                {
-                    'type': 'rich',
-                    'title': game.name,
-                    'color': 0xf56b3d,
-                    'url': f'https://store.steampowered.com/app/{game.id}',
-                    'image': {
-                        'url': f'https://cdn.cloudflare.steamstatic.com/steam/apps/{game.id}/capsule_231x87.jpg',
-                    }
-                }
-            ],
-            [
-                {
-                    'type': 1,
-                    'components': [
-                        {
-                            'type': 2,
-                            'label': 'Voter !',
-                            'style': 5,
-                            'url': url_for('lan_games', _external=True),
-                        }
-                    ]
-                }
-            ]
-        )
+        # discord.send_message(
+        #     f'**{current_user.display_name}** a proposé un nouveau jeu :',
+        #     [
+        #         {
+        #             'type': 'rich',
+        #             'title': game.name,
+        #             'color': 0xf56b3d,
+        #             'url': f'https://store.steampowered.com/app/{game.id}',
+        #             'image': {
+        #                 'url': f'https://cdn.cloudflare.steamstatic.com/steam/apps/{game.id}/capsule_231x87.jpg',
+        #             }
+        #         }
+        #     ],
+        #     [
+        #         {
+        #             'type': 1,
+        #             'components': [
+        #                 {
+        #                     'type': 2,
+        #                     'label': 'Voter !',
+        #                     'style': 5,
+        #                     'url': url_for('lan_games', _external=True),
+        #                 }
+        #             ]
+        #         }
+        #     ]
+        # )
 
         flash('Ta proposition a bien été enregistrée !', 'success')
     except IntegrityError:
@@ -283,3 +300,36 @@ def lan_games_proposal_submit(game_id: int) -> Response:
         flash('Identifiant de jeu invalide.', 'error')
 
     return redirect(url_for('lan_games_proposal', **request.args))
+
+
+@app.route('/admin/utilisateurs')
+@login_required
+@to_home_if_not_admin
+def admin_users() -> Union[str, Response]:
+    users = db.session.execute(
+        sa.select(User)
+    ).scalars()
+
+    return render_template(
+        'admin/users.html',
+        users=users
+    )
+
+
+@app.route('/admin/lan/jeux')
+@login_required
+@to_home_if_not_admin
+def admin_lan_games() -> Union[str, Response]:
+    proposals = db.session.execute(
+        sa.select(LanGameProposal)
+        .options(
+            sa_orm.selectinload(LanGameProposal.game),
+            sa_orm.selectinload(LanGameProposal.user),
+            sa_orm.selectinload(LanGameProposal.votes),
+        )
+    ).scalars()
+
+    return render_template(
+        'admin/lan_games.html',
+        proposals=proposals
+    )

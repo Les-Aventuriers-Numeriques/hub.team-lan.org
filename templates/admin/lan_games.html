@@ -1,0 +1,63 @@
+{% extends 'layout.html' %}
+
+{% block title %}Jeux de la LAN{% endblock %}
+
+{% block cssfiles %}
+    {% assets 'css_base' %}<link rel="stylesheet" href="{{ ASSET_URL }}">{% endassets %}
+{% endblock %}
+
+{% block content %}
+    <form>
+        <label for="status">Statut de la section</label>
+
+        <select id="status" name="status">
+            <option>Désactivée</option>
+            <option>Activée</option>
+            <option>Lecture seule</option>
+        </select>
+
+        <small>
+            <strong>Désactivée</strong> : aucun accès, période creuse ; <strong>Activée</strong> : accès normal, période de choix des jeux ; <strong>Lecture seule</strong> : consultation uniquement, date de la LAN proche.
+        </small>
+    </form>
+
+    <h2>Propositions</h2>
+
+    <p>
+        <a href="#" role="button" class="secondary">Envoyer le top 5 sur Discord</a>
+        <a href="#" role="button" class="secondary">Réinitialisation</a>
+    </p>
+
+    {% if proposals %}
+        <table class="striped mb-0">
+            <thead>
+                <tr>
+                    <th scope="col">Jeu</th>
+                    <th>Votes</th>
+                    <th>Proposé par</th>
+                    <th>Proposé le</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for proposal in proposals %}
+                    <tr>
+                        <th scope="row">{{ proposal.game.name }}</th>
+                        <td>{{ proposal.votes|length }}</td>
+                        <td>{{ proposal.user.display_name }}</td>
+                        <td>{{ proposal.created_at|datetimeformat }}</td>
+                        <td>
+                            <a href="#">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                                    <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+                                </svg>
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p><strong>Aucune proposition.</strong></p>
+    {% endif %}
+{% endblock %}
