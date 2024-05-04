@@ -41,18 +41,18 @@ app.config.update(
     BABEL_DEFAULT_TIMEZONE=env.str('BABEL_DEFAULT_TIMEZONE', default='Europe/Paris'),
 
     SQLALCHEMY_SCHEMA_NAME=env.str('SQLALCHEMY_SCHEMA_NAME', default='postgres'),
-    SQLALCHEMY_DATABASE_URI=env.str('SQLALCHEMY_DATABASE_URI', default='postgresql+psycopg2://postgres:postgres@localhost/postgres'),
+    SQLALCHEMY_DATABASE_URI=env.str('SQLALCHEMY_DATABASE_URI', default='postgresql+psycopg://postgres:postgres@localhost/postgres'),
 
     STEAM_API_KEY=env.str('STEAM_API_KEY'),
 
     DISCORD_CLIENT_ID=env.int('DISCORD_CLIENT_ID'),
     DISCORD_CLIENT_SECRET=env.str('DISCORD_CLIENT_SECRET'),
-    DISCORD_BOT_TOKEN=env.str('DISCORD_BOT_TOKEN'),
+    DISCORD_BOT_TOKEN=env.str('DISCORD_BOT_TOKEN', None),
     DISCORD_GUILD_ID=env.int('DISCORD_GUILD_ID'),
     DISCORD_MEMBER_ROLE_ID=env.int('DISCORD_MEMBER_ROLE_ID'),
     DISCORD_LAN_PARTICIPANT_ROLE_ID=env.int('DISCORD_LAN_PARTICIPANT_ROLE_ID'),
     DISCORD_ADMIN_ROLE_ID=env.int('DISCORD_ADMIN_ROLE_ID'),
-    DISCORD_LAN_CHANNEL_ID=env.int('DISCORD_LAN_CHANNEL_ID'),
+    DISCORD_LAN_CHANNEL_ID=env.int('DISCORD_LAN_CHANNEL_ID', None),
 
     # Valeurs de configuration qui ne peuvent pas être surchargées
     PERMANENT_SESSION_LIFETIME=timedelta(days=365),

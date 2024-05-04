@@ -55,6 +55,10 @@ def get_membership_info(token: Dict) -> Response:
     )
 
 
+def can_send_messages() -> bool:
+    return app.config['DISCORD_LAN_CHANNEL_ID'] and app.config['DISCORD_BOT_TOKEN']
+
+
 def send_message(content: str, embeds: Optional[List] = None, components: Optional[List] = None) -> Response:
     return requests.post(
         '{API_BASE_URL}/channels/{DISCORD_LAN_CHANNEL_ID}/messages'.format(API_BASE_URL=API_BASE_URL, **app.config),

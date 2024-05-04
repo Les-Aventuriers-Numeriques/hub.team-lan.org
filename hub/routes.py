@@ -256,8 +256,6 @@ def lan_games_proposal() -> Union[str, Response]:
 @to_home_if_cannot_access_lan_section
 def lan_games_proposal_submit(game_id: int) -> Response:
     try:
-        game = db.get_or_404(Game, game_id)
-
         proposal = LanGameProposal()
         proposal.game_id = game_id
         proposal.user_id = current_user.id
@@ -265,37 +263,40 @@ def lan_games_proposal_submit(game_id: int) -> Response:
         db.session.add(proposal)
         db.session.commit()
 
-        discord.send_message(
-            f'**{current_user.display_name}** a proposé un nouveau jeu :',
-            [
-                {
-                    'type': 'rich',
-                    'title': game.name,
-                    'color': 0xf56b3d,
-                    'url': f'https://store.steampowered.com/app/{game.id}',
-                    'image': {
-                        'url': f'https://cdn.cloudflare.steamstatic.com/steam/apps/{game.id}/capsule_231x87.jpg',
-                    }
-                }
-            ],
-            [
-                {
-                    'type': 1,
-                    'components': [
-                        {
-                            'type': 2,
-                            'label': 'Voter !',
-                            'style': 5,
-                            'url': url_for('lan_games', _external=True),
+        if discord.can_send_messages():
+            game = db.get_or_404(Game, game_id)
+
+            discord.send_message(
+                f'**{current_user.display_name}** a proposé un nouveau jeu :',
+                [
+                    {
+                        'type': 'rich',
+                        'title': game.name,
+                        'color': 0xf56b3d,
+                        'url': f'https://store.steampowered.com/app/{game.id}',
+                        'image': {
+                            'url': f'https://cdn.cloudflare.steamstatic.com/steam/apps/{game.id}/capsule_231x87.jpg',
                         }
-                    ]
-                }
-            ]
-        )
+                    }
+                ],
+                [
+                    {
+                        'type': 1,
+                        'components': [
+                            {
+                                'type': 2,
+                                'label': 'Voter !',
+                                'style': 5,
+                                'url': url_for('lan_games', _external=True),
+                            }
+                        ]
+                    }
+                ]
+            )
 
         flash('Ta proposition a bien été enregistrée !', 'success')
     except IntegrityError:
-        flash('Ce jeu a déjà été proposé, petit polisson.', 'error')
+        flash('Ce jeu a déjà été proposé (ou identifiant de jeu invalide).', 'error')
     except NotFound:
         flash('Identifiant de jeu invalide.', 'error')
 
