@@ -3,11 +3,11 @@ Flask-Assets==2.1.0
 Flask-SQLAlchemy==3.1.1
 Flask-Migrate==4.0.7
 Flask-Login==0.6.3
-Flask-Babel==4.0.0
+flask-babel==4.0.0
 Flask-WTF==1.2.1
-SQLAlchemy-Searchable==2.1.0
+sqlalchemy-searchable==2.1.0
 environs==11.0.0
-cssutils==2.10.2
+cssutils==2.10.3
 jsmin==3.0.1
 psycopg==3.1.18
 requests==2.31.0
