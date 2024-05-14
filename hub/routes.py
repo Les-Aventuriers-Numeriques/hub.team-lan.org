@@ -149,7 +149,7 @@ def login_callback() -> Union[str, Response]:
 
     flash('{} {} !'.format('Bienvenue' if new_user else 'Content de te revoir', user.display_name), 'success')
 
-    return redirect(url_for('home'))
+    return redirect(session.pop('next', url_for('home')))
 
 
 @app.route('/deconnexion')
@@ -308,13 +308,33 @@ def lan_games_proposal_submit(game_id: int) -> Response:
 @to_home_if_not_admin
 def admin_users() -> Union[str, Response]:
     users = db.session.execute(
-        sa.select(User)
+        sa.select(User).order_by(User.display_name.asc())
     ).scalars()
 
     return render_template(
         'admin/users.html',
         users=users
     )
+
+
+@app.route('/admin/utilisateurs/<int:user_id>')
+@login_required
+@to_home_if_not_admin
+def admin_user_delete(user_id: int) -> Response:
+    try:
+        user = db.get_or_404(User, user_id)
+
+        if user.id == current_user.id or user.is_admin:
+            flash('Tu ne peux pas supprimer cet utilisateur.', 'error')
+        else:
+            db.session.delete(user)
+            db.session.commit()
+
+            flash('Utilisateur supprimé.', 'success')
+    except NotFound:
+        flash('Identifiant d\'utilisateur invalide.', 'error')
+
+    return redirect(url_for('admin_users'))
 
 
 @app.route('/admin/lan/jeux')

@@ -38,7 +38,7 @@
         <table class="striped mb-0">
             <thead>
                 <tr>
-                    <th scope="col">Jeu</th>
+                    <th>Jeu</th>
                     <th>Proposé par</th>
                     <th>Le</th>
                     <th></th>
@@ -47,7 +47,7 @@
             <tbody>
                 {% for proposal in proposals %}
                     <tr>
-                        <th scope="row">{{ proposal.game.name }}</th>
+                        <td>{{ proposal.game.name }}</td>
                         <td>{{ proposal.user.display_name }}</td>
                         <td>{{ proposal.created_at|datetimeformat }}</td>
                         <td>

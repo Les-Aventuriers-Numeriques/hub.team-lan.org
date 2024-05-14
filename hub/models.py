@@ -28,6 +28,9 @@ class User(CreatedAtMixin, UpdatedAtMixin, UserMixin, db.Model):
     is_lan_participant = mapped_column(sa.Boolean, nullable=False, default=sa.text('false'))
     is_admin = mapped_column(sa.Boolean, nullable=False, default=sa.text('false'))
 
+    proposals = relationship('LanGameProposal', back_populates='user')
+    votes = relationship('LanGameProposalVote', back_populates='user')
+
     def my_vote(self, proposal: LanGameProposal) -> Optional[LanGameProposalVote]:
         return next((vote for vote in proposal.votes if vote.user_id == self.id), None)
 
@@ -41,7 +44,7 @@ class Game(db.Model):
     id = mapped_column(sa.BigInteger, primary_key=True, autoincrement=False)
 
     name = mapped_column(sa.String(255), nullable=False)
-    search_vector = sa.Column(TSVectorType('name', regconfig='english_nostop'))
+    search_vector = mapped_column(TSVectorType('name', regconfig='english_nostop'))
 
     proposal = relationship('LanGameProposal', uselist=False, back_populates='game')
 
@@ -65,7 +68,7 @@ class LanGameProposal(CreatedAtMixin, db.Model):
 
     votes = relationship('LanGameProposalVote', back_populates='proposal')
     game = relationship('Game', uselist=False, back_populates='proposal')
-    user = relationship('User', uselist=False)
+    user = relationship('User', uselist=False, back_populates='proposals')
 
     def votes_count(self, type_: LanGameProposalVoteType) -> int:
         return len([
@@ -102,11 +105,10 @@ class LanGameProposalVote(CreatedAtMixin, UpdatedAtMixin, db.Model):
 
     game_proposal_game_id = mapped_column(sa.BigInteger, sa.ForeignKey('lan_game_proposals.game_id', ondelete='cascade'), primary_key=True, autoincrement=False)
     user_id = mapped_column(sa.BigInteger, sa.ForeignKey('users.id', ondelete='cascade'), primary_key=True, autoincrement=False)
-    type = sa.Column(sa.Enum(LanGameProposalVoteType), nullable=False)
+    type = mapped_column(sa.Enum(LanGameProposalVoteType), nullable=False)
 
     proposal = relationship('LanGameProposal', uselist=False, back_populates='votes')
-
-    user = relationship('User', uselist=False)
+    user = relationship('User', uselist=False, back_populates='votes')
 
     def __repr__(self) -> str:
         return f'LanGameProposalVote:{self.game_proposal_game_id}+{self.user_id}'

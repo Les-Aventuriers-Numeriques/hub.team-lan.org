@@ -11,7 +11,7 @@
         <table class="striped mb-0">
             <thead>
                 <tr>
-                    <th scope="col">ID Discord</th>
+                    <th>ID Discord</th>
                     <th>Pseudo</th>
                     <th>Membre ?</th>
                     <th>Participant LAN ?</th>
@@ -24,7 +24,7 @@
             <tbody>
                 {% for user in users %}
                     <tr>
-                        <th scope="row"><code>{{ user.id }}</code></th>
+                        <td><code>{{ user.id }}</code></td>
                         <td>{{ user.display_name }}</td>
                         <td>{{ 'Oui' if user.is_member else 'Non' }}</td>
                         <td>{{ 'Oui' if user.is_lan_participant else 'Non' }}</td>
@@ -32,18 +32,13 @@
                         <td>{{ user.created_at|datetimeformat }}</td>
                         <td>{{ user.updated_at|datetimeformat }}</td>
                         <td>
-                            <a href="#">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
-                                    <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2z"/>
-                                    <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466"/>
-                                </svg>
-                            </a>
-
-                            <a href="#">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
-                                    <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
-                                </svg>
-                            </a>
+                            {% if user.id != current_user.id and not user.is_admin %}
+                                <a href="{{ url_for('admin_user_delete', user_id=user.id) }}" hx-confirm="Confirmer ? Toutes les données liées seront également supprimées.">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                                        <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+                                    </svg>
+                                </a>
+                            {% endif %}
                         </td>
                     </tr>
                 {% endfor %}
