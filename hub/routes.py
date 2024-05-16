@@ -320,8 +320,8 @@ def admin_user_delete(user_id: int) -> Response:
     try:
         user = db.get_or_404(User, user_id)
 
-        if user.id == current_user.id or user.is_admin:
-            flash('Tu ne peux pas supprimer cet utilisateur.', 'error')
+        if user.id == current_user.id:
+            flash('Tu ne peux pas te supprimer toi-même.', 'error')
         else:
             db.session.delete(user)
             db.session.commit()
