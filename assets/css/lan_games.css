@@ -24,6 +24,13 @@ body > main .games > * {
     margin-bottom: 0;
 }
 
+body > main .games > *:target {
+    border-width: var(--pico-border-width);
+    border-style: solid;
+    border-color: var(--pico-form-element-valid-active-border-color);
+    scroll-margin-top: var(--pico-spacing);
+}
+
 body > main .games img {
     border: var(--pico-border-width) solid var(--pico-muted-border-color);
     border-radius: var(--pico-border-radius);

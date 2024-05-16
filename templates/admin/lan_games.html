@@ -1,13 +1,13 @@
 {% extends 'layout.html' %}
 
-{% block title %}Jeux de la LAN{% endblock %}
+{% block title %}Admin : jeux de la LAN{% endblock %}
 
 {% block cssfiles %}
     {% assets 'css_base' %}<link rel="stylesheet" href="{{ ASSET_URL }}">{% endassets %}
 {% endblock %}
 
 {% block content %}
-    <form>
+    {#<form>
         <label for="status">Statut de la section</label>
 
         <select id="status" name="status">
@@ -27,11 +27,11 @@
         <small>Identifiants de jeux Steam séparés par des virgules qui ne seront pas disponibles à la proposition.</small>
     </form>
 
-    <h2>Propositions</h2>
+    <h2>Propositions</h2>#}
 
     <p>
         <a href="#" role="button" class="secondary">Envoyer le top 8 sur Discord</a>
-        <a href="#" role="button" class="secondary">Réinitialiser</a>
+        {#<a href="#" role="button" class="secondary" onclick="return confirm('Toutes les propositions et votes seront supprimés. Confirmer ?')">Réinitialiser</a>#}
     </p>
 
     {% if proposals %}
@@ -47,11 +47,11 @@
             <tbody>
                 {% for proposal in proposals %}
                     <tr>
-                        <td>{{ proposal.game.name }}</td>
+                        <td>{{ proposal.game.name }} <small>({{ proposal.game.id }})</small></td>
                         <td>{{ proposal.user.display_name }}</td>
                         <td>{{ proposal.created_at|datetimeformat }}</td>
                         <td>
-                            <a href="#">
+                            <a href="#" onclick="return confirm('La proposition et les votes associés seront supprimés. Confirmer ?')">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
                                     <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
                                 </svg>

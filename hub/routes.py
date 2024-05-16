@@ -211,9 +211,7 @@ def lan_games_proposal_vote(game_id: int, vote_type: str) -> Response:
 
     db.session.commit()
 
-    flash('A voté !', 'success')
-
-    return redirect(url_for('lan_games'))
+    return redirect(url_for('lan_games', _anchor=f'g-{game_id}'))
 
 
 @app.route('/lan/jeux/proposer')
@@ -293,14 +291,12 @@ def lan_games_proposal_submit(game_id: int) -> Response:
                     }
                 ]
             )
-
-        flash('Ta proposition a bien été enregistrée !', 'success')
     except IntegrityError:
         flash('Ce jeu a déjà été proposé (ou identifiant de jeu invalide).', 'error')
     except NotFound:
         flash('Identifiant de jeu invalide.', 'error')
 
-    return redirect(url_for('lan_games_proposal', **request.args))
+    return redirect(url_for('lan_games_proposal', **request.args, _anchor=f'g-{game_id}'))
 
 
 @app.route('/admin/utilisateurs')

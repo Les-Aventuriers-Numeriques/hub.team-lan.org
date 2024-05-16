@@ -1,6 +1,6 @@
 {% extends 'layout.html' %}
 
-{% block title %}Utilisateurs{% endblock %}
+{% block title %}Admin : utilisateurs{% endblock %}
 
 {% block cssfiles %}
     {% assets 'css_base' %}<link rel="stylesheet" href="{{ ASSET_URL }}">{% endassets %}
@@ -11,7 +11,6 @@
         <table class="striped mb-0">
             <thead>
                 <tr>
-                    <th>ID Discord</th>
                     <th>Pseudo</th>
                     <th>Membre ?</th>
                     <th>Participant LAN ?</th>
@@ -24,8 +23,7 @@
             <tbody>
                 {% for user in users %}
                     <tr>
-                        <td><code>{{ user.id }}</code></td>
-                        <td>{{ user.display_name }}</td>
+                        <td>{{ user.display_name }} <small>({{ user.id }})</small></td>
                         <td>{{ 'Oui' if user.is_member else 'Non' }}</td>
                         <td>{{ 'Oui' if user.is_lan_participant else 'Non' }}</td>
                         <td>{{ 'Oui' if user.is_admin else 'Non' }}</td>
@@ -33,7 +31,7 @@
                         <td>{{ user.updated_at|datetimeformat }}</td>
                         <td>
                             {% if user.id != current_user.id and not user.is_admin %}
-                                <a href="{{ url_for('admin_user_delete', user_id=user.id) }}" hx-confirm="Confirmer ? Toutes les données liées seront également supprimées.">
+                                <a href="{{ url_for('admin_user_delete', user_id=user.id) }}" onclick="return confirm('L\'utilisateur et tout ce qui lui est lié sera supprimé. Confirmer ?')">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
                                         <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
                                     </svg>
