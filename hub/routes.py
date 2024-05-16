@@ -1,11 +1,11 @@
 from hub.models import User, Game, LanGameProposal, LanGameProposalVote, LanGameProposalVoteType
 from flask import render_template, redirect, url_for, flash, session, request
 from flask_login import login_required, current_user, logout_user, login_user
+from sqlalchemy_searchable import search, inspect_search_vectors
 from hub.forms import LanGamesProposalSearchForm
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import NotFound
-from sqlalchemy_searchable import search
 from datetime import datetime, UTC
 from werkzeug import Response
 from functools import wraps
@@ -233,11 +233,11 @@ def lan_games_proposal() -> Union[str, Response]:
                 .limit(20)
                 .order_by(
                     sa.desc(
-                        sa.func.ts_rank_cd(Game.search_vector, sa.func.parse_websearch(form.terms.data), 2)
+                        sa.func.ts_rank_cd(inspect_search_vectors(Game)[0], sa.func.parse_websearch(form.terms.data), 2)
                     )
                 ),
                 form.terms.data,
-                regconfig='english_nostop'
+                regconfig=sa.cast('english_nostop', postgresql.REGCONFIG)
             )
         ).scalars().all()
 

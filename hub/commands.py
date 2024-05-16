@@ -10,7 +10,6 @@ def update_games() -> None:
     """Met à jour la base de données interne des jeux Steam."""
     click.echo('Mise à jour des jeux Steam...')
 
-    games = []
     have_more_results = True
     last_appid = None
 
@@ -36,12 +35,12 @@ def update_games() -> None:
 
         json = response.json()['response']
 
-        games.extend([
+        games = [
             {
                 'id': game['appid'],
                 'name': game['name'],
             } for game in json['apps'] if game['name']
-        ])
+        ]
 
         have_more_results = json.get('have_more_results', False)
         last_appid = json.get('last_appid')
