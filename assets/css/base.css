@@ -114,9 +114,16 @@ body > footer {
     color: var(--pico-muted-color);
     font-size: 0.7em;
     border-top: var(--pico-border-width) solid var(--pico-muted-border-color);
+    text-align: center;
 }
 
 body > footer a {
     --pico-color: var(--pico-muted-color);
     --pico-underline: var(--pico-muted-color);
+}
+
+@media (min-width: 768px) {
+    body > footer {
+        text-align: initial;
+    }
 }
