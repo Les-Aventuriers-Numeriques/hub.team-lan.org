@@ -7,7 +7,7 @@ flask-babel==4.0.0
 Flask-WTF==1.2.1
 sqlalchemy-searchable==2.1.0
 environs==11.0.0
-cssutils==2.10.3
+cssutils==2.11.0
 jsmin==3.0.1
 psycopg[binary]==3.1.19
 requests==2.31.0
