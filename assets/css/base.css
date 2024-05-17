@@ -51,6 +51,10 @@ body > header > div > div > div {
     font-size: 1rem;
 }
 
+body > header > nav > ul {
+    flex-direction: column;
+}
+
 body > header nav li {
     padding: var(--pico-nav-element-spacing-horizontal);
 }
@@ -59,6 +63,10 @@ body > header nav li {
     body > header {
         flex-direction: row;
         justify-content: space-between;
+    }
+
+    body > header > nav > ul {
+        flex-direction: row;
     }
 }
 

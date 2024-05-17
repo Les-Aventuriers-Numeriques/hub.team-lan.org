@@ -6,7 +6,7 @@
 
 body > main .games {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: 1fr;
     column-gap: var(--pico-grid-column-gap);
     row-gap: var(--pico-grid-row-gap);
 }
@@ -34,4 +34,10 @@ body > main .games > *:target {
 body > main .games img {
     border: var(--pico-border-width) solid var(--pico-muted-border-color);
     border-radius: var(--pico-border-radius);
+}
+
+@media (min-width: 768px) {
+    body > main .games {
+        grid-template-columns: repeat(4, 1fr);
+    }
 }
