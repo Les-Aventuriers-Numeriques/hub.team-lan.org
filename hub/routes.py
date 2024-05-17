@@ -168,10 +168,10 @@ def home() -> str:
     return render_template('home.html')
 
 
-@app.route('/lan/jeux')
+@app.route('/lan/jeux/voter')
 @login_required
 @to_home_if_cannot_access_lan_section
-def lan_games() -> Union[str, Response]:
+def lan_games_vote() -> Union[str, Response]:
     proposals = db.session.execute(
         sa.select(LanGameProposal)
         .options(
@@ -211,7 +211,7 @@ def lan_games_proposal_vote(game_id: int, vote_type: str) -> Response:
 
     db.session.commit()
 
-    return redirect(url_for('lan_games', _anchor=f'g-{game_id}'))
+    return redirect(url_for('lan_games_vote', _anchor=f'g-{game_id}'))
 
 
 @app.route('/lan/jeux/proposer')
@@ -284,7 +284,7 @@ def lan_games_proposal_submit(game_id: int) -> Response:
                                 'type': 2,
                                 'label': 'Voter !',
                                 'style': 5,
-                                'url': url_for('lan_games', _external=True),
+                                'url': url_for('lan_games_vote', _external=True),
                             }
                         ]
                     }
@@ -427,7 +427,7 @@ def admin_lan_game_proposals_send_top() -> Response:
                             'type': 2,
                             'label': 'Voter !',
                             'style': 5,
-                            'url': url_for('lan_games', _external=True),
+                            'url': url_for('lan_games_vote', _external=True),
                         }
                     ]
                 }
