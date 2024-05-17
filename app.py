@@ -57,7 +57,9 @@ app.config.update(
     # Valeurs de configuration qui ne peuvent pas être surchargées
     PERMANENT_SESSION_LIFETIME=timedelta(days=365),
     BUNDLE_ERRORS=True,
-    USE_SESSION_FOR_NEXT=True
+    USE_SESSION_FOR_NEXT=True,
+
+    TOP_LAN_GAME_PROPOSALS=8,
 )
 
 # -----------------------------------------------------------

@@ -184,7 +184,7 @@ def lan_games() -> Union[str, Response]:
     return render_template(
         'lan/games.html',
         proposals=proposals,
-        vote_types=LanGameProposalVoteType
+        LanGameProposalVoteType=LanGameProposalVoteType
     )
 
 
@@ -398,15 +398,22 @@ def admin_lan_game_proposals_send_top() -> Response:
 
         proposals.sort(key=lambda p: p.votes_count(LanGameProposalVoteType.YES), reverse=True)
 
+        proposals = proposals[:app.config['TOP_LAN_GAME_PROPOSALS']]
+
         discord.send_message(
-            'Voici le **top 8** actuel des jeux avec le plus de 👍 :',
+            'Voici le **top {TOP_LAN_GAME_PROPOSALS}** actuel des jeux avec le plus de 👍 :'.format(**app.config),
             [
                 {
                     'color': 0xf56b3d,
                     'fields': [
                         {
                           'name': proposal.game.name,
-                          'value': '{} 👍'.format(proposal.votes_count(LanGameProposalVoteType.YES)),
+                          'value': '\n\n'.join([
+                              '{} {}'.format(
+                                  '👍' if vote_type == vote_type.YES else '😐' if vote_type == vote_type.NEUTRAL else '👎' if vote_type == vote_type.NO else '',
+                                  proposal.votes_count(vote_type),
+                              ) for vote_type in LanGameProposalVoteType
+                          ]),
                           'inline': True
                         } for proposal in proposals
                     ]
