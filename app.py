@@ -59,7 +59,7 @@ app.config.update(
     BUNDLE_ERRORS=True,
     USE_SESSION_FOR_NEXT=True,
 
-    TOP_LAN_GAME_PROPOSALS=8,
+    TOP_LAN_GAME_PROPOSALS=9,
 )
 
 # -----------------------------------------------------------
