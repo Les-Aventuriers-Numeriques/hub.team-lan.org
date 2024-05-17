@@ -30,7 +30,7 @@ def to_home_if_authenticated(f):
 def to_home_if_cannot_access_lan_section(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        if not current_user.is_lan_participant or not current_user.is_admin:
+        if not current_user.is_lan_participant and not current_user.is_admin:
             flash('Désolé, tu ne fais pas partie des participants à la LAN.', 'error')
 
             return redirect(url_for('home'))
