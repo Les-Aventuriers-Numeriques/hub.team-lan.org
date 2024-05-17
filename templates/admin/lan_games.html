@@ -31,7 +31,7 @@
 
     {% if proposals %}
         <p>
-            <a href="#" role="button" class="secondary">Envoyer le top 8 sur Discord</a>
+            <a href="{{ url_for('admin_lan_game_proposals_send_top') }}" role="button" class="secondary">Envoyer le top 8 sur Discord</a>
             <a href="{{ url_for('admin_lan_game_proposals_reset') }}" role="button" class="secondary" onclick="return confirm('Toutes les propositions et votes seront supprimés. Confirmer ?')">Réinitialiser</a>
         </p>
 

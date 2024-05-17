@@ -268,7 +268,6 @@ def lan_games_proposal_submit(game_id: int) -> Response:
                 f'**{current_user.display_name}** a proposé un nouveau jeu :',
                 [
                     {
-                        'type': 'rich',
                         'title': game.name,
                         'color': 0xf56b3d,
                         'url': f'https://store.steampowered.com/app/{game.id}',
@@ -380,5 +379,55 @@ def admin_lan_game_proposals_reset() -> Response:
     db.session.commit()
 
     flash('Propositions réinitialisées.', 'success')
+
+    return redirect(url_for('admin_lan_games'))
+
+
+@app.route('/admin/lan/jeux/propositions/envoyer-top')
+@login_required
+@to_home_if_not_admin
+def admin_lan_game_proposals_send_top() -> Response:
+    if discord.can_send_messages():
+        proposals = db.session.execute(
+            sa.select(LanGameProposal)
+            .options(
+                sa_orm.selectinload(LanGameProposal.game),
+                sa_orm.selectinload(LanGameProposal.votes)
+            )
+        ).scalars().all()
+
+        proposals.sort(key=lambda p: p.votes_count(LanGameProposalVoteType.YES), reverse=True)
+
+        discord.send_message(
+            'Voici le **top 8** actuel des jeux avec le plus de 👍 :',
+            [
+                {
+                    'fields': [
+                        {
+                          'name': proposal.game.name,
+                          'value': '{} 👍'.format(proposal.votes_count(LanGameProposalVoteType.YES)),
+                          'inline': True
+                        } for proposal in proposals
+                    ]
+                }
+            ],
+            [
+                {
+                    'type': 1,
+                    'components': [
+                        {
+                            'type': 2,
+                            'label': 'Voter !',
+                            'style': 5,
+                            'url': url_for('lan_games', _external=True),
+                        }
+                    ]
+                }
+            ]
+        )
+
+        flash('C\'est fait.', 'success')
+    else:
+        flash('Peut pas pour le moment.', 'error')
 
     return redirect(url_for('admin_lan_games'))
