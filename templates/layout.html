@@ -29,15 +29,17 @@
         {% if current_user.is_authenticated %}
             <nav>
                 <ul>
-                    <li>
-                        <details class="dropdown">
-                            <summary>Jeux de la LAN</summary>
-                            <ul>
-                                <li><a href="{{ url_for('lan_games_vote') }}">Voter</a></li>
-                                <li><a href="{{ url_for('lan_games_proposal') }}">Proposer</a></li>
-                            </ul>
-                        </details>
-                    </li>
+                    {% if current_user.is_lan_participant %}
+                        <li>
+                            <details class="dropdown">
+                                <summary>Jeux de la LAN</summary>
+                                <ul>
+                                    <li><a href="{{ url_for('lan_games_vote') }}">Voter</a></li>
+                                    <li><a href="{{ url_for('lan_games_proposal') }}">Proposer</a></li>
+                                </ul>
+                            </details>
+                        </li>
+                    {% endif %}
 
                     {% if current_user.is_admin %}
                         <li>
