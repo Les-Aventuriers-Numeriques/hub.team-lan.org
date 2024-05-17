@@ -312,7 +312,7 @@ def admin_users() -> Union[str, Response]:
     )
 
 
-@app.route('/admin/utilisateurs/<int:user_id>')
+@app.route('/admin/utilisateurs/<int:user_id>/supprimer')
 @login_required
 @to_home_if_not_admin
 def admin_user_delete(user_id: int) -> Response:
