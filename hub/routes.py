@@ -438,7 +438,7 @@ def admin_lan_game_proposals_send_top() -> Response:
         proposals = proposals[:app.config['TOP_LAN_GAME_PROPOSALS']]
 
         discord.send_message(
-            'Voici le **top {TOP_LAN_GAME_PROPOSALS}** actuel des jeux avec le plus de 👍 :'.format(**app.config),
+            'Voici le **top {TOP_LAN_GAME_PROPOSALS}** actuel des jeux proposés :'.format(**app.config),
             [
                 {
                     'color': 0xf56b3d,
