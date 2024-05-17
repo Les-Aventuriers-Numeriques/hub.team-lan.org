@@ -402,6 +402,7 @@ def admin_lan_game_proposals_send_top() -> Response:
             'Voici le **top 8** actuel des jeux avec le plus de 👍 :',
             [
                 {
+                    'color': 0xf56b3d,
                     'fields': [
                         {
                           'name': proposal.game.name,
