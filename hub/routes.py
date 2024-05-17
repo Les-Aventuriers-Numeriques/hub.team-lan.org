@@ -433,7 +433,7 @@ def admin_lan_game_proposals_send_top() -> Response:
             )
         ).scalars().all()
 
-        proposals.sort(key=lambda p: p.votes_count(LanGameProposalVoteType.YES), reverse=True)
+        proposals.sort(key=lambda p: p.score, reverse=True)
 
         proposals = proposals[:app.config['TOP_LAN_GAME_PROPOSALS']]
 
