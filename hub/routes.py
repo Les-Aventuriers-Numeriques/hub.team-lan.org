@@ -305,7 +305,7 @@ def lan_games_proposal_submit(game_id: int) -> Response:
 def admin_users() -> Union[str, Response]:
     users = db.session.execute(
         sa.select(User).order_by(User.display_name.asc())
-    ).scalars()
+    ).scalars().all()
 
     return render_template(
         'admin/users.html',
@@ -343,9 +343,42 @@ def admin_lan_games() -> Union[str, Response]:
             sa_orm.selectinload(LanGameProposal.game),
             sa_orm.selectinload(LanGameProposal.user)
         )
-    ).scalars()
+    ).scalars().all()
 
     return render_template(
         'admin/lan_games.html',
         proposals=proposals
     )
+
+
+@app.route('/admin/lan/jeux/proposition/<int:game_id>/supprimer')
+@login_required
+@to_home_if_not_admin
+def admin_lan_game_proposal_delete(game_id: int) -> Response:
+    result = db.session.execute(
+        sa.delete(LanGameProposal).where(LanGameProposal.game_id == game_id)
+    )
+
+    db.session.commit()
+
+    if result.rowcount == 1:
+        flash('Proposition supprimée.', 'success')
+    else:
+        flash('Aucune proposition à supprimer.', 'error')
+
+    return redirect(url_for('admin_lan_games'))
+
+
+@app.route('/admin/lan/jeux/propositions/reinitialiser')
+@login_required
+@to_home_if_not_admin
+def admin_lan_game_proposals_reset() -> Response:
+    db.session.execute(
+        sa.delete(LanGameProposal)
+    )
+
+    db.session.commit()
+
+    flash('Propositions réinitialisées.', 'success')
+
+    return redirect(url_for('admin_lan_games'))
