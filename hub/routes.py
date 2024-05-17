@@ -378,7 +378,7 @@ def admin_lan_game_proposals_reset() -> Response:
 
     db.session.commit()
 
-    flash('Propositions réinitialisées.', 'success')
+    flash('Propositions et votes réinitialisés.', 'success')
 
     return redirect(url_for('admin_lan_games'))
 
