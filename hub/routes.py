@@ -408,7 +408,7 @@ def admin_lan_game_proposals_send_top() -> Response:
                     'fields': [
                         {
                           'name': proposal.game.name,
-                          'value': '\n\n'.join([
+                          'value': '  '.join([
                               '{} {}'.format(
                                   '👍' if vote_type == vote_type.YES else '😐' if vote_type == vote_type.NEUTRAL else '👎' if vote_type == vote_type.NO else '',
                                   proposal.votes_count(vote_type),
