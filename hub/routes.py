@@ -181,6 +181,8 @@ def lan_games_vote() -> Union[str, Response]:
         )
     ).scalars().all()
 
+    proposals.sort(key=lambda p: p.score, reverse=True)
+
     return render_template(
         'lan/games.html',
         proposals=proposals,
@@ -344,6 +346,8 @@ def admin_lan_games() -> Union[str, Response]:
         )
     ).scalars().all()
 
+    proposals.sort(key=lambda p: p.game.name)
+
     return render_template(
         'admin/lan_games.html',
         proposals=proposals
@@ -368,10 +372,28 @@ def admin_lan_game_proposal_delete(game_id: int) -> Response:
     return redirect(url_for('admin_lan_games'))
 
 
-@app.route('/admin/lan/jeux/propositions/reinitialiser')
+@app.route('/admin/lan/jeux/proposition/<int:game_id>/supprimer-votes')
 @login_required
 @to_home_if_not_admin
-def admin_lan_game_proposals_reset() -> Response:
+def admin_lan_game_proposal_delete_votes(game_id: int) -> Response:
+    result = db.session.execute(
+        sa.delete(LanGameProposalVote).where(LanGameProposalVote.game_proposal_game_id == game_id)
+    )
+
+    db.session.commit()
+
+    if result.rowcount == 1:
+        flash('Votes supprimés.', 'success')
+    else:
+        flash('Aucun vote à supprimer.', 'error')
+
+    return redirect(url_for('admin_lan_games'))
+
+
+@app.route('/admin/lan/jeux/propositions/reinitialiser-tout')
+@login_required
+@to_home_if_not_admin
+def admin_lan_game_proposals_reset_all() -> Response:
     db.session.execute(
         sa.delete(LanGameProposal)
     )
@@ -379,6 +401,21 @@ def admin_lan_game_proposals_reset() -> Response:
     db.session.commit()
 
     flash('Propositions et votes réinitialisés.', 'success')
+
+    return redirect(url_for('admin_lan_games'))
+
+
+@app.route('/admin/lan/jeux/propositions/reinitialiser-votes')
+@login_required
+@to_home_if_not_admin
+def admin_lan_game_proposals_reset_votes() -> Response:
+    db.session.execute(
+        sa.delete(LanGameProposalVote)
+    )
+
+    db.session.commit()
+
+    flash('Votes réinitialisés.', 'success')
 
     return redirect(url_for('admin_lan_games'))
 

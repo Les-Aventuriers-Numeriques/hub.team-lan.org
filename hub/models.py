@@ -1,6 +1,7 @@
 from __future__ import annotations
 from sqlalchemy.orm import mapped_column, relationship
 from sqlalchemy_utils.types import TSVectorType
+from sqlalchemy.util import memoized_property
 from enum import Enum as PythonEnum
 from datetime import UTC, datetime
 from flask_login import UserMixin
@@ -82,6 +83,20 @@ class LanGameProposal(CreatedAtMixin, db.Model):
             return 0.0
 
         return self.votes_count(type_) / votes_total
+
+    @memoized_property
+    def score(self) -> int:
+        score = 0
+
+        for vote in self.votes:
+            if vote.type == LanGameProposalVoteType.YES:
+                score += 2
+            elif vote.type == LanGameProposalVoteType.NEUTRAL:
+                score += 1
+            elif vote.type == LanGameProposalVoteType.NO:
+                score -= 1
+
+        return score
 
     def __repr__(self) -> str:
         return f'LanGameProposal:{self.game_id}'
