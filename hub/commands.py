@@ -1,5 +1,6 @@
 from sqlalchemy.dialects import postgresql
 from hub.models import Game
+import sqlalchemy as sa
 from app import app, db
 import requests
 import click
@@ -12,8 +13,11 @@ def update_games() -> None:
 
     have_more_results = True
     last_appid = None
+    all_app_ids = set()
 
     while have_more_results:
+        click.echo('  Téléchargement du paquet...')
+
         response = requests.get(
             'https://api.steampowered.com/IStoreService/GetAppList/v1/',
             params={
@@ -45,9 +49,21 @@ def update_games() -> None:
         have_more_results = json.get('have_more_results', False)
         last_appid = json.get('last_appid')
 
-        ins = postgresql.insert(Game).values(games)
+        query = postgresql.insert(Game).values(games)
 
-        db.session.execute(ins.on_conflict_do_nothing())
+        click.echo('  Mise à jour de la BDD...')
+
+        db.session.execute(query.on_conflict_do_nothing())
+
+        all_app_ids.update([
+            game['id'] for game in games
+        ])
+
+    click.echo('Suppression des anciens jeux...')
+
+    db.session.execute(
+        sa.delete(Game).where(Game.id.not_in(all_app_ids))
+    )
 
     db.session.commit()
 
