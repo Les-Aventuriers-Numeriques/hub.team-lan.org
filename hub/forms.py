@@ -33,9 +33,10 @@ class LanGamesSettings(FlaskForm):
     )
 
     def validate_lan_games_excluded(self, field):
-        try:
-            field.data = [
-                int(value.strip()) for value in field.data.split(',')
-            ]
-        except ValueError:
-            raise validators.ValidationError('Format invalide : lis donc ce qu\'il y a écrit ci-dessous.')
+        if field.data:
+            try:
+                field.data = [
+                    int(value.strip()) for value in field.data.split(',')
+                ]
+            except ValueError:
+                raise validators.ValidationError('Format invalide : lis donc ce qu\'il y a écrit ci-dessous.')

@@ -27,7 +27,7 @@ body > main .games > * {
 body > main .games > *:target {
     border-width: var(--pico-border-width);
     border-style: solid;
-    border-color: var(--pico-form-element-valid-active-border-color);
+    border-color: var(--pico-primary-border);
     scroll-margin-top: var(--pico-spacing);
 }
 
