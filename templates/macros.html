@@ -1,6 +1,6 @@
-{% macro vote(vote_type, proposal, my_vote=None) -%}
+{% macro vote(vote_type, proposal, my_vote=None, lan_game_status='disabled') -%}
     <div>
-        {% if not my_vote or my_vote.type != vote_type %}
+        {% if lan_game_status == 'enabled' and (not my_vote or my_vote.type != vote_type) %}
             <a href="{{ url_for('lan_games_proposal_vote', game_id=proposal.game.id, vote_type=vote_type.value) }}">
         {%- endif -%}
 
@@ -18,7 +18,7 @@
                 </svg>
             {%- endif -%}
 
-        {%- if not my_vote or my_vote.type != vote_type -%}
+        {%- if lan_game_status == 'enabled' and (not my_vote or my_vote.type != vote_type) -%}
             </a>
         {% endif %}
 

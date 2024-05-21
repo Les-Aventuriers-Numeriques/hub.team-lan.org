@@ -30,10 +30,28 @@ def to_home_if_authenticated(f):
 def to_home_if_cannot_access_lan_section(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        if not current_user.is_lan_participant and not current_user.is_admin:
+        if not current_user.is_lan_participant:
             flash('Désolé, tu ne fais pas partie des participants à la LAN.', 'error')
 
             return redirect(url_for('home'))
+
+        if Setting.get('lan_games_status', 'disabled') == 'disabled':
+            flash('On ne choisis pas encore les jeux pour la LAN, revient plus tard !', 'error')
+
+            return redirect(url_for('home'))
+
+        return f(*args, **kwargs)
+
+    return decorated
+
+
+def to_lan_games_vote_if_lan_section_read_only(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if Setting.get('lan_games_status', 'disabled') == 'read_only':
+            flash('Trop tard, la date de la LAN approche, les propositions et votes sont figés !', 'error')
+
+            return redirect(url_for('lan_games_vote'))
 
         return f(*args, **kwargs)
 
@@ -183,16 +201,20 @@ def lan_games_vote() -> Union[str, Response]:
 
     proposals.sort(key=lambda p: p.score, reverse=True)
 
+    lan_games_status = Setting.get('lan_games_status', 'disabled')
+
     return render_template(
         'lan/games.html',
         proposals=proposals,
-        LanGameProposalVoteType=LanGameProposalVoteType
+        LanGameProposalVoteType=LanGameProposalVoteType,
+        lan_games_status=lan_games_status
     )
 
 
 @app.route('/lan/jeux/voter/<int:game_id>/<any({}):vote_type>'.format(LanGameProposalVoteType.cslist()))
 @login_required
 @to_home_if_cannot_access_lan_section
+@to_lan_games_vote_if_lan_section_read_only
 def lan_games_proposal_vote(game_id: int, vote_type: str) -> Response:
     query = postgresql.insert(LanGameProposalVote).values(
         game_proposal_game_id=game_id,
@@ -219,6 +241,7 @@ def lan_games_proposal_vote(game_id: int, vote_type: str) -> Response:
 @app.route('/lan/jeux/proposer')
 @login_required
 @to_home_if_cannot_access_lan_section
+@to_lan_games_vote_if_lan_section_read_only
 def lan_games_proposal() -> Union[str, Response]:
     form = LanGamesProposalSearchForm(request.args, meta={'csrf': False})
     validated = len(request.args) > 0 and form.validate()
@@ -254,6 +277,7 @@ def lan_games_proposal() -> Union[str, Response]:
 @app.route('/lan/jeux/proposer/<int:game_id>')
 @login_required
 @to_home_if_cannot_access_lan_section
+@to_lan_games_vote_if_lan_section_read_only
 def lan_games_proposal_submit(game_id: int) -> Response:
     try:
         proposal = LanGameProposal()

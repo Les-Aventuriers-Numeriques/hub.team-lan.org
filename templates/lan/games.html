@@ -9,7 +9,11 @@
 {% endblock %}
 
 {% block content %}
-    <p>Ici, on choisit les jeux principaux de la LAN en votant. <a href="{{ url_for('lan_games_proposal') }}">Pour proposer des jeux, c'est par ici</a>.</p>
+    {% if lan_games_status == 'enabled' %}
+        <p>Ici, on choisit les jeux principaux de la LAN en votant. <a href="{{ url_for('lan_games_proposal') }}">Pour proposer des jeux, c'est par ici</a>.</p>
+    {% else %}
+        <p>Voici les résultats finaux des jeux pour la LAN !</p>
+    {% endif %}
 
     {% if proposals %}
         <div class="games">
@@ -21,9 +25,9 @@
                         <img src="{{ proposal.game.image_url }}" alt="Illustration {{ proposal.game.name }}" width="231" height="87">
                     </a>
 
-                    <div class="{{ 'voted' if my_vote }}">
+                    <div>
                         {% for vote_type in LanGameProposalVoteType %}
-                            {{ vote(vote_type, proposal, my_vote) }}
+                            {{ vote(vote_type, proposal, my_vote, lan_game_status=lan_games_status) }}
                         {% endfor %}
                     </div>
                 </article>

@@ -23,6 +23,7 @@ class LanGamesSettings(FlaskForm):
             ('enabled', 'Activée'),
             ('read_only', 'Lecture seule'),
         ],
+        default='disabled',
         description='<strong>Désactivée</strong> : aucun accès, période creuse ; <strong>Activée</strong> : accès normal, période de choix des jeux ; <strong>Lecture seule</strong> : consultation uniquement, date de la LAN proche.'
     )
 

@@ -5,11 +5,11 @@
  * Liste des jeux */
 
 body > main .games > * > div {
-    display: flex;
-    flex-direction: row;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-auto-flow: column;
     column-gap: var(--pico-grid-column-gap);
     row-gap: var(--pico-grid-row-gap);
-    justify-content: center;
 }
 
 body > main .games > * > div > div {
@@ -24,4 +24,5 @@ body > main .games > * > div > div {
 body > main .games > * > div > div > span {
     color: var(--pico-muted-color);
     font-size: 0.7em;
+    white-space: nowrap;
 }
