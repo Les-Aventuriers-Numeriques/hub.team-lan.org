@@ -194,20 +194,20 @@ def lan_games_vote() -> Union[str, Response]:
 @login_required
 @to_home_if_cannot_access_lan_section
 def lan_games_proposal_vote(game_id: int, vote_type: str) -> Response:
-    ins = postgresql.insert(LanGameProposalVote).values(
+    query = postgresql.insert(LanGameProposalVote).values(
         game_proposal_game_id=game_id,
         user_id=current_user.id,
         type=LanGameProposalVoteType(vote_type)
     )
 
-    db.session.execute(ins.on_conflict_do_update(
+    db.session.execute(query.on_conflict_do_update(
         index_elements=[
             LanGameProposalVote.game_proposal_game_id,
             LanGameProposalVote.user_id,
         ],
         set_={
-            LanGameProposalVote.type: ins.excluded.type,
-            LanGameProposalVote.updated_at: datetime.now(UTC)
+            LanGameProposalVote.type: query.excluded.type,
+            LanGameProposalVote.updated_at: datetime.now(UTC),
         }
     ))
 

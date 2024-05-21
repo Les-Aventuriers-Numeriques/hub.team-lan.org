@@ -1,11 +1,12 @@
 from __future__ import annotations
 from sqlalchemy.orm import mapped_column, relationship
+from typing import Optional, Union, List, Dict, Any
 from sqlalchemy_utils.types import TSVectorType
 from sqlalchemy.util import memoized_property
+from sqlalchemy.dialects import postgresql
 from enum import Enum as PythonEnum
 from datetime import UTC, datetime
 from flask_login import UserMixin
-from typing import Optional
 from app import db
 import sqlalchemy as sa
 
@@ -134,6 +135,61 @@ class Setting(UpdatedAtMixin, db.Model):
 
     name = mapped_column(sa.String(255), primary_key=True, autoincrement=False)
     value = mapped_column(sa.PickleType)
+
+    @classmethod
+    def get(cls, name: Union[str, List[str]], default: Any = None) -> Union[str, Dict[str, Any], Any]:
+        if isinstance(name, str):
+            return db.session.execute(
+                sa.select(cls.value).where(cls.name == name)
+            ).scalar() or default
+        elif isinstance(name, list):
+            result = {
+                n: v for n, v in db.session.execute(
+                    sa.select(cls.name, cls.value).where(cls.name.in_(name))
+                ).all()
+            }
+
+            return {
+                n: result.get(n, default) for n in name
+            }
+
+    @classmethod
+    def set(cls, name: Union[str, Dict[str, Any]], value: Optional[Any] = None) -> None:
+        query = postgresql.insert(cls)
+
+        if isinstance(name, str):
+            query = query.values(
+                name=name,
+                value=value
+            )
+        elif isinstance(name, dict):
+            query = query.values([
+                {
+                    'name': n,
+                    'value': v
+                } for n, v in name.items()
+            ])
+
+        db.session.execute(query.on_conflict_do_update(
+            index_elements=[
+                cls.name,
+            ],
+            set_={
+                cls.value: query.excluded.value,
+                cls.updated_at: datetime.now(UTC),
+            }
+        ))
+
+    @classmethod
+    def delete(cls, name: Union[str, List[str]]) -> None:
+        query = sa.delete(cls)
+
+        if isinstance(name, str):
+            query = query.where(cls.name == name)
+        elif isinstance(name, list):
+            query = query.where(cls.name.in_(name))
+
+        db.session.execute(query)
 
 
 db.configure_mappers()
