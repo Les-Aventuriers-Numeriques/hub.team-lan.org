@@ -1,8 +1,8 @@
-from hub.models import User, Game, LanGameProposal, LanGameProposalVote, LanGameProposalVoteType
+from hub.models import User, Game, LanGameProposal, LanGameProposalVote, LanGameProposalVoteType, Setting
 from flask import render_template, redirect, url_for, flash, session, request
 from flask_login import login_required, current_user, logout_user, login_user
+from hub.forms import LanGamesProposalSearchForm, LanGamesSettings
 from sqlalchemy_searchable import search, inspect_search_vectors
-from hub.forms import LanGamesProposalSearchForm
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import NotFound
@@ -334,7 +334,7 @@ def admin_user_delete(user_id: int) -> Response:
     return redirect(url_for('admin_users'))
 
 
-@app.route('/admin/lan/jeux')
+@app.route('/admin/lan/jeux', methods=['GET', 'POST'])
 @login_required
 @to_home_if_not_admin
 def admin_lan_games() -> Union[str, Response]:
@@ -348,9 +348,29 @@ def admin_lan_games() -> Union[str, Response]:
 
     proposals.sort(key=lambda p: p.game.name)
 
+    form_data = Setting.get(['lan_games_status', 'lan_games_excluded'])
+    form_data['lan_games_excluded'] = ', '.join([
+        str(value) for value in form_data.get('lan_games_excluded', []) or []
+    ])
+
+    form = LanGamesSettings(data=form_data)
+
+    if form.validate_on_submit():
+        Setting.set({
+            'lan_games_status': form.lan_games_status.data,
+            'lan_games_excluded': form.lan_games_excluded.data,
+        })
+
+        db.session.commit()
+
+        flash('Paramètres enregistrés.', 'success')
+
+        return redirect(url_for('admin_lan_games'))
+
     return render_template(
         'admin/lan_games.html',
-        proposals=proposals
+        proposals=proposals,
+        form=form
     )
 
 

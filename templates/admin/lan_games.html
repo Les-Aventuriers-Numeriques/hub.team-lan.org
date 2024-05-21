@@ -1,5 +1,7 @@
 {% extends 'layout.html' %}
 
+{% from 'macros.html' import field with context %}
+
 {% block title %}Admin : jeux de la LAN{% endblock %}
 
 {% block cssfiles %}
@@ -7,27 +9,19 @@
 {% endblock %}
 
 {% block content %}
-    {#<form>
-        <label for="status">Statut de la section</label>
+    <form method="post" action="{{ url_for('admin_lan_games') }}">
+        {{ form.csrf_token }}
 
-        <select id="status" name="status">
-            <option>Désactivée</option>
-            <option>Activée</option>
-            <option>Lecture seule</option>
-        </select>
+        {{ field(form.lan_games_status) }}
 
-        <small>
-            <strong>Désactivée</strong> : aucun accès, période creuse ; <strong>Activée</strong> : accès normal, période de choix des jeux ; <strong>Lecture seule</strong> : consultation uniquement, date de la LAN proche.
-        </small>
+        {{ field(form.lan_games_excluded) }}
 
-        <label for="excluded">Jeux exclus</label>
-
-        <textarea id="excluded" name="excluded"></textarea>
-
-        <small>Identifiants de jeux Steam séparés par des virgules qui ne seront pas disponibles à la proposition.</small>
+        <p class="mb-0">
+            <button type="submit" class="mb-0">Enregistrer</button>
+        </p>
     </form>
 
-    <h2>Propositions</h2>#}
+    <h2>Propositions</h2>
 
     {% if proposals %}
         <p>

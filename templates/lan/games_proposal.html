@@ -1,5 +1,7 @@
 {% extends 'layout.html' %}
 
+{% from 'macros.html' import field with context %}
+
 {% block title %}Jeux de la LAN : proposer{% endblock %}
 
 {% block cssfiles %}
@@ -10,15 +12,7 @@
     <p>Propose ici des jeux pour la LAN. Tu as accès à l'entièreté du catalogue Steam. <a href="{{ url_for('lan_games_vote') }}">Pour voter pour des jeux, c'est par là</a>.</p>
 
     <form method="get" action="{{ url_for('lan_games_proposal') }}">
-        <div>
-            {{ form.terms(placeholder='Tape le nom d\'un jeu...', aria_invalid='true' if form.terms.errors else '', class='mb-0' if not validated) }}
-
-            {% if form.terms.errors %}
-                <small class="mb-0">
-                    {{ form.terms.errors|join('<br>') }}
-                </small>
-            {% endif %}
-        </div>
+        {{ field(form.terms, with_label=False) }}
     </form>
 
     {% if validated %}
