@@ -129,7 +129,7 @@ class LanGameProposalVote(CreatedAtMixin, UpdatedAtMixin, db.Model):
         return f'LanGameProposalVote:{self.game_proposal_game_id}+{self.user_id}'
 
 
-class Setting(CreatedAtMixin, UpdatedAtMixin, db.Model):
+class Setting(UpdatedAtMixin, db.Model):
     __tablename__ = 'settings'
 
     name = mapped_column(sa.String(255), primary_key=True, autoincrement=False)
