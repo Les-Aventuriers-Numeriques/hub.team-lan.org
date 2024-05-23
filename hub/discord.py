@@ -1,10 +1,13 @@
-from typing import Dict, List, Optional
+from hub.models import User, Game, LanGameProposalVoteType
+from flask_discord_interactions.models.embed import Media
+from flask_discord_interactions import Message, Embed, ActionRow, ButtonStyles, Button
 from urllib.parse import urlencode
 from flask import url_for, session
+from typing import Dict, Literal
 from requests import Response
 from app import app
-import secrets
 import requests
+import secrets
 
 requests = requests.Session()
 requests.headers.update({
@@ -17,6 +20,8 @@ SCOPES = (
 )
 
 API_BASE_URL = 'https://discord.com/api'
+
+EMBEDS_COLOR = 0xf56b3d
 
 
 def generate_authorize_url() -> str:
@@ -59,15 +64,60 @@ def can_send_messages() -> bool:
     return app.config['DISCORD_LAN_CHANNEL_ID'] and app.config['DISCORD_BOT_TOKEN']
 
 
-def send_message(content: str, embeds: Optional[List] = None, components: Optional[List] = None) -> Response:
+def send_proposal_message(user: User, game: Game) -> Response:
+    data, content_type = Message(
+        f'**{user.display_name}** a proposé un nouveau jeu :',
+        embed=Embed(
+            title=game.name,
+            color=EMBEDS_COLOR,
+            url=f'https://store.steampowered.com/app/{game.id}',
+            image=Media(f'https://cdn.cloudflare.steamstatic.com/steam/apps/{game.id}/capsule_231x87.jpg')
+        ),
+        components=[
+            ActionRow(
+                components=[
+                    Button(
+                        custom_id=_component_custom_id('v', gid=game.id, v=vote_type.value),
+                        style=ButtonStyles.PRIMARY,
+                        emoji={
+                            'name': _vote_type_emoji(vote_type),
+                        }
+                    ) for vote_type in LanGameProposalVoteType
+                ] + [
+                    Button(
+                        style=ButtonStyles.LINK,
+                        label='Voir tous les jeux',
+                        url=url_for('lan_games_vote', _external=True),
+                    )
+                ]
+            )
+        ]
+    ).encode(True)
+
     return requests.post(
         '{API_BASE_URL}/channels/{DISCORD_LAN_CHANNEL_ID}/messages'.format(API_BASE_URL=API_BASE_URL, **app.config),
-        json={
-            'content': content,
-            'embeds': embeds,
-            'components': components,
-        },
+        data=data,
         headers={
+            'Content-Type': content_type,
             'Authorization': 'Bot {DISCORD_BOT_TOKEN}'.format(**app.config),
         }
     )
+
+
+def _vote_type_emoji(vote_type: LanGameProposalVoteType) -> str:
+    if vote_type == vote_type.YES:
+        return '👍'
+
+    if vote_type == vote_type.NEUTRAL:
+        return '😐'
+
+    if vote_type == vote_type.NO:
+        return '👎'
+
+    return ''
+
+
+def _component_custom_id(action: Literal['v'], **params) -> str:
+    return urlencode({
+        'a': action,
+    } | params)

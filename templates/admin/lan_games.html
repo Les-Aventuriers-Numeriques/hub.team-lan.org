@@ -25,7 +25,6 @@
 
     {% if proposals %}
         <p>
-            <a href="{{ url_for('admin_lan_game_proposals_send_top') }}" role="button" class="secondary" onclick="return confirm('Le message sera envoyé immédiatement sur le canal. Confirmer ?')">Envoyer le top {{ config['TOP_LAN_GAME_PROPOSALS'] }} sur Discord</a>
             <a href="{{ url_for('admin_lan_game_proposals_reset_votes') }}" role="button" class="secondary" onclick="return confirm('Tous les votes seront supprimés. Confirmer ?')">Réinitialiser les votes</a>
             <a href="{{ url_for('admin_lan_game_proposals_reset_all') }}" role="button" class="secondary" onclick="return confirm('Toutes les propositions et votes seront supprimés. Confirmer ?')">Réinitialiser tout</a>
         </p>

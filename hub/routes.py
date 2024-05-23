@@ -297,33 +297,9 @@ def lan_games_proposal_submit(game_id: int) -> Response:
         db.session.commit()
 
         if discord.can_send_messages():
-            game = db.get_or_404(Game, game_id)
-
-            discord.send_message(
-                f'**{current_user.display_name}** a proposé un nouveau jeu :',
-                [
-                    {
-                        'title': game.name,
-                        'color': 0xf56b3d,
-                        'url': f'https://store.steampowered.com/app/{game.id}',
-                        'image': {
-                            'url': f'https://cdn.cloudflare.steamstatic.com/steam/apps/{game.id}/capsule_231x87.jpg',
-                        }
-                    }
-                ],
-                [
-                    {
-                        'type': 1,
-                        'components': [
-                            {
-                                'type': 2,
-                                'label': 'Voter !',
-                                'style': 5,
-                                'url': url_for('lan_games_vote', _external=True),
-                            }
-                        ]
-                    }
-                ]
+            discord.send_proposal_message(
+                current_user,
+                db.get_or_404(Game, game_id)
             )
     except IntegrityError:
         flash('Ce jeu a déjà été proposé (ou identifiant de jeu invalide).', 'error')
@@ -475,59 +451,59 @@ def admin_lan_game_proposals_reset_votes() -> Response:
     return redirect(url_for('admin_lan_games'))
 
 
-@app.route('/admin/lan/jeux/propositions/envoyer-top')
-@login_required
-@to_home_if_not_admin
-def admin_lan_game_proposals_send_top() -> Response:
-    if discord.can_send_messages():
-        proposals = db.session.execute(
-            sa.select(LanGameProposal)
-            .options(
-                sa_orm.selectinload(LanGameProposal.game),
-                sa_orm.selectinload(LanGameProposal.votes)
-            )
-        ).scalars().all()
-
-        proposals.sort(key=lambda p: p.score, reverse=True)
-
-        proposals = proposals[:app.config['TOP_LAN_GAME_PROPOSALS']]
-
-        discord.send_message(
-            'Voici le **top {TOP_LAN_GAME_PROPOSALS}** actuel des jeux proposés :'.format(**app.config),
-            [
-                {
-                    'color': 0xf56b3d,
-                    'fields': [
-                        {
-                          'name': proposal.game.name,
-                          'value': '  '.join([
-                              '{} {}'.format(
-                                  '👍' if vote_type == vote_type.YES else '😐' if vote_type == vote_type.NEUTRAL else '👎' if vote_type == vote_type.NO else '',
-                                  proposal.votes_count(vote_type),
-                              ) for vote_type in LanGameProposalVoteType
-                          ]),
-                          'inline': True
-                        } for proposal in proposals
-                    ]
-                }
-            ],
-            [
-                {
-                    'type': 1,
-                    'components': [
-                        {
-                            'type': 2,
-                            'label': 'Voter !',
-                            'style': 5,
-                            'url': url_for('lan_games_vote', _external=True),
-                        }
-                    ]
-                }
-            ]
-        )
-
-        flash('C\'est fait.', 'success')
-    else:
-        flash('Peut pas pour le moment.', 'error')
-
-    return redirect(url_for('admin_lan_games'))
+# @app.route('/admin/lan/jeux/propositions/envoyer-top')
+# @login_required
+# @to_home_if_not_admin
+# def admin_lan_game_proposals_send_top() -> Response:
+#     if discord.can_send_messages():
+#         proposals = db.session.execute(
+#             sa.select(LanGameProposal)
+#             .options(
+#                 sa_orm.selectinload(LanGameProposal.game),
+#                 sa_orm.selectinload(LanGameProposal.votes)
+#             )
+#         ).scalars().all()
+#
+#         proposals.sort(key=lambda p: p.score, reverse=True)
+#
+#         proposals = proposals[:app.config['TOP_LAN_GAME_PROPOSALS']]
+#
+#         discord.send_message(
+#             'Voici le **top {TOP_LAN_GAME_PROPOSALS}** actuel des jeux proposés :'.format(**app.config),
+#             [
+#                 {
+#                     'color': 0xf56b3d,
+#                     'fields': [
+#                         {
+#                           'name': proposal.game.name,
+#                           'value': '  '.join([
+#                               '{} {}'.format(
+#                                   '👍' if vote_type == vote_type.YES else '😐' if vote_type == vote_type.NEUTRAL else '👎' if vote_type == vote_type.NO else '',
+#                                   proposal.votes_count(vote_type),
+#                               ) for vote_type in LanGameProposalVoteType
+#                           ]),
+#                           'inline': True
+#                         } for proposal in proposals
+#                     ]
+#                 }
+#             ],
+#             [
+#                 {
+#                     'type': 1,
+#                     'components': [
+#                         {
+#                             'type': 2,
+#                             'style': 5,
+#                             'label': 'Voir tous les jeux',
+#                             'url': url_for('lan_games_vote', _external=True),
+#                         }
+#                     ]
+#                 }
+#             ]
+#         )
+#
+#         flash('C\'est fait.', 'success')
+#     else:
+#         flash('Peut pas pour le moment.', 'error')
+#
+#     return redirect(url_for('admin_lan_games'))

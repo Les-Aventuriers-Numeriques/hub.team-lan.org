@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, session
+from flask_discord_interactions import DiscordInteractions
 from sqlalchemy_searchable import make_searchable
 from werkzeug.exceptions import HTTPException
 from flask_assets import Environment, Bundle
@@ -60,6 +61,8 @@ app.config.update(
     USE_SESSION_FOR_NEXT=True,
 
     TOP_LAN_GAME_PROPOSALS=9,
+
+    DISCORD_INTERACTIONS_PATH='/discord-interactions',
 )
 
 # -----------------------------------------------------------
@@ -117,6 +120,10 @@ assets.register('css_lan_games_proposal', Bundle('css/base.css', 'css/lan_games.
 # Flask-Babel
 babel = Babel(app)
 
+# Flask-Discord-Interactions
+discord_interactions = DiscordInteractions(app)
+discord_interactions.set_route(app.config['DISCORD_INTERACTIONS_PATH'])
+
 # Flask-SQLAlchemy
 class AppDeclarativeBase(DeclarativeBase):
     pass
@@ -149,6 +156,9 @@ def load_user(user_id: str):
 @app.before_request
 def before_request():
     if request.endpoint and request.endpoint.startswith(('static', 'debugtoolbar', '_debug_toolbar')):
+        return
+
+    if request.path == app.config['DISCORD_INTERACTIONS_PATH']:
         return
 
     session.permanent = True

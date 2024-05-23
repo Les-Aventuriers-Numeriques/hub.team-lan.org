@@ -5,6 +5,7 @@ Flask-Migrate==4.0.7
 Flask-Login==0.6.3
 flask-babel==4.0.0
 Flask-WTF==1.2.1
+Flask-Discord-Interactions==2.1.2
 sqlalchemy-searchable==2.1.0
 environs==11.0.0
 cssutils==2.11.0
