@@ -77,18 +77,23 @@ def send_proposal_message(user: User, game: Game) -> Response:
             ActionRow(
                 components=[
                     Button(
-                        custom_id=_component_custom_id('v', gid=game.id, v=vote_type.value),
                         style=ButtonStyles.PRIMARY,
+                        custom_id=_component_custom_id('v', gid=game.id, v=vote_type.value),
                         emoji={
                             'name': _vote_type_emoji(vote_type),
                         }
                     ) for vote_type in LanGameProposalVoteType
                 ] + [
                     Button(
+                        style=ButtonStyles.SECONDARY,
+                        custom_id=_component_custom_id('t'),
+                        label='Voir le top {TOP_LAN_GAME_PROPOSALS}'.format(**app.config),
+                    ),
+                    Button(
                         style=ButtonStyles.LINK,
                         label='Voir tous les jeux',
                         url=url_for('lan_games_vote', _external=True),
-                    )
+                    ),
                 ]
             )
         ]
@@ -117,7 +122,7 @@ def _vote_type_emoji(vote_type: LanGameProposalVoteType) -> str:
     return ''
 
 
-def _component_custom_id(action: Literal['v'], **params) -> str:
+def _component_custom_id(action: Literal['v', 't'], **params) -> str:
     return urlencode({
         'a': action,
     } | params)
