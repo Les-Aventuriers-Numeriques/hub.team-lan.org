@@ -1,11 +1,13 @@
-from hub.models import User, Game, LanGameProposalVoteType
-from flask_discord_interactions.models.embed import Media
 from flask_discord_interactions import Message, Embed, ActionRow, ButtonStyles, Button
+from hub.models import User, Game, LanGameProposalVoteType, LanGameProposal
+from flask_discord_interactions.models.embed import Media, Field
+from app import app, db, discord_interactions
 from urllib.parse import urlencode
 from flask import url_for, session
 from typing import Dict, Literal
 from requests import Response
-from app import app
+import sqlalchemy.orm as sa_orm
+import sqlalchemy as sa
 import requests
 import secrets
 
@@ -64,7 +66,75 @@ def can_send_messages() -> bool:
     return app.config['DISCORD_LAN_CHANNEL_ID'] and app.config['DISCORD_BOT_TOKEN']
 
 
+@discord_interactions.custom_handler('top')
+def _handle_top_button(ctx):
+    proposals = db.session.execute(
+        sa.select(LanGameProposal)
+        .options(
+            sa_orm.selectinload(LanGameProposal.game),
+            sa_orm.selectinload(LanGameProposal.votes)
+        )
+    ).scalars().all()
+
+    proposals.sort(key=lambda p: p.score, reverse=True)
+
+    proposals = proposals[:app.config['TOP_LAN_GAME_PROPOSALS']]
+
+    return Message(
+        'Voici le **top {TOP_LAN_GAME_PROPOSALS}** actuel des jeux proposés :'.format(**app.config),
+        embed=Embed(
+            color=EMBEDS_COLOR,
+            fields=[
+                Field(
+                    name=proposal.game.name,
+                    value='  '.join([
+                        '{} {}'.format(
+                            _vote_type_emoji(vote_type),
+                            proposal.votes_count(vote_type),
+                        ) for vote_type in LanGameProposalVoteType
+                    ]),
+                    inline=True
+                ) for proposal in proposals
+            ]
+        ),
+        components=[
+            ActionRow(
+                components=[
+                    Button(
+                        style=ButtonStyles.LINK,
+                        label='Voir tous les jeux',
+                        url=url_for('lan_games_vote', _external=True),
+                    )
+                ]
+            )
+        ]
+    )
+
+
 def send_proposal_message(user: User, game: Game) -> Response:
+    components = [
+        Button(
+            style=ButtonStyles.PRIMARY,
+            custom_id=_component_custom_id('v', gid=game.id, v=vote_type.value),
+            emoji={
+                'name': _vote_type_emoji(vote_type),
+            }
+        ) for vote_type in LanGameProposalVoteType
+    ]
+
+    components.extend([
+        Button(
+            style=ButtonStyles.SECONDARY,
+            custom_id=_handle_top_button,
+            label='Voir le top {TOP_LAN_GAME_PROPOSALS}'.format(**app.config),
+        ),
+        Button(
+            style=ButtonStyles.LINK,
+            label='Voir tous les jeux',
+            url=url_for('lan_games_vote', _external=True),
+        )
+    ])
+
     data, content_type = Message(
         f'**{user.display_name}** a proposé un nouveau jeu :',
         embed=Embed(
@@ -75,26 +145,7 @@ def send_proposal_message(user: User, game: Game) -> Response:
         ),
         components=[
             ActionRow(
-                components=[
-                    Button(
-                        style=ButtonStyles.PRIMARY,
-                        custom_id=_component_custom_id('v', gid=game.id, v=vote_type.value),
-                        emoji={
-                            'name': _vote_type_emoji(vote_type),
-                        }
-                    ) for vote_type in LanGameProposalVoteType
-                ] + [
-                    Button(
-                        style=ButtonStyles.SECONDARY,
-                        custom_id=_component_custom_id('t'),
-                        label='Voir le top {TOP_LAN_GAME_PROPOSALS}'.format(**app.config),
-                    ),
-                    Button(
-                        style=ButtonStyles.LINK,
-                        label='Voir tous les jeux',
-                        url=url_for('lan_games_vote', _external=True),
-                    ),
-                ]
+                components=components
             )
         ]
     ).encode(True)
