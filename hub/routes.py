@@ -216,26 +216,18 @@ def lan_games_vote() -> Union[str, Response]:
 @to_home_if_cannot_access_lan_section
 @to_lan_games_vote_if_lan_section_read_only
 def lan_games_proposal_vote(game_id: int, vote_type: str) -> Response:
-    query = postgresql.insert(LanGameProposalVote).values(
-        game_proposal_game_id=game_id,
-        user_id=current_user.id,
-        type=LanGameProposalVoteType(vote_type)
-    )
+    anchor = None
 
-    db.session.execute(query.on_conflict_do_update(
-        index_elements=[
-            LanGameProposalVote.game_proposal_game_id,
-            LanGameProposalVote.user_id,
-        ],
-        set_={
-            LanGameProposalVote.type: query.excluded.type,
-            LanGameProposalVote.updated_at: datetime.now(UTC),
-        }
-    ))
+    try:
+        LanGameProposalVote.vote(current_user, game_id, LanGameProposalVoteType(vote_type))
 
-    db.session.commit()
+        db.session.commit()
 
-    return redirect(url_for('lan_games_vote', _anchor=f'g-{game_id}'))
+        anchor = f'g-{game_id}'
+    except IntegrityError:
+        flash('Identifiant de jeu invalide.', 'error')
+
+    return redirect(url_for('lan_games_vote', _anchor=anchor))
 
 
 @app.route('/lan/jeux/proposer')
@@ -283,6 +275,8 @@ def lan_games_proposal() -> Union[str, Response]:
 @to_home_if_cannot_access_lan_section
 @to_lan_games_vote_if_lan_section_read_only
 def lan_games_proposal_submit(game_id: int) -> Response:
+    anchor = None
+
     try:
         excluded_game_ids = Setting.get('lan_games_excluded', [])
 
@@ -301,6 +295,8 @@ def lan_games_proposal_submit(game_id: int) -> Response:
                 current_user,
                 db.get_or_404(Game, game_id)
             )
+
+        anchor = f'g-{game_id}'
     except IntegrityError:
         flash('Ce jeu a déjà été proposé (ou identifiant de jeu invalide).', 'error')
     except NotFound:
@@ -308,7 +304,7 @@ def lan_games_proposal_submit(game_id: int) -> Response:
     except ValueError:
         flash('Ce jeu est exclu des propositions.', 'error')
 
-    return redirect(url_for('lan_games_proposal', **request.args, _anchor=f'g-{game_id}'))
+    return redirect(url_for('lan_games_proposal', **request.args, _anchor=anchor))
 
 
 @app.route('/admin/utilisateurs')

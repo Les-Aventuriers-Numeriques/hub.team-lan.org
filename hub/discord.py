@@ -1,7 +1,8 @@
 from flask_discord_interactions import Message, Embed, ActionRow, ButtonStyles, Button
-from hub.models import User, Game, LanGameProposalVoteType, LanGameProposal
+from hub.models import User, Game, LanGameProposalVoteType, LanGameProposal, Setting, LanGameProposalVote
 from flask_discord_interactions.models.embed import Media, Field
 from app import app, db, discord_interactions
+from sqlalchemy.exc import IntegrityError
 from urllib.parse import urlencode
 from flask import url_for, session
 from typing import Dict, Literal
@@ -68,6 +69,11 @@ def can_send_messages() -> bool:
 
 @discord_interactions.custom_handler('top')
 def _handle_top_button(ctx):
+    if Setting.get('lan_games_status', 'disabled') == 'disabled':
+        return Message(
+            'On ne choisis pas encore les jeux pour la LAN !'
+        )
+
     proposals = db.session.execute(
         sa.select(LanGameProposal)
         .options(
@@ -111,11 +117,47 @@ def _handle_top_button(ctx):
     )
 
 
+@discord_interactions.custom_handler('vote')
+def _handle_vote_button(ctx, game_id: int, vote_type: Literal['YES', 'NEUTRAL', 'NO']):
+    user = db.session.get(User, ctx.author.id)
+
+    if not user:
+        message = 'Tu n\'a pas encore de compte sur notre intranet. Crée-le ici {} et rééssaye. Tu peux également voter ici {}.'.format(
+            url_for('login', _external=True),
+            url_for('lan_games_vote', _external=True),
+        )
+    elif not user.is_lan_participant:
+        message = 'Désolé, tu ne fais pas partie des participants à la LAN.'
+    else:
+        lan_games_status = Setting.get('lan_games_status', 'disabled')
+
+        if lan_games_status == 'disabled':
+            message = 'On ne choisis pas encore les jeux pour la LAN, revient plus tard !'
+        elif lan_games_status == 'read_only':
+            message = 'Trop tard, la date de la LAN approche, les propositions et votes sont figés !'
+        else:
+            try:
+                LanGameProposalVote.vote(user, game_id, LanGameProposalVoteType(vote_type))
+
+                db.session.commit()
+
+                message = 'A voté !'
+            except ValueError:
+                message = 'Type de vote invalide.'
+            except IntegrityError:
+                message = 'Identifiant de jeu invalide.'
+
+    return Message(
+        message,
+        ephemeral=True
+    )
+
+
 def send_proposal_message(user: User, game: Game) -> Response:
     components = [
         Button(
             style=ButtonStyles.PRIMARY,
-            custom_id=_component_custom_id('v', gid=game.id, v=vote_type.value),
+            custom_id=[_handle_vote_button, game.id, vote_type.value],
             emoji={
                 'name': _vote_type_emoji(vote_type),
             }
@@ -171,9 +213,3 @@ def _vote_type_emoji(vote_type: LanGameProposalVoteType) -> str:
         return '👎'
 
     return ''
-
-
-def _component_custom_id(action: Literal['v', 't'], **params) -> str:
-    return urlencode({
-        'a': action,
-    } | params)

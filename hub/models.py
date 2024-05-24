@@ -126,6 +126,25 @@ class LanGameProposalVote(CreatedAtMixin, UpdatedAtMixin, db.Model):
     proposal = relationship('LanGameProposal', uselist=False, back_populates='votes')
     user = relationship('User', uselist=False, back_populates='votes')
 
+    @classmethod
+    def vote(cls, user: User, game_id: int, vote_type: LanGameProposalVoteType):
+        query = postgresql.insert(cls).values(
+            game_proposal_game_id=game_id,
+            user_id=user.id,
+            type=vote_type
+        )
+
+        db.session.execute(query.on_conflict_do_update(
+            index_elements=[
+                cls.game_proposal_game_id,
+                cls.user_id,
+            ],
+            set_={
+                cls.type: query.excluded.type,
+                cls.updated_at: datetime.now(UTC),
+            }
+        ))
+
     def __repr__(self) -> str:
         return f'LanGameProposalVote:{self.game_proposal_game_id}+{self.user_id}'
 
