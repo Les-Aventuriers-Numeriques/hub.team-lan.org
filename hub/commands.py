@@ -1,4 +1,5 @@
 from sqlalchemy.dialects import postgresql
+from itertools import batched
 from hub.models import Game
 import sqlalchemy as sa
 from app import app, db
@@ -27,7 +28,7 @@ def update_games() -> None:
                 'include_software': 'false',
                 'include_videos': 'false',
                 'include_hardware': 'false',
-                'max_results': 10000,
+                'max_results': 5000,
                 'last_appid': last_appid,
             },
             headers={
@@ -61,9 +62,10 @@ def update_games() -> None:
 
     click.echo('Suppression des anciens jeux...')
 
-    db.session.execute(
-        sa.delete(Game).where(Game.id.not_in(all_app_ids))
-    )
+    for all_app_ids_chunk in batched(all_app_ids, 5000):
+        db.session.execute(
+            sa.delete(Game).where(Game.id.not_in(all_app_ids_chunk))
+        )
 
     db.session.commit()
 
