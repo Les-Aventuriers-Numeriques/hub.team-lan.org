@@ -60,6 +60,8 @@ def update_games() -> None:
             game['id'] for game in games
         ])
 
+    db.session.commit()
+
     click.echo('Suppression des anciens jeux...')
 
     for all_app_ids_chunk in batched(all_app_ids, 5000):
