@@ -6,7 +6,6 @@ from sqlalchemy_searchable import search, inspect_search_vectors
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import NotFound
-from datetime import datetime, UTC
 from werkzeug import Response
 from functools import wraps
 from typing import Union
