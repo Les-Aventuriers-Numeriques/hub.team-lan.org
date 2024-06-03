@@ -87,4 +87,6 @@ def downgrade():
     op.execute('DROP FUNCTION parse_websearch(regconfig, text);')
     op.execute('DROP FUNCTION parse_websearch(text);')
 
+    op.execute('DROP TYPE langameproposalvotetype;')
+
     # ### end Alembic commands ###
