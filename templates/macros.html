@@ -22,7 +22,7 @@
             </a>
         {% endif %}
 
-        <span>{{ proposal.votes_count(vote_type) }} ({{ proposal.votes_percentage(vote_type)|percentformat }})</span>
+        <span{% if proposal.votes_count(vote_type) %} data-tooltip="{{ proposal.votes_by_type(vote_type)|join(', ', attribute='user.display_name') }}"{% endif %}>{{ proposal.votes_count(vote_type) }} ({{ proposal.votes_percentage(vote_type)|percentformat }})</span>
     </div>
 {%- endmacro %}
 

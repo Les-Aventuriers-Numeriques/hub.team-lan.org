@@ -72,10 +72,13 @@ class LanGameProposal(CreatedAtMixin, db.Model):
     game = relationship('Game', uselist=False, back_populates='proposal')
     user = relationship('User', uselist=False, back_populates='proposals')
 
-    def votes_count(self, type_: LanGameProposalVoteType) -> int:
-        return len([
+    def votes_by_type(self, type_: LanGameProposalVoteType) -> List[LanGameProposalVote]:
+        return [
             vote for vote in self.votes if vote.type == type_
-        ])
+        ]
+
+    def votes_count(self, type_: LanGameProposalVoteType) -> int:
+        return len(self.votes_by_type(type_))
 
     def votes_percentage(self, type_: LanGameProposalVoteType) -> float:
         votes_total = len(self.votes)
