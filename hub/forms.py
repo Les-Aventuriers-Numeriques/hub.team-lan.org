@@ -1,6 +1,6 @@
 from wtforms import SearchField, SelectField, TextAreaField
 from sqlalchemy import func as sa_func
-from hub.models import LanGameProposal
+from hub.models import LanGameProposal, Game
 from flask_wtf import FlaskForm
 from app import db
 import wtforms.validators as validators
@@ -45,12 +45,20 @@ class LanGamesSettings(FlaskForm):
             except ValueError:
                 raise validators.ValidationError('Format invalide : lis donc ce qu\'il y a écrit ci-dessous.')
 
-            count = db.session.execute(
+            existing_count = db.session.execute(
+                sa.select(sa_func.count('*')).select_from(Game)
+                .where(Game.id.in_(data))
+            ).scalar()
+
+            if existing_count != len(data):
+                raise validators.ValidationError('Certains identifiants donnés ne correspondent à aucun jeu connu.')
+
+            already_proposed_count = db.session.execute(
                 sa.select(sa_func.count('*')).select_from(LanGameProposal)
                 .where(LanGameProposal.game_id.in_(data))
             ).scalar()
 
-            if count > 0:
-                raise validators.ValidationError('Impossible d\'exclure un jeu déjà proposé (il faut le supprimer des propositions avant).')
+            if already_proposed_count > 0:
+                raise validators.ValidationError('Certains identifiants donnés concernent des jeux déjà proposés (il faut les supprimer des propositions avant).')
 
             field.data = data
