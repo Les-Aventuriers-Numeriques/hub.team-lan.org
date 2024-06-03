@@ -29,13 +29,18 @@
         {% if current_user.is_authenticated %}
             <nav>
                 <ul>
-                    {% if current_user.is_lan_participant %}
+                    {% if current_user.is_lan_participant and g.lan_games_status != 'disabled' %}
                         <li>
                             <details class="dropdown">
-                                <summary>Jeux de la LAN</summary>
+                                <summary>LAN party</summary>
                                 <ul>
-                                    <li><a href="{{ url_for('lan_games_vote') }}">Voter</a></li>
-                                    <li><a href="{{ url_for('lan_games_proposal') }}">Proposer</a></li>
+                                    {% if g.lan_games_status != 'disabled' %}
+                                        <li><a href="{{ url_for('lan_games_vote') }}">Voter pour des jeux</a></li>
+
+                                        {% if g.lan_games_status == 'enabled' %}
+                                            <li><a href="{{ url_for('lan_games_proposal') }}">Proposer des jeux</a></li>
+                                        {% endif %}
+                                    {% endif %}
                                 </ul>
                             </details>
                         </li>
@@ -47,7 +52,7 @@
                                 <summary>Administration</summary>
                                 <ul>
                                     <li><a href="{{ url_for('admin_users') }}">Utilisateurs</a></li>
-                                    <li><a href="{{ url_for('admin_lan_games') }}">Jeux de la LAN</a></li>
+                                    <li><a href="{{ url_for('admin_lan_games') }}">LAN party : jeux</a></li>
                                 </ul>
                             </details>
                         </li>

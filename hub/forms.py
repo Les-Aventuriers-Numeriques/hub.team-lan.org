@@ -1,6 +1,6 @@
 from wtforms import SearchField, SelectField, TextAreaField
-from sqlalchemy import func as sa_func
 from hub.models import LanGameProposal, Game
+from sqlalchemy import func as sa_func
 from flask_wtf import FlaskForm
 from app import db
 import wtforms.validators as validators

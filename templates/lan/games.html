@@ -2,14 +2,14 @@
 
 {% from 'macros.html' import vote with context %}
 
-{% block title %}Jeux de la LAN : voter{% endblock %}
+{% block title %}LAN party : voter pour des jeux{% endblock %}
 
 {% block cssfiles %}
     {% assets 'css_lan_games_vote' %}<link rel="stylesheet" href="{{ ASSET_URL }}">{% endassets %}
 {% endblock %}
 
 {% block content %}
-    {% if lan_games_status == 'enabled' %}
+    {% if g.lan_games_status == 'enabled' %}
         <p>Ici, on choisit les jeux principaux de la LAN en votant. <a href="{{ url_for('lan_games_proposal') }}">Pour proposer des jeux, c'est par ici</a>.</p>
     {% else %}
         <p>Voici les résultats finaux des jeux pour la LAN !</p>
@@ -27,7 +27,7 @@
 
                     <div>
                         {% for vote_type in LanGameProposalVoteType %}
-                            {{ vote(vote_type, proposal, my_vote, lan_game_status=lan_games_status) }}
+                            {{ vote(vote_type, proposal, my_vote) }}
                         {% endfor %}
                     </div>
                 </article>

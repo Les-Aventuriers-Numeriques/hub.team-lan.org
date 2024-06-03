@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session
+from flask import Flask, render_template, request, session, g
 from flask_discord_interactions import DiscordInteractions
 from sqlalchemy_searchable import make_searchable
 from werkzeug.exceptions import HTTPException
@@ -158,6 +158,8 @@ def load_user(user_id: str):
 def before_request():
     if request.endpoint and request.endpoint.startswith(('static', 'debugtoolbar', '_debug_toolbar')):
         return
+
+    g.lan_games_status =  hub.models.Setting.get('lan_games_status', 'disabled')
 
     if request.path == app.config['DISCORD_INTERACTIONS_PATH']:
         return

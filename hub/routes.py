@@ -1,5 +1,5 @@
 from hub.models import User, Game, LanGameProposal, LanGameProposalVote, LanGameProposalVoteType, Setting
-from flask import render_template, redirect, url_for, flash, session, request
+from flask import render_template, redirect, url_for, flash, session, request, g
 from flask_login import login_required, current_user, logout_user, login_user
 from hub.forms import LanGamesProposalSearchForm, LanGamesSettings
 from sqlalchemy_searchable import search, inspect_search_vectors
@@ -34,7 +34,7 @@ def to_home_if_cannot_access_lan_section(f):
 
             return redirect(url_for('home'))
 
-        if Setting.get('lan_games_status', 'disabled') == 'disabled':
+        if g.lan_games_status == 'disabled':
             flash('On ne choisis pas encore les jeux pour la LAN, revient plus tard !', 'error')
 
             return redirect(url_for('home'))
@@ -47,7 +47,7 @@ def to_home_if_cannot_access_lan_section(f):
 def to_lan_games_vote_if_lan_section_read_only(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        if Setting.get('lan_games_status', 'disabled') == 'read_only':
+        if g.lan_games_status == 'read_only':
             flash('Trop tard, la date de la LAN approche, les propositions et votes sont figés !', 'error')
 
             return redirect(url_for('lan_games_vote'))
@@ -200,13 +200,10 @@ def lan_games_vote() -> Union[str, Response]:
 
     proposals.sort(key=lambda p: p.score, reverse=True)
 
-    lan_games_status = Setting.get('lan_games_status', 'disabled')
-
     return render_template(
         'lan/games.html',
         proposals=proposals,
-        LanGameProposalVoteType=LanGameProposalVoteType,
-        lan_games_status=lan_games_status
+        LanGameProposalVoteType=LanGameProposalVoteType
     )
 
 

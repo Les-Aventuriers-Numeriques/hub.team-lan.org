@@ -3,8 +3,8 @@ from hub.models import User, Game, LanGameProposalVoteType, LanGameProposal, Set
 from flask_discord_interactions.models.embed import Media, Field
 from app import app, db, discord_interactions
 from sqlalchemy.exc import IntegrityError
+from flask import url_for, session, g
 from urllib.parse import urlencode
-from flask import url_for, session
 from typing import Dict, Literal
 from requests import Response
 import sqlalchemy.orm as sa_orm
@@ -69,7 +69,7 @@ def can_send_messages() -> bool:
 
 @discord_interactions.custom_handler('top')
 def _handle_top_button(ctx):
-    if Setting.get('lan_games_status', 'disabled') == 'disabled':
+    if g.lan_games_status == 'disabled':
         return Message(
             'On ne choisis pas encore les jeux pour la LAN !'
         )
@@ -129,11 +129,9 @@ def _handle_vote_button(ctx, game_id: int, vote_type: Literal['YES', 'NEUTRAL', 
     elif not user.is_lan_participant:
         message = 'Désolé, tu ne fais pas partie des participants à la LAN.'
     else:
-        lan_games_status = Setting.get('lan_games_status', 'disabled')
-
-        if lan_games_status == 'disabled':
+        if g.lan_games_status == 'disabled':
             message = 'On ne choisis pas encore les jeux pour la LAN, revient plus tard !'
-        elif lan_games_status == 'read_only':
+        elif g.lan_games_status == 'read_only':
             message = 'Trop tard, la date de la LAN approche, les propositions et votes sont figés !'
         else:
             try:
