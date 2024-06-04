@@ -34,14 +34,14 @@
                 <tr>
                     <th>Jeu</th>
                     <th>Proposé par</th>
-                    <th>Le</th>
+                    <th>Proposé le</th>
                     <th></th>
                 </tr>
             </thead>
             <tbody>
                 {% for proposal in proposals %}
                     <tr>
-                        <td>{{ proposal.game.name }} <small>({{ proposal.game.id }})</small></td>
+                        <td>{{ proposal.game.name }} <code>{{ proposal.game.id }}</code></td>
                         <td>{{ proposal.user.display_name }}</td>
                         <td>{{ proposal.created_at|datetimeformat }}</td>
                         <td>

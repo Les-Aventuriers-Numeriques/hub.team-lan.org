@@ -16,14 +16,14 @@
                     <th>Participant LAN ?</th>
                     <th>Admin ?</th>
                     <th>Création</th>
-                    <th>Dernière mise à jour</th>
+                    <th>Mise à jour</th>
                     <th></th>
                 </tr>
             </thead>
             <tbody>
                 {% for user in users %}
                     <tr>
-                        <td>{{ user.display_name }} <small>({{ user.id }})</small></td>
+                        <td>{{ user.display_name }} <code>{{ user.id }}</code></td>
                         <td>{{ 'Oui' if user.is_member else 'Non' }}</td>
                         <td>{{ 'Oui' if user.is_lan_participant else 'Non' }}</td>
                         <td>{{ 'Oui' if user.is_admin else 'Non' }}</td>
