@@ -1,4 +1,4 @@
-from hub.models import User, Game, LanGameProposal, LanGameProposalVote, LanGameProposalVoteType, Setting
+from hub.models import User, Game, LanGameProposal, LanGameProposalVote, VoteType, Setting
 from flask import render_template, redirect, url_for, flash, session, request, g
 from flask_login import login_required, current_user, logout_user, login_user
 from hub.forms import LanGamesProposalSearchForm, LanGamesSettings
@@ -203,11 +203,11 @@ def lan_games_vote() -> Union[str, Response]:
     return render_template(
         'lan/games.html',
         proposals=proposals,
-        LanGameProposalVoteType=LanGameProposalVoteType
+        VoteType=VoteType
     )
 
 
-@app.route('/lan/jeux/voter/<int:game_id>/<any({}):vote_type>'.format(LanGameProposalVoteType.cslist()))
+@app.route('/lan/jeux/voter/<int:game_id>/<any({}):vote_type>'.format(VoteType.cslist()))
 @login_required
 @to_home_if_cannot_access_lan_section
 @to_lan_games_vote_if_lan_section_read_only
@@ -215,7 +215,7 @@ def lan_games_proposal_vote(game_id: int, vote_type: str) -> Response:
     anchor = None
 
     try:
-        LanGameProposalVote.vote(current_user, game_id, LanGameProposalVoteType(vote_type))
+        LanGameProposalVote.vote(current_user, game_id, VoteType(vote_type))
 
         db.session.commit()
 

@@ -19,6 +19,19 @@ class UpdatedAtMixin:
     updated_at = mapped_column(sa.DateTime, nullable=False, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
 
 
+# ATTENTION : Ne jamais modifier cette liste. Il est possible d'ajouter des éléments, à la fin de la liste uniquement.
+class VoteType(PythonEnum):
+    YES = 'YES'
+    NEUTRAL = 'NEUTRAL'
+    NO = 'NO'
+
+    @classmethod
+    def cslist(cls) -> str:
+        return ','.join([
+            e.value for e in cls
+        ])
+
+
 class User(CreatedAtMixin, UpdatedAtMixin, UserMixin, db.Model):
     __tablename__ = 'users'
 
@@ -72,15 +85,15 @@ class LanGameProposal(CreatedAtMixin, db.Model):
     game = relationship('Game', uselist=False, back_populates='proposal')
     user = relationship('User', uselist=False, back_populates='proposals')
 
-    def votes_by_type(self, type_: LanGameProposalVoteType) -> List[LanGameProposalVote]:
+    def votes_by_type(self, type_: VoteType) -> List[LanGameProposalVote]:
         return [
             vote for vote in self.votes if vote.type == type_
         ]
 
-    def votes_count(self, type_: LanGameProposalVoteType) -> int:
+    def votes_count(self, type_: VoteType) -> int:
         return len(self.votes_by_type(type_))
 
-    def votes_percentage(self, type_: LanGameProposalVoteType) -> float:
+    def votes_percentage(self, type_: VoteType) -> float:
         votes_total = len(self.votes)
 
         if votes_total == 0:
@@ -93,11 +106,11 @@ class LanGameProposal(CreatedAtMixin, db.Model):
         score = 0
 
         for vote in self.votes:
-            if vote.type == LanGameProposalVoteType.YES:
+            if vote.type == VoteType.YES:
                 score += 2
-            elif vote.type == LanGameProposalVoteType.NEUTRAL:
+            elif vote.type == VoteType.NEUTRAL:
                 score += 1
-            elif vote.type == LanGameProposalVoteType.NO:
+            elif vote.type == VoteType.NO:
                 score -= 1
 
         return score
@@ -106,31 +119,18 @@ class LanGameProposal(CreatedAtMixin, db.Model):
         return f'LanGameProposal:{self.game_id}'
 
 
-# ATTENTION : Ne jamais modifier cette liste. Il est possible d'ajouter des éléments, à la fin de la liste uniquement.
-class LanGameProposalVoteType(PythonEnum):
-    YES = 'YES'
-    NEUTRAL = 'NEUTRAL'
-    NO = 'NO'
-
-    @classmethod
-    def cslist(cls) -> str:
-        return ','.join([
-            e.value for e in cls
-        ])
-
-
 class LanGameProposalVote(CreatedAtMixin, UpdatedAtMixin, db.Model):
     __tablename__ = 'lan_game_proposal_votes'
 
     game_proposal_game_id = mapped_column(sa.BigInteger, sa.ForeignKey('lan_game_proposals.game_id', ondelete='cascade'), primary_key=True, autoincrement=False)
     user_id = mapped_column(sa.BigInteger, sa.ForeignKey('users.id', ondelete='cascade'), primary_key=True, autoincrement=False)
-    type = mapped_column(sa.Enum(LanGameProposalVoteType), nullable=False)
+    type = mapped_column(sa.Enum(VoteType), nullable=False)
 
     proposal = relationship('LanGameProposal', uselist=False, back_populates='votes')
     user = relationship('User', uselist=False, back_populates='votes')
 
     @classmethod
-    def vote(cls, user: User, game_id: int, vote_type: LanGameProposalVoteType):
+    def vote(cls, user: User, game_id: int, vote_type: VoteType):
         query = postgresql.insert(cls).values(
             game_proposal_game_id=game_id,
             user_id=user.id,

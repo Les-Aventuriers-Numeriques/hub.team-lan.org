@@ -26,7 +26,7 @@
                     </a>
 
                     <div>
-                        {% for vote_type in LanGameProposalVoteType %}
+                        {% for vote_type in VoteType %}
                             {{ vote(vote_type, proposal, my_vote) }}
                         {% endfor %}
                     </div>

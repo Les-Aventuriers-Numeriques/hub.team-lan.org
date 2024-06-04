@@ -1,5 +1,5 @@
 from flask_discord_interactions import Message, Embed, ActionRow, ButtonStyles, Button
-from hub.models import User, Game, LanGameProposalVoteType, LanGameProposal, Setting, LanGameProposalVote
+from hub.models import User, Game, VoteType, LanGameProposal, Setting, LanGameProposalVote
 from flask_discord_interactions.models.embed import Media, Field
 from app import app, db, discord_interactions
 from sqlalchemy.exc import IntegrityError
@@ -97,7 +97,7 @@ def _handle_top_button(ctx):
                         '{} {}'.format(
                             _vote_type_emoji(vote_type),
                             proposal.votes_count(vote_type),
-                        ) for vote_type in LanGameProposalVoteType
+                        ) for vote_type in VoteType
                     ]),
                     inline=True
                 ) for proposal in proposals
@@ -135,7 +135,7 @@ def _handle_vote_button(ctx, game_id: int, vote_type: Literal['YES', 'NEUTRAL', 
             message = 'Trop tard, la date de la LAN approche, les propositions et votes sont figés !'
         else:
             try:
-                LanGameProposalVote.vote(user, game_id, LanGameProposalVoteType(vote_type))
+                LanGameProposalVote.vote(user, game_id, VoteType(vote_type))
 
                 db.session.commit()
 
@@ -159,7 +159,7 @@ def send_proposal_message(user: User, game: Game) -> Response:
             emoji={
                 'name': _vote_type_emoji(vote_type),
             }
-        ) for vote_type in LanGameProposalVoteType
+        ) for vote_type in VoteType
     ]
 
     components.extend([
@@ -200,7 +200,7 @@ def send_proposal_message(user: User, game: Game) -> Response:
     )
 
 
-def _vote_type_emoji(vote_type: LanGameProposalVoteType) -> str:
+def _vote_type_emoji(vote_type: VoteType) -> str:
     if vote_type == vote_type.YES:
         return '👍'
 
