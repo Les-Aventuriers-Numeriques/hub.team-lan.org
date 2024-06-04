@@ -12,9 +12,6 @@ if [ -f .flaskenv ]; then
     export $(cat .flaskenv | xargs)
 fi
 
-# Activation de l'environnement virtuel Python
-. venv/bin/activate
-
 echo "Récupération de la dernière version du code"
 
 git pull
