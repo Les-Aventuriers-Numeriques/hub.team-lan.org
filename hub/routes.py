@@ -70,6 +70,21 @@ def to_home_if_not_admin(f):
     return decorated
 
 
+def logout_if_must_relogin(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if current_user.must_relogin:
+            logout_user()
+
+            flash('Merci de te reconnecter.', 'error')
+
+            return redirect(url_for('login'))
+
+        return f(*args, **kwargs)
+
+    return decorated
+
+
 @app.route('/connexion')
 @to_home_if_authenticated
 def login() -> Union[str, Response]:
@@ -122,24 +137,23 @@ def login_callback() -> Union[str, Response]:
     is_member = str(app.config['DISCORD_MEMBER_ROLE_ID']) in user_roles
     is_lan_participant = str(app.config['DISCORD_LAN_PARTICIPANT_ROLE_ID']) in user_roles
     is_admin = str(app.config['DISCORD_ADMIN_ROLE_ID']) in user_roles
-
-    if not is_member and not is_lan_participant and not is_admin:
-        flash('Tu n\'as pas l\'autorisation d\'accéder à notre intranet.', 'error')
-
-        return redirect(url_for('login'))
+    has_any_role = is_member or is_lan_participant or is_admin
 
     user_info = membership_info.get('user', {})
 
     discord_id = user_info.get('id')
 
     user = db.session.get(User, discord_id)
-    new_user = False
+    is_new_user = not user
 
-    if not user:
+    if is_new_user:
+        if not has_any_role:
+            flash('Tu n\'as pas l\'autorisation d\'accéder à notre intranet.', 'error')
+
+            return redirect(url_for('login'))
+
         user = User()
         user.id = discord_id
-
-        new_user = True
 
     user.display_name = membership_info.get('nick') or user_info.get('global_name') or user_info.get('username')
 
@@ -156,15 +170,21 @@ def login_callback() -> Union[str, Response]:
     user.is_member = is_member
     user.is_lan_participant = is_lan_participant
     user.is_admin = is_admin
+    user.must_relogin = False
 
     db.session.add(user)
     db.session.commit()
 
     session.pop('oauth2_state', None)
 
+    if not has_any_role:
+        flash('Désolé, tu n\'as plus l\'autorisation d\'accéder à notre intranet.', 'error')
+
+        return redirect(url_for('login'))
+
     login_user(user, remember=True)
 
-    flash('{} {} !'.format('Bienvenue' if new_user else 'Content de te revoir', user.display_name), 'success')
+    flash('{} {} !'.format('Bienvenue' if is_new_user else 'Content de te revoir', user.display_name), 'success')
 
     return redirect(session.pop('next', url_for('home')))
 
@@ -181,12 +201,14 @@ def logout() -> Response:
 
 @app.route('/')
 @login_required
+@logout_if_must_relogin
 def home() -> str:
     return render_template('home.html')
 
 
 @app.route('/lan/jeux/voter')
 @login_required
+@logout_if_must_relogin
 @to_home_if_cannot_access_lan_section
 def lan_games_vote() -> Union[str, Response]:
     proposals = db.session.execute(
@@ -209,6 +231,7 @@ def lan_games_vote() -> Union[str, Response]:
 
 @app.route('/lan/jeux/voter/<int:game_id>/<any({}):vote_type>'.format(VoteType.cslist()))
 @login_required
+@logout_if_must_relogin
 @to_home_if_cannot_access_lan_section
 @to_lan_games_vote_if_lan_section_read_only
 def lan_games_proposal_vote(game_id: int, vote_type: str) -> Response:
@@ -228,6 +251,7 @@ def lan_games_proposal_vote(game_id: int, vote_type: str) -> Response:
 
 @app.route('/lan/jeux/proposer')
 @login_required
+@logout_if_must_relogin
 @to_home_if_cannot_access_lan_section
 @to_lan_games_vote_if_lan_section_read_only
 def lan_games_proposal() -> Union[str, Response]:
@@ -268,6 +292,7 @@ def lan_games_proposal() -> Union[str, Response]:
 
 @app.route('/lan/jeux/proposer/<int:game_id>')
 @login_required
+@logout_if_must_relogin
 @to_home_if_cannot_access_lan_section
 @to_lan_games_vote_if_lan_section_read_only
 def lan_games_proposal_submit(game_id: int) -> Response:
@@ -305,6 +330,7 @@ def lan_games_proposal_submit(game_id: int) -> Response:
 
 @app.route('/admin/utilisateurs')
 @login_required
+@logout_if_must_relogin
 @to_home_if_not_admin
 def admin_users() -> Union[str, Response]:
     users = db.session.execute(
@@ -319,26 +345,67 @@ def admin_users() -> Union[str, Response]:
 
 @app.route('/admin/utilisateurs/<int:user_id>/supprimer')
 @login_required
+@logout_if_must_relogin
 @to_home_if_not_admin
 def admin_user_delete(user_id: int) -> Response:
-    try:
-        user = db.get_or_404(User, user_id)
+    if user_id == current_user.id:
+        flash('Tu ne peux pas te supprimer toi-même.', 'error')
+    else:
+        result = db.session.execute(
+            sa.delete(User).where(User.id == user_id)
+        )
 
-        if user.id == current_user.id:
-            flash('Tu ne peux pas te supprimer toi-même.', 'error')
-        else:
-            db.session.delete(user)
-            db.session.commit()
+        db.session.commit()
 
+        if result.rowcount == 1:
             flash('Utilisateur supprimé.', 'success')
-    except NotFound:
+        else:
+            flash('Identifiant d\'utilisateur invalide.', 'error')
+
+    return redirect(url_for('admin_users'))
+
+
+@app.route('/admin/utilisateurs/<int:user_id>/forcer-reconnexion')
+@login_required
+@logout_if_must_relogin
+@to_home_if_not_admin
+def admin_user_force_relogin(user_id: int) -> Response:
+    result = db.session.execute(
+        sa.update(User).where(User.id == user_id).values(must_relogin=True)
+    )
+
+    db.session.commit()
+
+    if result.rowcount == 1:
+        flash('Utilisateur forcé à se reconnecté.', 'success')
+    else:
         flash('Identifiant d\'utilisateur invalide.', 'error')
+
+    return redirect(url_for('admin_users'))
+
+
+@app.route('/admin/utilisateurs/participants-lan-forcer-reconnexion')
+@login_required
+@logout_if_must_relogin
+@to_home_if_not_admin
+def admin_users_lan_participants_force_relogin() -> Response:
+    result = db.session.execute(
+        sa.update(User).where(User.is_lan_participant == True).values(must_relogin=True)
+    )
+
+    db.session.commit()
+
+    if result.rowcount >= 1:
+        flash('Participants à la LAN forcés à se reconnecter.', 'success')
+    else:
+        flash('Aucun participant à la LAN à forcer à se reconnecter.', 'error')
 
     return redirect(url_for('admin_users'))
 
 
 @app.route('/admin/lan/jeux', methods=['GET', 'POST'])
 @login_required
+@logout_if_must_relogin
 @to_home_if_not_admin
 def admin_lan_games() -> Union[str, Response]:
     proposals = db.session.execute(
@@ -379,6 +446,7 @@ def admin_lan_games() -> Union[str, Response]:
 
 @app.route('/admin/lan/jeux/proposition/<int:game_id>/supprimer')
 @login_required
+@logout_if_must_relogin
 @to_home_if_not_admin
 def admin_lan_game_proposal_delete(game_id: int) -> Response:
     result = db.session.execute(
@@ -397,6 +465,7 @@ def admin_lan_game_proposal_delete(game_id: int) -> Response:
 
 @app.route('/admin/lan/jeux/proposition/<int:game_id>/supprimer-votes')
 @login_required
+@logout_if_must_relogin
 @to_home_if_not_admin
 def admin_lan_game_proposal_delete_votes(game_id: int) -> Response:
     result = db.session.execute(
@@ -415,6 +484,7 @@ def admin_lan_game_proposal_delete_votes(game_id: int) -> Response:
 
 @app.route('/admin/lan/jeux/propositions/reinitialiser-tout')
 @login_required
+@logout_if_must_relogin
 @to_home_if_not_admin
 def admin_lan_game_proposals_reset_all() -> Response:
     db.session.execute(
@@ -430,6 +500,7 @@ def admin_lan_game_proposals_reset_all() -> Response:
 
 @app.route('/admin/lan/jeux/propositions/reinitialiser-votes')
 @login_required
+@logout_if_must_relogin
 @to_home_if_not_admin
 def admin_lan_game_proposals_reset_votes() -> Response:
     db.session.execute(
