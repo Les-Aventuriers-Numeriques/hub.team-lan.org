@@ -40,8 +40,9 @@ class User(CreatedAtMixin, UpdatedAtMixin, UserMixin, db.Model):
     display_name = mapped_column(sa.String(255), nullable=False)
     avatar_url = mapped_column(sa.String(255))
     is_member = mapped_column(sa.Boolean, nullable=False, default=False, server_default=sa.text('false'))
-    is_lan_participant = mapped_column(sa.Boolean, nullable=False, default=sa.text('false'))
-    is_admin = mapped_column(sa.Boolean, nullable=False, default=sa.text('false'))
+    is_lan_participant = mapped_column(sa.Boolean, nullable=False, default=False, server_default=sa.text('false'))
+    is_admin = mapped_column(sa.Boolean, nullable=False, default=False, server_default=sa.text('false'))
+    must_relogin = mapped_column(sa.Boolean, nullable=False, default=False, server_default=sa.text('false'))
 
     proposals = relationship('LanGameProposal', back_populates='user')
     votes = relationship('LanGameProposalVote', back_populates='user')
