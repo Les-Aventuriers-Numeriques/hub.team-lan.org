@@ -405,7 +405,7 @@ def admin_lan_game_proposal_delete_votes(game_id: int) -> Response:
 
     db.session.commit()
 
-    if result.rowcount == 1:
+    if result.rowcount >= 1:
         flash('Votes supprimés.', 'success')
     else:
         flash('Aucun vote à supprimer.', 'error')
