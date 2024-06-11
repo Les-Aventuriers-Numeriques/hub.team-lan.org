@@ -1,5 +1,7 @@
 instance/webassets-cache/*
 !instance/webassets-cache/.gitkeep
+instance/data/*
+!instance/data/.gitkeep
 static/css/*.min.css
 static/js/*.min.js
 venv
