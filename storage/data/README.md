@@ -7,12 +7,12 @@ fichier, contenant le libellé des colonnes dont voici la description :
   - `name` - Le nom du jeu ou du mod
   - `url` - Une URL vers une page permettant d'obtenir le jeu ou le mod
 
-Un identifiant est attributé automatiquement à chaque jeu ou mod de façon décrémentiel à partir de `-1` pour la première
-ligne (càd `-2` pour le 2ème jeu, `-3` pour le 3ème, etc).
+Un identifiant est attributé automatiquement à chaque jeu ou mod de façon décrémentielle à partir de `-1` pour le premier
+jeu (puis `-2` pour le 2ème jeu, `-3` pour le 3ème, etc).
 
 > [!CAUTION]
-> Une fois un jeu / mod inséré dans ce fichier et une fois le fichier traité, **il n'est plus possible de le changer de
-> ligne ni de le supprimer**.
+> Une fois un jeu / mod inséré dans ce fichier et une fois le fichier traité au moins une fois, **il n'est plus possible
+> de changer de ligne ni de supprimer le jeu**. Il est bien sûr possible de mettre à jour son nom ou son URL.
 
 Une image associée à chaque jeu ou mod **doit** également être présente dans le dossier `static/images/games/{identifiant}.png`
 où `{identifiant}` correspond à l'identifiant qui sera généré pour le jeu (voir ci-dessus). L'image  **doit** avoir une
