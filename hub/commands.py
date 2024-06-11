@@ -3,6 +3,7 @@ from hub.models import Game
 from app import app, db
 import requests
 import click
+import csv
 
 
 @app.cli.command()
@@ -51,7 +52,39 @@ def update_games() -> None:
 
         click.echo('  Mise à jour de la BDD...')
 
-        db.session.execute(query.on_conflict_do_nothing())
+        db.session.execute(query.on_conflict_do_update(
+            index_elements=[Game.id],
+            set_={
+                Game.name: query.excluded.name,
+            }
+        ))
+
+    click.echo('Mise à jour des jeux personnalisés...')
+
+    with open('storage/data/games.csv', 'r', encoding='utf-8') as f:
+        i = -1
+        games = []
+
+        for row in csv.DictReader(f):
+            games.append({
+                'id': i,
+                'name': row['name'],
+                'custom_url': row['url'],
+            })
+
+            i -= 1
+
+    query = postgresql.insert(Game).values(games)
+
+    click.echo('  Mise à jour de la BDD...')
+
+    db.session.execute(query.on_conflict_do_update(
+        index_elements=[Game.id],
+        set_={
+            Game.name: query.excluded.name,
+            Game.custom_url: query.excluded.custom_url,
+        }
+    ))
 
     db.session.commit()
 

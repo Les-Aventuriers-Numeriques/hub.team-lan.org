@@ -229,7 +229,7 @@ def lan_games_vote() -> Union[str, Response]:
     )
 
 
-@app.route('/lan/jeux/voter/<int:game_id>/<any({}):vote_type>'.format(VoteType.cslist()))
+@app.route('/lan/jeux/voter/<int(signed=True):game_id>/<any({}):vote_type>'.format(VoteType.cslist()))
 @login_required
 @logout_if_must_relogin
 @to_home_if_cannot_access_lan_section
@@ -242,7 +242,7 @@ def lan_games_proposal_vote(game_id: int, vote_type: str) -> Response:
 
         db.session.commit()
 
-        anchor = f'g-{game_id}'
+        anchor = f'g={game_id}'
     except IntegrityError:
         flash('Identifiant de jeu invalide.', 'error')
 
@@ -290,7 +290,7 @@ def lan_games_proposal() -> Union[str, Response]:
     )
 
 
-@app.route('/lan/jeux/proposer/<int:game_id>')
+@app.route('/lan/jeux/proposer/<int(signed=True):game_id>')
 @login_required
 @logout_if_must_relogin
 @to_home_if_cannot_access_lan_section
@@ -317,7 +317,7 @@ def lan_games_proposal_submit(game_id: int) -> Response:
                 db.get_or_404(Game, game_id)
             )
 
-        anchor = f'g-{game_id}'
+        anchor = f'g={game_id}'
     except IntegrityError:
         flash('Ce jeu a déjà été proposé (ou identifiant de jeu invalide).', 'error')
     except NotFound:
@@ -444,7 +444,7 @@ def admin_lan_games() -> Union[str, Response]:
     )
 
 
-@app.route('/admin/lan/jeux/proposition/<int:game_id>/supprimer')
+@app.route('/admin/lan/jeux/proposition/<int(signed=True):game_id>/supprimer')
 @login_required
 @logout_if_must_relogin
 @to_home_if_not_admin
@@ -463,7 +463,7 @@ def admin_lan_game_proposal_delete(game_id: int) -> Response:
     return redirect(url_for('admin_lan_games'))
 
 
-@app.route('/admin/lan/jeux/proposition/<int:game_id>/supprimer-votes')
+@app.route('/admin/lan/jeux/proposition/<int(signed=True):game_id>/supprimer-votes')
 @login_required
 @logout_if_must_relogin
 @to_home_if_not_admin
