@@ -77,7 +77,7 @@ class Game(db.Model):
     @property
     def image_url(self) -> str:
         if self.is_custom:
-            return url_for('static', filename=f'images/games/{self.id}.png')
+            return url_for('static', filename=f'images/games/{self.id}.png', _external=True)
 
         return f'https://cdn.cloudflare.steamstatic.com/steam/apps/{self.id}/capsule_231x87.jpg'
 
