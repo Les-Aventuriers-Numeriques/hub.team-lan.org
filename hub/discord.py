@@ -180,8 +180,8 @@ def send_proposal_message(user: User, game: Game) -> Response:
         embed=Embed(
             title=game.name,
             color=EMBEDS_COLOR,
-            url=f'https://store.steampowered.com/app/{game.id}',
-            image=Media(f'https://cdn.cloudflare.steamstatic.com/steam/apps/{game.id}/capsule_231x87.jpg')
+            url=game.url,
+            image=Media(game.image_url)
         ),
         components=[
             ActionRow(
