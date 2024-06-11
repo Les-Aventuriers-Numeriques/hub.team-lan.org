@@ -7,6 +7,7 @@ from sqlalchemy.dialects import postgresql
 from enum import Enum as PythonEnum
 from datetime import UTC, datetime
 from flask_login import UserMixin
+from flask import url_for
 from app import db
 import sqlalchemy as sa
 
@@ -61,15 +62,23 @@ class Game(db.Model):
 
     name = mapped_column(sa.String(255), nullable=False)
     search_vector = mapped_column(TSVectorType('name', regconfig='english_nostop'))
+    custom_url = mapped_column(sa.String(255), nullable=True)
 
     proposal = relationship('LanGameProposal', uselist=False, back_populates='game')
 
     @property
-    def store_url(self) -> str:
-        return f'https://store.steampowered.com/app/{self.id}'
+    def is_custom(self) -> bool:
+        return self.id < 0
+
+    @property
+    def url(self) -> str:
+        return self.custom_url if self.is_custom else f'https://store.steampowered.com/app/{self.id}'
 
     @property
     def image_url(self) -> str:
+        if self.is_custom:
+            return url_for('static', filename=f'images/games/{self.id}.png')
+
         return f'https://cdn.cloudflare.steamstatic.com/steam/apps/{self.id}/capsule_231x87.jpg'
 
     def __repr__(self) -> str:
