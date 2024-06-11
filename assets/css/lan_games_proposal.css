@@ -4,6 +4,10 @@
 /************************************************************************
  * Liste des jeux */
 
+body > main .games {
+    margin-bottom: var(--pico-spacing);
+}
+
 body > main .games > * {
     flex-direction: row;
 }
