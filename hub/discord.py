@@ -1,5 +1,5 @@
 from flask_discord_interactions import Message, Embed, ActionRow, ButtonStyles, Button
-from hub.models import User, Game, VoteType, LanGameProposal, Setting, LanGameProposalVote
+from hub.models import User, Game, VoteType, LanGameProposal, LanGameProposalVote
 from flask_discord_interactions.models.embed import Media, Field
 from app import app, db, discord_interactions
 from sqlalchemy.exc import IntegrityError

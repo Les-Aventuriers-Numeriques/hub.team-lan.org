@@ -12,7 +12,7 @@
     <p>Propose ici des jeux pour la LAN. Tu as accès à l'entièreté du catalogue Steam. <a href="{{ url_for('lan_games_vote') }}">Pour voter pour des jeux, c'est par là</a>.</p>
 
     <form method="get" action="{{ url_for('lan_games_proposal') }}">
-        {{ field(form.terms, with_label=False) }}
+        {{ field(form.terms, with_label=False, class='mb-0' if not validated else '') }}
     </form>
 
     {% if validated %}
