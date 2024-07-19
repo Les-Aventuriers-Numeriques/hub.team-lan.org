@@ -7,6 +7,10 @@ import requests
 import click
 import csv
 
+CHICKEN_DINNER_LOCK_CACHE_KEY = 'chicken_dinner_processing'
+CHICKEN_DINNER_LAST_PROCESSED_CACHE_KEY = 'chicken_dinner_last_processed'
+PUBG_SHARD = 'steam'
+
 
 @app.cli.command()
 def cc() -> None:
@@ -106,23 +110,19 @@ def update_games() -> None:
 @app.cli.command()
 def chicken_dinner() -> None:
     """Envoie nos Chicken Dinners sur Discord."""
-    lock_cache_key = 'chicken_dinner_processing'
-    last_processed_cache_key = 'chicken_dinner_last_processed'
-    pubg_shard = 'steam'
-
-    if cache.get(lock_cache_key):
+    if cache.get(CHICKEN_DINNER_LOCK_CACHE_KEY):
         click.secho('Un traitement est déjà en cours', fg='yellow')
 
         return
 
-    cache.set(lock_cache_key, True)
-    last_processed = cache.get(last_processed_cache_key)
+    cache.set(CHICKEN_DINNER_LOCK_CACHE_KEY, True)
+    last_processed = cache.get(CHICKEN_DINNER_LAST_PROCESSED_CACHE_KEY)
 
     client = PUBGApiClient(app.config['PUBG_API_JWT_TOKEN'], cache)
 
     click.secho('Récupération des joueurs...')
 
-    players = client.get_players(pubg_shard, player_names=app.config['PUBG_PLAYER_NAMES_INTERNAL'])['data']
+    players = client.get_players(PUBG_SHARD, player_names=app.config['PUBG_PLAYER_NAMES_INTERNAL'])['data']
 
     click.secho('  {} joueurs récupérés'.format(len(players)))
 
@@ -135,12 +135,12 @@ def chicken_dinner() -> None:
     click.secho('Récupération de {} matches...'.format(len(matches_id)))
 
     matches = {
-        match_id: client.get_match(pubg_shard, match_id) for match_id in matches_id
+        match_id: client.get_match(PUBG_SHARD, match_id) for match_id in matches_id
     }
 
     if last_processed:
         matches = {
-            match_id: match for match_id, match in matches.items() if datetime.fromisoformat(match['attributes']['createdAt']) >= last_processed
+            match_id: match for match_id, match in matches.items() if datetime.fromisoformat(match['data']['attributes']['createdAt']) >= last_processed
         }
 
         if matches:
@@ -150,7 +150,17 @@ def chicken_dinner() -> None:
     else:
         click.secho('1er traitement: aucune action à effectuer', fg='yellow')
 
-    cache.set(last_processed_cache_key, datetime.now(timezone.utc))
-    cache.set(lock_cache_key, False)
+    cache.set(CHICKEN_DINNER_LAST_PROCESSED_CACHE_KEY, datetime.now(timezone.utc))
+    cache.set(CHICKEN_DINNER_LOCK_CACHE_KEY, False)
+
+    click.secho('Effectué', fg='green')
+
+
+@app.cli.command()
+def chicken_dinner_clear_lock() -> None:
+    """Supprime le verrou du traitement des Chicken Dinners."""
+    click.echo('Suppression du verrou...')
+
+    cache.set(CHICKEN_DINNER_LOCK_CACHE_KEY, False)
 
     click.secho('Effectué', fg='green')
