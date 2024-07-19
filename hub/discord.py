@@ -3,9 +3,9 @@ from hub.models import User, Game, VoteType, LanGameProposal, LanGameProposalVot
 from flask_discord_interactions.models.embed import Media, Field
 from app import app, db, discord_interactions
 from sqlalchemy.exc import IntegrityError
+from typing import Dict, Literal, List
 from flask import url_for, session, g
 from urllib.parse import urlencode
-from typing import Dict, Literal
 from requests import Response
 import sqlalchemy.orm as sa_orm
 import sqlalchemy as sa
@@ -190,6 +190,44 @@ def send_proposal_message(user: User, game: Game) -> Response:
         ]
     ).encode(True)
 
+    return _send_message(data, content_type)
+
+
+def send_chicken_dinner_message(map_name: str, game_mode_name: str, participants: List[Dict]) -> Response:
+    players_names = ', '.join([
+        '[{0}](https://pubg.sh/{0}/{1})'.format(
+            participant['attributes']['stats']['name'],
+            participant['attributes']['shardId']
+        ) for participant in participants
+    ])
+
+    content = f'{players_names} ont fait un 🐔Chicken Dinner en **{game_mode_name}** sur **{map_name}** ! Kikitoudur.'
+    image = 'https://pbs.twimg.com/media/EXfqIngWsAA6gBq.jpg'
+
+    data, content_type = Message(
+        content,
+        embed=Embed(
+            title='Stats',
+            color=EMBEDS_COLOR,
+            image=Media(image),
+            fields=[
+                Field(
+                    name=participant['attributes']['stats']['name'],
+                    value='💀 {} 🆘 {} 🤕 {:d}'.format(
+                        participant['attributes']['stats']['kills'],
+                        participant['attributes']['stats']['assists'],
+                        participant['attributes']['stats']['damageDealt']
+                    ),
+                    inline=True
+                ) for participant in participants
+            ]
+        )
+    ).encode(True)
+
+    return _send_message(data, content_type)
+
+
+def _send_message(data: Dict, content_type: str) -> Response:
     return requests.post(
         '{API_BASE_URL}/channels/{DISCORD_LAN_CHANNEL_ID}/messages'.format(API_BASE_URL=API_BASE_URL, **app.config),
         data=data,
