@@ -1,5 +1,6 @@
 instance/webassets-cache/*
 !instance/webassets-cache/.gitkeep
+instance/cache/*
 instance/data/*
 !instance/data/.gitkeep
 static/css/*.min.css

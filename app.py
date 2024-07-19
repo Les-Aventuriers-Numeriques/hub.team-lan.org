@@ -9,6 +9,7 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import timedelta, date
 from flask_login import LoginManager
 from flask_migrate import Migrate
+from flask_caching import Cache
 from typing import Tuple, Dict
 from environs import Env
 
@@ -28,6 +29,9 @@ app.config.update(
 
     SENTRY_DSN=env.str('SENTRY_DSN', default=None),
     SENTRY_TRACES_SAMPLE_RATE=env.float('SENTRY_TRACES_SAMPLE_RATE', default=None),
+
+    CACHE_TYPE=env.str('CACHE_TYPE', default='FileSystemCache'),
+    CACHE_DIR=env.str('CACHE_DIR', default='instance/cache'),
 
     ASSETS_CACHE=env.str('ASSETS_CACHE', default='instance/webassets-cache'),
 
@@ -55,6 +59,10 @@ app.config.update(
     DISCORD_LAN_PARTICIPANT_ROLE_ID=env.int('DISCORD_LAN_PARTICIPANT_ROLE_ID'),
     DISCORD_ADMIN_ROLE_ID=env.int('DISCORD_ADMIN_ROLE_ID'),
     DISCORD_LAN_CHANNEL_ID=env.int('DISCORD_LAN_CHANNEL_ID', None),
+
+    PUBG_API_JWT_TOKEN=env.str('PUBG_API_JWT_TOKEN', None),
+    PUBG_PLAYER_NAMES_INTERNAL=env.list('PUBG_PLAYER_NAMES_INTERNAL', []),
+    PUBG_PLAYER_NAMES_EXTERNAL=env.list('PUBG_PLAYER_NAMES_EXTERNAL', []),
 
     # Valeurs de configuration qui ne peuvent pas être surchargées
     PERMANENT_SESSION_LIFETIME=timedelta(days=365),
@@ -124,6 +132,9 @@ babel = Babel(app)
 # Flask-Discord-Interactions
 discord_interactions = DiscordInteractions(app)
 discord_interactions.set_route(app.config['DISCORD_INTERACTIONS_PATH'])
+
+# Flask-Caching
+cache = Cache(app)
 
 # Flask-SQLAlchemy
 class AppDeclarativeBase(DeclarativeBase):
