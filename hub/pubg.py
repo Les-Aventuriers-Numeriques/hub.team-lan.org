@@ -1,9 +1,8 @@
 from ratelimit import limits, sleep_and_retry
-from requests import Request, PreparedRequest
 from requests.exceptions import HTTPError
 from typing import Dict, Optional, List
 from flask_caching import Cache
-from hashlib import sha1
+from requests import Request
 import requests
 
 requests = requests.Session()
@@ -49,7 +48,7 @@ class PUBGApiClient:
         return self.call(
             f'shards/{shard}/matches/{match_id}',
             needs_auth=False,
-            cache_timeout=60 * 60 * 24 * 15
+            cache_timeout=60 * 60 * 24 * 14 # 14 jours
         )
 
     @sleep_and_retry
@@ -57,7 +56,8 @@ class PUBGApiClient:
     def call(self, resource: str, params: Optional[Dict] = None, needs_auth: bool = True, cache_timeout: Optional[int] = None) -> Dict:
         url = API_BASE_URL + resource
         headers = {
-            'Accept': 'application/vnd.api+json'
+            'Accept': 'application/vnd.api+json',
+            'Accept-Encoding': 'gzip',
         }
 
         if self.jwt_token:
@@ -71,7 +71,7 @@ class PUBGApiClient:
             Request('GET', url, headers=headers, params=params)
         )
 
-        cache_key = PUBGApiClient.make_cache_key(request)
+        cache_key = f'pubg_api_client.{request.method}.{request.url}'
 
         if self.cache and cache_timeout:
             response_data = self.cache.get(cache_key)
@@ -99,9 +99,3 @@ class PUBGApiClient:
             self.cache.set(cache_key, response_data, cache_timeout)
 
         return response_data
-
-    @staticmethod
-    def make_cache_key(request: PreparedRequest) -> str:
-        return sha1(
-            f'pubg_api_client.{request.method}.{request.url}'.encode()
-        ).hexdigest()

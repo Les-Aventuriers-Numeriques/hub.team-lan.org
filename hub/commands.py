@@ -1,9 +1,21 @@
 from sqlalchemy.dialects import postgresql
+from datetime import datetime, timezone
+from hub.pubg import PUBGApiClient
+from app import app, db, cache
 from hub.models import Game
-from app import app, db
 import requests
 import click
 import csv
+
+
+@app.cli.command()
+def cc() -> None:
+    """Supprime le cache."""
+    click.echo('Suppression du cache')
+
+    cache.clear()
+
+    click.secho('Effectué', fg='green')
 
 
 @app.cli.command()
@@ -87,5 +99,58 @@ def update_games() -> None:
     ))
 
     db.session.commit()
+
+    click.secho('Effectué', fg='green')
+
+
+@app.cli.command()
+def chicken_dinner() -> None:
+    """Envoie nos Chicken Dinners sur Discord."""
+    lock_cache_key = 'chicken_dinner_processing'
+    last_processed_cache_key = 'chicken_dinner_last_processed'
+    pubg_shard = 'steam'
+
+    if cache.get(lock_cache_key):
+        click.secho('Un traitement est déjà en cours', fg='yellow')
+
+        return
+
+    cache.set(lock_cache_key, True)
+    last_processed = cache.get(last_processed_cache_key)
+
+    client = PUBGApiClient(app.config['PUBG_API_JWT_TOKEN'], cache)
+
+    click.secho('Récupération des joueurs...')
+
+    players = client.get_players(pubg_shard, player_names=app.config['PUBG_PLAYER_NAMES_INTERNAL'])['data']
+
+    click.secho('  {} joueurs récupérés'.format(len(players)))
+
+    matches_id = set()
+
+    for player in players:
+        for match in player['relationships']['matches']['data']:
+            matches_id.add(match['id'])
+
+    click.secho('Récupération de {} matches...'.format(len(matches_id)))
+
+    matches = {
+        match_id: client.get_match(pubg_shard, match_id) for match_id in matches_id
+    }
+
+    if last_processed:
+        matches = {
+            match_id: match for match_id, match in matches.items() if datetime.fromisoformat(match['attributes']['createdAt']) >= last_processed
+        }
+
+        if matches:
+            click.secho('  {} nouveaux matches à envoyer'.format(len(matches)))
+        else:
+            click.secho('  Aucun nouveau match à envoyer', fg='yellow')
+    else:
+        click.secho('1er traitement: aucune action à effectuer', fg='yellow')
+
+    cache.set(last_processed_cache_key, datetime.now(timezone.utc))
+    cache.set(lock_cache_key, False)
 
     click.secho('Effectué', fg='green')
