@@ -142,11 +142,6 @@ def chicken_dinner() -> None:
         ]
 
         if last_processed:
-            print(last_processed)
-            print([
-                str(datetime.fromisoformat(match['data']['attributes']['createdAt'])) for match in matches
-            ])
-
             matches = [
                 match for match in matches if datetime.fromisoformat(match['data']['attributes']['createdAt']) >= last_processed
             ]
