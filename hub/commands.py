@@ -110,7 +110,7 @@ def update_games() -> None:
 
 @app.cli.command()
 def chicken_dinner() -> None:
-    """Envoie nos Chicken Dinners sur Discord."""
+    """Envoie nos Chicken Dinner sur Discord."""
     if cache.get(CHICKEN_DINNER_LOCK_CACHE_KEY):
         click.secho('Un traitement est déjà en cours', fg='yellow')
 
@@ -142,6 +142,11 @@ def chicken_dinner() -> None:
         ]
 
         if last_processed:
+            print(last_processed)
+            print([
+                str(datetime.fromisoformat(match['data']['attributes']['createdAt'])) for match in matches
+            ])
+
             matches = [
                 match for match in matches if datetime.fromisoformat(match['data']['attributes']['createdAt']) >= last_processed
             ]
@@ -188,6 +193,13 @@ def chicken_dinner() -> None:
             click.secho('1er traitement: aucune action à effectuer', fg='yellow')
 
         cache.set(CHICKEN_DINNER_LAST_PROCESSED_CACHE_KEY, datetime.now(timezone.utc), 0)
+    except Exception as e:
+        app.logger.exception('Une erreur est survenue lors du traitement des Chicken Dinner')
+
+        if not app.config['DEBUG'] and app.config['SENTRY_DSN']:
+            import sentry_sdk
+
+            sentry_sdk.capture_exception()
     finally:
         cache.set(CHICKEN_DINNER_LOCK_CACHE_KEY, False, 0)
 
@@ -196,7 +208,7 @@ def chicken_dinner() -> None:
 
 @app.cli.command()
 def chicken_dinner_clear_lock() -> None:
-    """Supprime le verrou du traitement des Chicken Dinners."""
+    """Supprime le verrou du traitement des Chicken Dinner."""
     click.echo('Suppression du verrou...')
 
     cache.set(CHICKEN_DINNER_LOCK_CACHE_KEY, False, 0)
@@ -207,7 +219,7 @@ def chicken_dinner_clear_lock() -> None:
 @app.cli.command()
 @click.argument('dt')
 def chicken_dinner_force_date(dt: str) -> None:
-    """Force la date de traitement des Chicken Dinners."""
+    """Force la date de traitement des Chicken Dinner."""
     click.echo('Ecrasement de la date...')
 
     cache.set(CHICKEN_DINNER_LAST_PROCESSED_CACHE_KEY, datetime.fromisoformat(dt), 0)

@@ -217,7 +217,7 @@ def send_chicken_dinner_message(map_name: str, game_mode_name: str, participants
     contents = [
         f'Les parents de {players_names} peuvent enfin être fiers grâce à leur top 1 en **{game_mode_name}** sur **{map_name}** !',
         f'On y croyait plus, un Chicken Dinner de plus pour {players_names} en **{game_mode_name}** sur **{map_name}** !',
-        f'C\'est sur **{map_name}** en **{game_mode_name}** que {players_names} ont brillé par leur Chicken Dinner (pour une fois) !',
+        f'C\'est sur **{map_name}** en **{game_mode_name}** que {players_names} ont brillé pour une fois par leur Chicken Dinner !',
         f'Dieu existe et le prouve à travers {players_names} et leur top 1 en **{game_mode_name}** sur **{map_name}** !',
         f'{players_names} dormiront l\'esprit tranquille ce soir grâce à leur top 1 en **{game_mode_name}** sur **{map_name}** !',
         f'C\'est {players_names} qui régalent ce soir avec leur Chicken Dinner en **{game_mode_name}** sur **{map_name}** !',
