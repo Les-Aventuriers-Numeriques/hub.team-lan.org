@@ -190,30 +190,56 @@ def send_proposal_message(user: User, game: Game) -> Response:
         ]
     ).encode(True)
 
-    return _send_message(data, content_type)
+    return _send_message(app.config['DISCORD_LAN_CHANNEL_ID'], data, content_type)
 
 
 def send_chicken_dinner_message(map_name: str, game_mode_name: str, participants: List[Dict]) -> Response:
-    players_names = ', '.join([
-        '[{0}](https://pubg.sh/{0}/{1})'.format(
+    def _participant_name(participant: Dict) -> str:
+        return '[{0}](https://pubg.sh/{0}/{1})'.format(
             participant['attributes']['stats']['name'],
             participant['attributes']['shardId']
-        ) for participant in participants
+        )
+
+    last_participant = None
+    participants_for_player_names = participants
+
+    if len(participants) > 1:
+        last_participant = participants[-1]
+        participants_for_player_names = participants[:-1]
+
+    players_names = ', '.join([
+        _participant_name(participant) for participant in participants_for_player_names
     ])
 
-    content = f'{players_names} ont fait un 🐔Chicken Dinner en **{game_mode_name}** sur **{map_name}** ! Kikitoudur.'
-    image = 'https://pbs.twimg.com/media/EXfqIngWsAA6gBq.jpg'
+    if last_participant:
+        players_names += ' et ' + _participant_name(last_participant)
+
+    contents = [
+        f'Les parents de {players_names} peuvent enfin être fiers grâce à leur top 1 en **{game_mode_name}** sur **{map_name}** !',
+        f'On y croyait plus, un Chicken Dinner de plus pour {players_names} en **{game_mode_name}** sur **{map_name}** !',
+        f'C\'est sur **{map_name}** en **{game_mode_name}** que {players_names} ont brillé par leur Chicken Dinner (pour une fois) !',
+        f'Dieu existe et le prouve à travers {players_names} et leur top 1 en **{game_mode_name}** sur **{map_name}** !',
+        f'{players_names} dormiront l\'esprit tranquille ce soir grâce à leur top 1 en **{game_mode_name}** sur **{map_name}** !',
+        f'C\'est {players_names} qui régalent ce soir avec leur Chicken Dinner en **{game_mode_name}** sur **{map_name}** !',
+        f'La zone est pacifiée sur **{map_name}** en **{game_mode_name}** grâce au top 1 de {players_names} !',
+    ]
+
+    images = [
+        'https://pbs.twimg.com/media/EXfqIngWsAA6gBq.jpg',
+        'https://i.imgur.com/M33pWNM.png',
+        'https://c.tenor.com/vOKwPz3lifIAAAAC/tenor.gif',
+    ]
 
     data, content_type = Message(
-        content,
+        '🐔 ' + secrets.choice(contents),
         embed=Embed(
             title='Stats',
             color=EMBEDS_COLOR,
-            image=Media(image),
+            image=Media(secrets.choice(images)),
             fields=[
                 Field(
                     name=participant['attributes']['stats']['name'],
-                    value='💀 {} 🆘 {} 🤕 {:d}'.format(
+                    value='💀 {} 🆘 {} 🤕 {:.0f}'.format(
                         participant['attributes']['stats']['kills'],
                         participant['attributes']['stats']['assists'],
                         participant['attributes']['stats']['damageDealt']
@@ -224,12 +250,12 @@ def send_chicken_dinner_message(map_name: str, game_mode_name: str, participants
         )
     ).encode(True)
 
-    return _send_message(data, content_type)
+    return _send_message(app.config['DISCORD_PUBG_CHANNEL_ID'], data, content_type)
 
 
-def _send_message(data: Dict, content_type: str) -> Response:
+def _send_message(channel_id: int, data: Dict, content_type: str) -> Response:
     return requests.post(
-        '{API_BASE_URL}/channels/{DISCORD_LAN_CHANNEL_ID}/messages'.format(API_BASE_URL=API_BASE_URL, **app.config),
+        '{API_BASE_URL}/channels/{channel_id}/messages'.format(API_BASE_URL=API_BASE_URL, channel_id=channel_id, **app.config),
         data=data,
         headers={
             'Content-Type': content_type,

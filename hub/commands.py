@@ -117,78 +117,81 @@ def chicken_dinner() -> None:
         return
 
     cache.set(CHICKEN_DINNER_LOCK_CACHE_KEY, True, 0)
-    last_processed = cache.get(CHICKEN_DINNER_LAST_PROCESSED_CACHE_KEY)
 
-    client = PUBGApiClient(app.config['PUBG_API_JWT_TOKEN'], cache)
+    try:
+        last_processed = cache.get(CHICKEN_DINNER_LAST_PROCESSED_CACHE_KEY)
 
-    click.echo('Récupération des joueurs...')
+        client = PUBGApiClient(app.config['PUBG_API_JWT_TOKEN'], cache)
 
-    players = client.get_players(PUBG_SHARD, player_names=app.config['PUBG_PLAYER_NAMES_INTERNAL'])['data']
+        click.echo('Récupération des joueurs...')
 
-    click.echo('  {} joueurs récupérés'.format(len(players)))
+        players = client.get_players(PUBG_SHARD, player_names=app.config['PUBG_PLAYER_NAMES_INTERNAL'])['data']
 
-    matches_id = set()
+        click.echo('  {} joueurs récupérés'.format(len(players)))
 
-    for player in players:
-        for match in player['relationships']['matches']['data']:
-            matches_id.add(match['id'])
+        matches_id = set()
 
-    click.echo('Récupération de {} matches...'.format(len(matches_id)))
+        for player in players:
+            for match in player['relationships']['matches']['data']:
+                matches_id.add(match['id'])
 
-    matches = [
-        client.get_match(PUBG_SHARD, match_id) for match_id in matches_id
-    ]
+        click.echo('Récupération de {} matches...'.format(len(matches_id)))
 
-    if last_processed:
-        # matches = [
-        #     match for match in matches if datetime.fromisoformat(match['data']['attributes']['createdAt']) >= last_processed
-        # ]
+        matches = [
+            client.get_match(PUBG_SHARD, match_id) for match_id in matches_id
+        ]
 
-        if matches:
-            click.echo('{} nouveaux matches à traiter'.format(len(matches)))
+        if last_processed:
+            # matches = [
+            #     match for match in matches if datetime.fromisoformat(match['data']['attributes']['createdAt']) >= last_processed
+            # ]
 
-            player_names_to_match = app.config['PUBG_PLAYER_NAMES_INTERNAL'] + app.config['PUBG_PLAYER_NAMES_EXTERNAL']
+            if matches:
+                click.echo('{} nouveaux matches à traiter'.format(len(matches)))
 
-            for match in matches:
-                click.echo('Traitement de {}'.format(match['data']['id']))
+                player_names_to_match = app.config['PUBG_PLAYER_NAMES_INTERNAL'] + app.config['PUBG_PLAYER_NAMES_EXTERNAL']
 
-                participants = [
-                    participant for participant in match['included'] if participant['type'] == 'participant' and participant['attributes']['stats']['name'] in player_names_to_match
-                ]
+                for match in matches:
+                    click.echo('Traitement de {}'.format(match['data']['id']))
 
-                participants_ids = [
-                    participant['id'] for participant in participants
-                ]
+                    participants = [
+                        participant for participant in match['included'] if participant['type'] == 'participant' and participant['attributes']['stats']['name'] in player_names_to_match
+                    ]
 
-                click.echo('  {} joueurs trouvés'.format(len(participants)))
+                    participants_ids = [
+                        participant['id'] for participant in participants
+                    ]
 
-                winning_team = next(
-                    (roster for roster in match['included'] if roster['type'] == 'roster' and roster['attributes']['won'] == 'true'),
-                    None
-                )
+                    click.echo('  {} joueurs trouvés'.format(len(participants)))
 
-                winning_team_participants_ids = [
-                    participant['id'] for participant in winning_team['relationships']['participants']['data']
-                ]
+                    winning_team = next(
+                        (roster for roster in match['included'] if roster['type'] == 'roster' and roster['attributes']['won'] == 'true'),
+                        None
+                    )
 
-                if not any(True for participant_id in participants_ids if participant_id in winning_team_participants_ids):
-                    click.secho('  Pas un Chicken Dinner', fg='yellow')
+                    winning_team_participants_ids = [
+                        participant['id'] for participant in winning_team['relationships']['participants']['data']
+                    ]
 
-                    continue
+                    if not any(True for participant_id in participants_ids if participant_id in winning_team_participants_ids):
+                        click.secho('  Pas un Chicken Dinner', fg='yellow')
 
-                map_id = match['data']['attributes']['mapName']
-                map_name = map_id
-                game_mode_id = match['data']['attributes']['gameMode']
-                game_mode_name = game_mode_id
+                        continue
 
-                # send_chicken_dinner_message(map_name, game_mode_name, participants)
+                    map_id = match['data']['attributes']['mapName']
+                    map_name = map_id
+                    game_mode_id = match['data']['attributes']['gameMode']
+                    game_mode_name = game_mode_id
+
+                    send_chicken_dinner_message(map_name, game_mode_name, participants)
+            else:
+                click.secho('Aucun nouveau match à envoyer', fg='yellow')
         else:
-            click.secho('Aucun nouveau match à envoyer', fg='yellow')
-    else:
-        click.secho('1er traitement: aucune action à effectuer', fg='yellow')
+            click.secho('1er traitement: aucune action à effectuer', fg='yellow')
 
-    cache.set(CHICKEN_DINNER_LAST_PROCESSED_CACHE_KEY, datetime.now(timezone.utc), 0)
-    cache.set(CHICKEN_DINNER_LOCK_CACHE_KEY, False, 0)
+        cache.set(CHICKEN_DINNER_LAST_PROCESSED_CACHE_KEY, datetime.now(timezone.utc), 0)
+    finally:
+        cache.set(CHICKEN_DINNER_LOCK_CACHE_KEY, False, 0)
 
     click.secho('Effectué', fg='green')
 
