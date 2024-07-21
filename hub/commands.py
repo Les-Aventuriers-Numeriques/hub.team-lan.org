@@ -1,7 +1,7 @@
+from hub.pubg import PUBGApiClient, MAP_NAMES, GAME_MODES
 from hub.discord import send_chicken_dinner_message
 from sqlalchemy.dialects import postgresql
 from datetime import datetime, timezone
-from hub.pubg import PUBGApiClient
 from app import app, db, cache
 from hub.models import Game
 import requests
@@ -142,9 +142,9 @@ def chicken_dinner() -> None:
         ]
 
         if last_processed:
-            # matches = [
-            #     match for match in matches if datetime.fromisoformat(match['data']['attributes']['createdAt']) >= last_processed
-            # ]
+            matches = [
+                match for match in matches if datetime.fromisoformat(match['data']['attributes']['createdAt']) >= last_processed
+            ]
 
             if matches:
                 click.echo('{} nouveaux matches à traiter'.format(len(matches)))
@@ -179,11 +179,9 @@ def chicken_dinner() -> None:
                         continue
 
                     map_id = match['data']['attributes']['mapName']
-                    map_name = map_id
                     game_mode_id = match['data']['attributes']['gameMode']
-                    game_mode_name = game_mode_id
 
-                    send_chicken_dinner_message(map_name, game_mode_name, participants)
+                    send_chicken_dinner_message(MAP_NAMES.get(map_id), GAME_MODES.get(game_mode_id), participants)
             else:
                 click.secho('Aucun nouveau match à envoyer', fg='yellow')
         else:
