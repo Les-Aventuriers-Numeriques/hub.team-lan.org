@@ -20,7 +20,7 @@ class PUBGApiErrorResponse(Exception):
 
 
 MAP_NAMES = {
-    'Baltic_Main': 'Erangel (remasterisé)',
+    'Baltic_Main': 'Erangel',
     'Chimera_Main': 'Paramo',
     'Desert_Main': 'Miramar',
     'DihorOtok_Main': 'Vikendi',

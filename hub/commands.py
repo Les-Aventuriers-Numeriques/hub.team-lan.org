@@ -202,3 +202,14 @@ def chicken_dinner_clear_lock() -> None:
     cache.set(CHICKEN_DINNER_LOCK_CACHE_KEY, False, 0)
 
     click.secho('Effectué', fg='green')
+
+
+@app.cli.command()
+@click.argument('dt')
+def chicken_dinner_force_date(dt: str) -> None:
+    """Force la date de traitement des Chicken Dinners."""
+    click.echo('Ecrasement de la date...')
+
+    cache.set(CHICKEN_DINNER_LAST_PROCESSED_CACHE_KEY, datetime.fromisoformat(dt), 0)
+
+    click.secho('Effectué', fg='green')
