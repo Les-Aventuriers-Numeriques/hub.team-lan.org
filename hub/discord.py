@@ -193,11 +193,12 @@ def send_proposal_message(user: User, game: Game) -> Response:
     return _send_message(app.config['DISCORD_LAN_CHANNEL_ID'], data, content_type)
 
 
-def send_chicken_dinner_message(map_name: str, game_mode_name: str, participants: List[Dict]) -> Response:
+def send_chicken_dinner_message(match_id: str, map_name: str, game_mode_name: str, participants: List[Dict]) -> Response:
     def _participant_name(participant: Dict) -> str:
-        return '[{0}](https://pubg.sh/{0}/{1})'.format(
+        return '[{0}](https://pubg.sh/{0}/{1}/{2})'.format(
             participant['attributes']['stats']['name'],
-            participant['attributes']['shardId']
+            participant['attributes']['shardId'],
+            match_id
         )
 
     last_participant = None

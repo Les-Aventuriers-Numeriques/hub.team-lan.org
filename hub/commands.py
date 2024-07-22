@@ -181,7 +181,7 @@ def chicken_dinner() -> None:
                     map_id = match['data']['attributes']['mapName']
                     game_mode_id = match['data']['attributes']['gameMode']
 
-                    send_chicken_dinner_message(MAP_NAMES.get(map_id), GAME_MODES.get(game_mode_id), participants)
+                    send_chicken_dinner_message(match['data']['id'], MAP_NAMES.get(map_id), GAME_MODES.get(game_mode_id), participants)
             else:
                 click.secho('Aucun nouveau match à envoyer', fg='yellow')
         else:
