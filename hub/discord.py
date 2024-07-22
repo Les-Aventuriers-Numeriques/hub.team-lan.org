@@ -208,23 +208,40 @@ def send_chicken_dinner_message(match_id: str, map_name: str, game_mode_name: st
         last_participant = participants[-1]
         participants_for_player_names = participants[:-1]
 
-    players_names = ', '.join([
+    participants_names = ', '.join([
         _participant_name(participant) for participant in participants_for_player_names
     ])
 
     if last_participant:
-        players_names += ' et ' + _participant_name(last_participant)
+        participants_names += ' et ' + _participant_name(last_participant)
+
+    pluralize = len(participants) > 1
 
     contents = [
-        f'Les parents de {players_names} peuvent enfin être fiers grâce à leur top 1 en **{game_mode_name}** sur **{map_name}** !',
-        f'On y croyait plus, un Chicken Dinner de plus pour {players_names} en **{game_mode_name}** sur **{map_name}** !',
-        f'C\'est sur **{map_name}** en **{game_mode_name}** que {players_names} ont brillé pour une fois par leur Chicken Dinner !',
-        f'Dieu existe et le prouve à travers {players_names} et leur top 1 en **{game_mode_name}** sur **{map_name}** !',
-        f'{players_names} dormiront l\'esprit tranquille ce soir grâce à leur top 1 en **{game_mode_name}** sur **{map_name}** !',
-        f'C\'est {players_names} qui régalent ce soir avec leur Chicken Dinner en **{game_mode_name}** sur **{map_name}** !',
-        f'La zone est pacifiée sur **{map_name}** en **{game_mode_name}** grâce au top 1 de {players_names} !',
-        f'C\'était mal barré comme d\'habitude sur **{map_name}** en **{game_mode_name}**, le skill (mais plus probablement la chance) a fait que {players_names} finissent top 1 !',
+        f'Les parents de {participants_names} peuvent enfin être fiers grâce à {"leur" if pluralize else "son"} top 1 en **{game_mode_name}** sur **{map_name}** !',
+        f'On y croyait plus, un Chicken Dinner de plus pour {participants_names} en **{game_mode_name}** sur **{map_name}** !',
+        f'C\'est sur **{map_name}** en **{game_mode_name}** que {participants_names} {"ont" if pluralize else "a"} brillé (pour une fois) par {"leur" if pluralize else "son"} Chicken Dinner !',
+        f'Dieu existe et le prouve à travers {participants_names} et {"leur" if pluralize else "son"} top 1 en **{game_mode_name}** sur **{map_name}** !',
+        f'{participants_names} {"dormiront" if pluralize else "dormira"} l\'esprit tranquille ce soir grâce à {"leur" if pluralize else "son"} top 1 en **{game_mode_name}** sur **{map_name}** !',
+        f'C\'est {participants_names} qui {"régalent" if pluralize else "régale"} ce soir avec {"leur" if pluralize else "son"} Chicken Dinner en **{game_mode_name}** sur **{map_name}** !',
+        f'La zone est pacifiée sur **{map_name}** en **{game_mode_name}** grâce au top 1 de {participants_names} !',
+        f'C\'était mal barré comme d\'habitude sur **{map_name}** en **{game_mode_name}**, mais le skill (plus probablement la chance) a fait que {participants_names} {"finissent" if pluralize else "finisse"} top 1 !',
+        f'Vous ne devinerez jamais comment ce top 1 hallucinant a été atteint par {participants_names} en **{game_mode_name}** sur **{map_name}** !',
     ]
+
+    participants_names_list = [
+        participant['attributes']['stats']['name'] for participant in participants
+    ]
+
+    if 'Pepsite' in participants_names_list:
+        contents.append(
+            f'{participants_names} {"ont" if pluralize else "a"} atteint le top 1 sur **{map_name}** en **{game_mode_name}**, heureusement que (pour une fois) la conduite de Pepsite ne l\'a pas empêché !'
+        )
+
+    if 'DrMastock' in participants_names_list:
+        contents.append(
+            f'Chicken Dinner pour {participants_names}, sûrement grâce à la x8 de DrMastock trouvée au dernier moment sur **{map_name}** en **{game_mode_name}** !'
+        )
 
     images = [
         'https://pbs.twimg.com/media/EXfqIngWsAA6gBq.jpg',
