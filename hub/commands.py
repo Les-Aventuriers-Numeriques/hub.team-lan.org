@@ -127,6 +127,8 @@ def chicken_dinner() -> None:
 
         players = client.get_players(PUBG_SHARD, player_names=app.config['PUBG_PLAYER_NAMES_INTERNAL'])['data']
 
+        cache.set(CHICKEN_DINNER_LAST_PROCESSED_CACHE_KEY, datetime.now(timezone.utc), 0)
+
         click.echo('  {} joueurs récupérés'.format(len(players)))
 
         matches_id = set()
@@ -186,8 +188,6 @@ def chicken_dinner() -> None:
                 click.secho('Aucun nouveau match à envoyer', fg='yellow')
         else:
             click.secho('1er traitement: aucune action à effectuer', fg='yellow')
-
-        cache.set(CHICKEN_DINNER_LAST_PROCESSED_CACHE_KEY, datetime.now(timezone.utc), 0)
     except Exception as e:
         app.logger.exception('Une erreur est survenue lors du traitement des Chicken Dinner')
 
