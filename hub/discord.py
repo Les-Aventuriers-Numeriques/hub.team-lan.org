@@ -222,12 +222,18 @@ def send_chicken_dinner_message(map_name: str, game_mode_name: str, participants
         f'{players_names} dormiront l\'esprit tranquille ce soir grâce à leur top 1 en **{game_mode_name}** sur **{map_name}** !',
         f'C\'est {players_names} qui régalent ce soir avec leur Chicken Dinner en **{game_mode_name}** sur **{map_name}** !',
         f'La zone est pacifiée sur **{map_name}** en **{game_mode_name}** grâce au top 1 de {players_names} !',
+        f'C\'était mal barré comme d\'habitude sur **{map_name}** en **{game_mode_name}**, le skill (mais plus probablement la chance) a fait que {players_names} finissent top 1 !',
     ]
 
     images = [
         'https://pbs.twimg.com/media/EXfqIngWsAA6gBq.jpg',
         'https://i.imgur.com/M33pWNM.png',
         'https://c.tenor.com/vOKwPz3lifIAAAAC/tenor.gif',
+        'https://media.toucharger.com/web/toucharger/upload/image_domain/7/5/75657/75657.gif',
+        'https://c.tenor.com/z04usSAGgJwAAAAd/tenor.gif',
+        'https://c.tenor.com/XYvg-iC6PT4AAAAC/tenor.gif',
+        'https://c.tenor.com/fit861DxTeQAAAAC/tenor.gif',
+        'https://c.tenor.com/6XA-L01v3RQAAAAC/tenor.gif',
     ]
 
     data, content_type = Message(
