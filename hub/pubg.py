@@ -142,7 +142,7 @@ class PUBGApiClient:
         try:
             response.raise_for_status()
         except HTTPError as e:
-            if 'application/json' in e.response.headers.get('Content-Type', ''):
+            if 'application/vnd.api+json' in e.response.headers.get('Content-Type', ''):
                 errors = [
                     e['detail'] for e in e.response.json()['errors']
                 ]
