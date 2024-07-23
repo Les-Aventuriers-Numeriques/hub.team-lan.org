@@ -274,6 +274,8 @@ def send_chicken_dinner_message(
             'https://c.tenor.com/ZFc20z8DItkAAAAC/tenor.gif',
             'https://1.bp.blogspot.com/-0a3fg-fUWdw/T3On8vGgmVI/AAAAAAAAA4A/PJg-1gRMH5Y/s200/bunk-the-wire.gif',
         ]
+    else:
+        raise ValueError('outcome must be one of won or worst')
 
     data, content_type = Message(
         secrets.choice(contents),
