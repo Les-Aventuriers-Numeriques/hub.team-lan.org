@@ -1,4 +1,3 @@
-from ratelimit import limits, sleep_and_retry
 from requests.exceptions import HTTPError
 from typing import Dict, Optional, List
 from flask_caching import Cache
@@ -109,8 +108,6 @@ class PUBGApiClient:
             cache_timeout=60 * 60 * 24 * 14 # 14 jours
         )
 
-    @sleep_and_retry
-    @limits(calls=10, period=60)
     def call(self, resource: str, params: Optional[Dict] = None, needs_auth: bool = True, cache_timeout: Optional[int] = None) -> Dict:
         url = API_BASE_URL + resource
         headers = {
