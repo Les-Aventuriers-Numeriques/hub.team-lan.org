@@ -123,7 +123,7 @@ class PUBGApiClient:
                 'Authorization': f'Bearer {self.jwt_token}'
             })
         elif needs_auth:
-            raise ValueError(f'{url} requires authentication but no JWT token has been set')
+            raise ValueError(f'{resource} requires authentication but no JWT token has been set')
 
         request = requests.prepare_request(
             Request('GET', url, headers=headers, params=params)
