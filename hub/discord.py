@@ -193,7 +193,13 @@ def send_proposal_message(user: User, game: Game) -> Response:
     return _send_message(app.config['DISCORD_LAN_CHANNEL_ID'], data, content_type)
 
 
-def send_chicken_dinner_message(match_id: str, map_name: str, game_mode_name: str, participants: List[Dict]) -> Response:
+def send_chicken_dinner_message(
+    outcome: str,
+    match_id: str,
+    map_name: str,
+    game_mode_name: str,
+    participants: List[Dict]
+) -> Response:
     def _participant_name(participant: Dict) -> str:
         return '[{0}](https://pubg.sh/{0}/{1}/{2})'.format(
             participant['attributes']['stats']['name'],
@@ -217,45 +223,60 @@ def send_chicken_dinner_message(match_id: str, map_name: str, game_mode_name: st
 
     pluralize = len(participants) > 1
 
-    contents = [
-        f'Les parents de {participants_names} peuvent enfin être fiers grâce à {"leur" if pluralize else "son"} top 1 en **{game_mode_name}** sur **{map_name}** !',
-        f'On y croyait plus, un Chicken Dinner de plus pour {participants_names} en **{game_mode_name}** sur **{map_name}** !',
-        f'C\'est sur **{map_name}** en **{game_mode_name}** que {participants_names} {"ont" if pluralize else "a"} brillé (pour une fois) par {"leur" if pluralize else "son"} Chicken Dinner !',
-        f'Dieu existe et le prouve à travers {participants_names} et {"leur" if pluralize else "son"} top 1 en **{game_mode_name}** sur **{map_name}** !',
-        f'{participants_names} {"dormiront" if pluralize else "dormira"} l\'esprit tranquille ce soir grâce à {"leur" if pluralize else "son"} top 1 en **{game_mode_name}** sur **{map_name}** !',
-        f'C\'est {participants_names} qui {"régalent" if pluralize else "régale"} ce soir avec {"leur" if pluralize else "son"} Chicken Dinner en **{game_mode_name}** sur **{map_name}** !',
-        f'La zone est pacifiée sur **{map_name}** en **{game_mode_name}** grâce au top 1 de {participants_names} !',
-        f'C\'était mal barré comme d\'habitude sur **{map_name}** en **{game_mode_name}**, mais le skill (plus probablement la chance) a fait que {participants_names} {"finissent" if pluralize else "finisse"} top 1 !',
-        f'Vous ne devinerez jamais comment ce top 1 hallucinant a été atteint par {participants_names} en **{game_mode_name}** sur **{map_name}** !',
-    ]
-
     participants_names_list = [
         participant['attributes']['stats']['name'] for participant in participants
     ]
 
-    if 'Pepsite' in participants_names_list:
-        contents.append(
-            f'{participants_names} {"ont" if pluralize else "a"} atteint le top 1 sur **{map_name}** en **{game_mode_name}**, heureusement que (pour une fois) la conduite de Pepsite ne l\'a pas empêché !'
-        )
+    if outcome == 'won':
+        contents = [
+            f'🥇 Les parents de {participants_names} peuvent enfin être fiers grâce à {"leur" if pluralize else "son"} top 1 en **{game_mode_name}** sur **{map_name}** !',
+            f'🐔 On y croyait plus, un Chicken Dinner de plus pour {participants_names} en **{game_mode_name}** sur **{map_name}** !',
+            f'🥇 C\'est sur **{map_name}** en **{game_mode_name}** que {participants_names} {"ont" if pluralize else "a"} brillé (pour une fois) par {"leur" if pluralize else "son"} Chicken Dinner !',
+            f'🥇 Dieu existe et le prouve à travers {participants_names} et {"leur" if pluralize else "son"} top 1 en **{game_mode_name}** sur **{map_name}** !',
+            f'🥇 {participants_names} {"dormiront" if pluralize else "dormira"} l\'esprit tranquille ce soir grâce à {"leur" if pluralize else "son"} top 1 en **{game_mode_name}** sur **{map_name}** !',
+            f'🐔 C\'est {participants_names} qui {"régalent" if pluralize else "régale"} ce soir avec {"leur" if pluralize else "son"} Chicken Dinner en **{game_mode_name}** sur **{map_name}** !',
+            f'🥇 La zone est pacifiée sur **{map_name}** en **{game_mode_name}** grâce au top 1 de {participants_names} !',
+            f'🥇 C\'était mal barré comme d\'habitude sur **{map_name}** en **{game_mode_name}**, mais le skill (plus probablement la chance) a fait que {participants_names} {"finissent" if pluralize else "finisse"} top 1 !',
+            f'🥇 Vous ne devinerez jamais comment ce top 1 hallucinant a été atteint par {participants_names} en **{game_mode_name}** sur **{map_name}** !',
+        ]
 
-    if 'DrMastock' in participants_names_list:
-        contents.append(
-            f'Chicken Dinner pour {participants_names}, sûrement grâce à la x8 de DrMastock trouvée au dernier moment sur **{map_name}** en **{game_mode_name}** !'
-        )
+        if 'Pepsite' in participants_names_list:
+            contents.append(
+                f'🥇 {participants_names} {"ont" if pluralize else "a"} atteint le top 1 sur **{map_name}** en **{game_mode_name}**, heureusement que (pour une fois) la conduite de Pepsite ne l\'a pas empêché !'
+            )
 
-    images = [
-        'https://pbs.twimg.com/media/EXfqIngWsAA6gBq.jpg',
-        'https://i.imgur.com/M33pWNM.png',
-        'https://c.tenor.com/vOKwPz3lifIAAAAC/tenor.gif',
-        'https://media.toucharger.com/web/toucharger/upload/image_domain/7/5/75657/75657.gif',
-        'https://c.tenor.com/z04usSAGgJwAAAAd/tenor.gif',
-        'https://c.tenor.com/XYvg-iC6PT4AAAAC/tenor.gif',
-        'https://c.tenor.com/fit861DxTeQAAAAC/tenor.gif',
-        'https://c.tenor.com/6XA-L01v3RQAAAAC/tenor.gif',
-    ]
+        if 'DrMastock' in participants_names_list:
+            contents.append(
+                f'🐔 Chicken Dinner pour {participants_names}, sûrement grâce à la x8 de DrMastock trouvée au dernier moment sur **{map_name}** en **{game_mode_name}** !'
+            )
+
+        images = [
+            'https://pbs.twimg.com/media/EXfqIngWsAA6gBq.jpg',
+            'https://i.imgur.com/M33pWNM.png',
+            'https://c.tenor.com/vOKwPz3lifIAAAAC/tenor.gif',
+            'https://media.toucharger.com/web/toucharger/upload/image_domain/7/5/75657/75657.gif',
+            'https://c.tenor.com/z04usSAGgJwAAAAd/tenor.gif',
+            'https://c.tenor.com/XYvg-iC6PT4AAAAC/tenor.gif',
+            'https://c.tenor.com/fit861DxTeQAAAAC/tenor.gif',
+            'https://c.tenor.com/6XA-L01v3RQAAAAC/tenor.gif',
+        ]
+    elif outcome == 'worst':
+        contents = [
+            f'🤦 Toucher le fond : c\'est tout ce que {participants_names} {"ont" if pluralize else "a"} pu faire sur **{map_name}** en **{game_mode_name}**.',
+            f'🤦 {participants_names} {"ont" if pluralize else "a"} brillé par {"leur" if pluralize else "sa"} médiocrité sur **{map_name}** en **{game_mode_name}**.',
+            f'🤦 Tout ce qu\'il ne fallait pas faire, {participants_names} l\'{"ont" if pluralize else "a"} fait sur **{map_name}** en **{game_mode_name}**.',
+            f'🤦 {participants_names} {"étaient" if pluralize else "était"} loin, très loin du Chicken Dinner sur **{map_name}** en **{game_mode_name}**.',
+            f'🤦 C\'était très rapide cette fois pour {participants_names} sur **{map_name}** en **{game_mode_name}**.',
+        ]
+
+        images = [
+            'https://c.tenor.com/-huJTdSu9PkAAAAd/tenor.gif',
+            'https://c.tenor.com/ZFc20z8DItkAAAAC/tenor.gif',
+            'https://1.bp.blogspot.com/-0a3fg-fUWdw/T3On8vGgmVI/AAAAAAAAA4A/PJg-1gRMH5Y/s200/bunk-the-wire.gif',
+        ]
 
     data, content_type = Message(
-        '🐔 ' + secrets.choice(contents),
+        secrets.choice(contents),
         embed=Embed(
             title='Stats',
             color=EMBEDS_COLOR,

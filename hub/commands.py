@@ -166,24 +166,48 @@ def chicken_dinner() -> None:
 
                     click.echo('  {} joueurs trouvés'.format(len(participants)))
 
-                    winning_team = next(
-                        (roster for roster in match['included'] if roster['type'] == 'roster' and roster['attributes']['won'] == 'true'),
-                        None
+                    rosters = sorted(
+                        [
+                            roster for roster in match['included'] if roster['type'] == 'roster'
+                        ],
+                        key=lambda roster: roster['attributes']['stats']['rank']
                     )
+
+                    winning_team = rosters[0]
 
                     winning_team_participants_ids = [
                         participant['id'] for participant in winning_team['relationships']['participants']['data']
                     ]
 
-                    if not any(True for participant_id in participants_ids if participant_id in winning_team_participants_ids):
-                        click.secho('  Pas un Chicken Dinner', fg='yellow')
+                    worst_team = rosters[-1]
+
+                    worst_team_participants_ids = [
+                        participant['id'] for participant in worst_team['relationships']['participants']['data']
+                    ]
+
+                    if any(True for participant_id in participants_ids if participant_id in winning_team_participants_ids):
+                        click.echo('  Gagné')
+
+                        outcome = 'won'
+                    elif any(True for participant_id in participants_ids if participant_id in worst_team_participants_ids):
+                        click.echo('  Dernière équipe')
+
+                        outcome = 'worst'
+                    else:
+                        click.echo('  Pas à envoyer')
 
                         continue
 
                     map_id = match['data']['attributes']['mapName']
                     game_mode_id = match['data']['attributes']['gameMode']
 
-                    send_chicken_dinner_message(match['data']['id'], MAP_NAMES.get(map_id), GAME_MODES.get(game_mode_id), participants)
+                    send_chicken_dinner_message(
+                        outcome,
+                        match['data']['id'],
+                        MAP_NAMES.get(map_id),
+                        GAME_MODES.get(game_mode_id),
+                        participants
+                    )
             else:
                 click.secho('Aucun nouveau match à envoyer', fg='yellow')
         else:
