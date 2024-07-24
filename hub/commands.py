@@ -1,7 +1,7 @@
 from hub.pubg import PUBGApiClient, MAP_NAMES, GAME_MODES
 from hub.discord import send_chicken_dinner_message
+from datetime import datetime, timezone, timedelta
 from sqlalchemy.dialects import postgresql
-from datetime import datetime, timezone
 from app import app, db, cache
 from hub.models import Game
 import requests
@@ -9,7 +9,7 @@ import click
 import csv
 
 CHICKEN_DINNER_LOCK_CACHE_KEY = 'chicken_dinner_processing'
-CHICKEN_DINNER_LAST_PROCESSED_CACHE_KEY = 'chicken_dinner_last_processed'
+CHICKEN_DINNER_PROCESSED_CACHE_KEY = 'chicken_dinner_processed'
 PUBG_SHARD = 'steam'
 
 
@@ -119,7 +119,7 @@ def chicken_dinner() -> None:
     cache.set(CHICKEN_DINNER_LOCK_CACHE_KEY, True, 0)
 
     try:
-        last_processed = cache.get(CHICKEN_DINNER_LAST_PROCESSED_CACHE_KEY)
+        processed = cache.get(CHICKEN_DINNER_PROCESSED_CACHE_KEY) or {}
 
         client = PUBGApiClient(app.config['PUBG_API_JWT_TOKEN'], cache)
 
@@ -128,6 +128,7 @@ def chicken_dinner() -> None:
         players = client.get_players(PUBG_SHARD, player_names=app.config['PUBG_PLAYER_NAMES_INTERNAL'])['data']
 
         now = datetime.now(timezone.utc)
+        fourteen_days_ago = now - timedelta(days=14)
 
         click.echo('  {} joueurs récupérés'.format(len(players)))
 
@@ -143,13 +144,17 @@ def chicken_dinner() -> None:
             client.get_match(PUBG_SHARD, match_id) for match_id in matches_id
         ]
 
-        if last_processed:
+        if processed:
             matches = [
-                match for match in matches if datetime.fromisoformat(match['data']['attributes']['createdAt']) >= last_processed
+                match for match in matches if match['data']['id'] not in processed
             ]
 
             if matches:
                 click.echo('{} nouveaux matches à traiter'.format(len(matches)))
+
+                processed.update({
+                    match['data']['id']: now for match in matches
+                })
 
                 player_names_to_match = app.config['PUBG_PLAYER_NAMES_INTERNAL'] + app.config['PUBG_PLAYER_NAMES_EXTERNAL']
 
@@ -186,34 +191,46 @@ def chicken_dinner() -> None:
                     ]
 
                     if any(True for participant_id in participants_ids if participant_id in winning_team_participants_ids):
-                        click.echo('  Gagné')
+                        click.secho('  Gagné', fg='green')
 
                         outcome = 'won'
                     elif any(True for participant_id in participants_ids if participant_id in worst_team_participants_ids):
-                        click.echo('  Dernière équipe')
+                        click.secho('  Dernière équipe', fg='red')
 
                         outcome = 'worst'
                     else:
-                        click.echo('  Pas à envoyer')
+                        click.secho('  Pas à envoyer', fg='yellow')
 
                         continue
 
                     map_id = match['data']['attributes']['mapName']
                     game_mode_id = match['data']['attributes']['gameMode']
 
-                    send_chicken_dinner_message(
-                        outcome,
-                        match['data']['id'],
-                        MAP_NAMES.get(map_id),
-                        GAME_MODES.get(game_mode_id),
-                        participants
-                    )
+                    # send_chicken_dinner_message(
+                    #     outcome,
+                    #     match['data']['id'],
+                    #     MAP_NAMES.get(map_id),
+                    #     GAME_MODES.get(game_mode_id),
+                    #     participants
+                    # )
             else:
                 click.secho('Aucun nouveau match à envoyer', fg='yellow')
+
+            processed = {
+                mid: dt for mid, dt in processed.items() if dt >= fourteen_days_ago
+            }
         else:
+            processed.update({
+                match['data']['id']: now for match in matches
+            })
+
             click.secho('1er traitement: aucune action à effectuer', fg='yellow')
 
-        cache.set(CHICKEN_DINNER_LAST_PROCESSED_CACHE_KEY, now, 0)
+        cache.set(
+            CHICKEN_DINNER_PROCESSED_CACHE_KEY,
+            processed,
+            0
+        )
     except Exception as e:
         app.logger.exception('Une erreur est survenue lors du traitement des Chicken Dinner')
 
@@ -239,10 +256,10 @@ def chicken_dinner_clear_lock() -> None:
 
 @app.cli.command()
 @click.argument('dt')
-def chicken_dinner_force_date(dt: str) -> None:
-    """Force la date de traitement des Chicken Dinner."""
-    click.echo('Ecrasement de la date...')
+def chicken_dinner_clear_processed() -> None:
+    """Supprime tous les matchs déjà traités."""
+    click.echo('Suppression des matchs...')
 
-    cache.set(CHICKEN_DINNER_LAST_PROCESSED_CACHE_KEY, datetime.fromisoformat(dt), 0)
+    cache.set(CHICKEN_DINNER_PROCESSED_CACHE_KEY, {}, 0)
 
     click.secho('Effectué', fg='green')
