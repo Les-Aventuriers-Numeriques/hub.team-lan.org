@@ -262,17 +262,21 @@ def send_chicken_dinner_message(
         ]
     elif outcome == 'worst':
         contents = [
-            f'🤦‍♂️ Toucher le fond : c\'est tout ce que {participants_names} {"ont" if pluralize else "a"} pu faire sur **{map_name}** en **{game_mode_name}**.',
+            f'🤦‍♂️ Toucher le fond sur **{map_name}** : c\'est tout ce que {participants_names} {"ont" if pluralize else "a"} pu faire en **{game_mode_name}**.',
             f'🤕️ {participants_names} {"ont" if pluralize else "a"} brillé par {"leur" if pluralize else "sa"} médiocrité sur **{map_name}** en **{game_mode_name}**.',
             f'🤦‍♂️ Tout ce qu\'il ne fallait pas faire, {participants_names} l\'{"ont" if pluralize else "a"} fait sur **{map_name}** en **{game_mode_name}**.',
             f'🤕️ {participants_names} {"étaient" if pluralize else "était"} loin, très loin du Chicken Dinner sur **{map_name}** en **{game_mode_name}**.',
             f'🤦‍♂️ C\'était très rapide cette fois pour {participants_names} sur **{map_name}** en **{game_mode_name}**.',
+            f'🤕️ {participants_names} : {"vous étiez les maillons faibles" if pluralize else "tu était le maillon faible"} sur **{map_name}** en **{game_mode_name}**. Au revoir.',
+            f'🤦‍♂️ Etait-ce la malchance ? Le manque de skill ? La carte ? Sûrement un peu des trois pour {participants_names} sur **{map_name}** en **{game_mode_name}**.',
         ]
 
         images = [
             'https://c.tenor.com/-huJTdSu9PkAAAAd/tenor.gif',
             'https://c.tenor.com/ZFc20z8DItkAAAAC/tenor.gif',
             'https://1.bp.blogspot.com/-0a3fg-fUWdw/T3On8vGgmVI/AAAAAAAAA4A/PJg-1gRMH5Y/s200/bunk-the-wire.gif',
+            'https://c.tenor.com/pclCqjkaebQAAAAC/tenor.gif',
+            'https://c.tenor.com/bO1zLArkvScAAAAC/tenor.gif',
         ]
     else:
         raise ValueError('outcome must be one of "won" or "worst"')
