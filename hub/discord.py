@@ -262,11 +262,11 @@ def send_chicken_dinner_message(
         ]
     elif outcome == 'worst':
         contents = [
-            f'🤦 Toucher le fond : c\'est tout ce que {participants_names} {"ont" if pluralize else "a"} pu faire sur **{map_name}** en **{game_mode_name}**.',
-            f'🤦 {participants_names} {"ont" if pluralize else "a"} brillé par {"leur" if pluralize else "sa"} médiocrité sur **{map_name}** en **{game_mode_name}**.',
-            f'🤦 Tout ce qu\'il ne fallait pas faire, {participants_names} l\'{"ont" if pluralize else "a"} fait sur **{map_name}** en **{game_mode_name}**.',
-            f'🤦 {participants_names} {"étaient" if pluralize else "était"} loin, très loin du Chicken Dinner sur **{map_name}** en **{game_mode_name}**.',
-            f'🤦 C\'était très rapide cette fois pour {participants_names} sur **{map_name}** en **{game_mode_name}**.',
+            f'🤦‍♂️ Toucher le fond : c\'est tout ce que {participants_names} {"ont" if pluralize else "a"} pu faire sur **{map_name}** en **{game_mode_name}**.',
+            f'🤕️ {participants_names} {"ont" if pluralize else "a"} brillé par {"leur" if pluralize else "sa"} médiocrité sur **{map_name}** en **{game_mode_name}**.',
+            f'🤦‍♂️ Tout ce qu\'il ne fallait pas faire, {participants_names} l\'{"ont" if pluralize else "a"} fait sur **{map_name}** en **{game_mode_name}**.',
+            f'🤕️ {participants_names} {"étaient" if pluralize else "était"} loin, très loin du Chicken Dinner sur **{map_name}** en **{game_mode_name}**.',
+            f'🤦‍♂️ C\'était très rapide cette fois pour {participants_names} sur **{map_name}** en **{game_mode_name}**.',
         ]
 
         images = [
@@ -275,7 +275,7 @@ def send_chicken_dinner_message(
             'https://1.bp.blogspot.com/-0a3fg-fUWdw/T3On8vGgmVI/AAAAAAAAA4A/PJg-1gRMH5Y/s200/bunk-the-wire.gif',
         ]
     else:
-        raise ValueError('outcome must be one of won or worst')
+        raise ValueError('outcome must be one of "won" or "worst"')
 
     data, content_type = Message(
         secrets.choice(contents),
