@@ -13,9 +13,6 @@ from flask_caching import Cache
 from typing import Tuple, Dict
 from environs import Env
 
-import logging
-logging.basicConfig(level=logging.INFO)
-
 # -----------------------------------------------------------
 # Initialisation de l'application
 
