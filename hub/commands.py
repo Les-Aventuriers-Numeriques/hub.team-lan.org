@@ -161,6 +161,11 @@ def chicken_dinner() -> None:
                 for match in matches:
                     click.echo('Traitement de {}'.format(match['data']['id']))
 
+                    if match['data']['attributes']['matchType'] not in ('airoyale', 'official', 'seasonal'):
+                        click.secho('  Pas un match qui nous intéresse', fg='yellow')
+
+                        continue
+
                     participants = [
                         participant for participant in match['included'] if participant['type'] == 'participant' and participant['attributes']['stats']['name'] in player_names_to_match
                     ]
