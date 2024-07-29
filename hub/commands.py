@@ -1,4 +1,4 @@
-from hub.pubg import PUBGApiClient, MAP_NAMES, GAME_MODES
+from hub.pubg import PUBGApiClient, MATCH_TYPES_NAMES
 from hub.discord import send_chicken_dinner_message
 from datetime import datetime, timezone, timedelta
 from sqlalchemy.dialects import postgresql
@@ -161,7 +161,7 @@ def chicken_dinner() -> None:
                 for match in matches:
                     click.echo('Traitement de {}'.format(match['data']['id']))
 
-                    if match['data']['attributes']['matchType'] not in ('airoyale', 'official', 'seasonal'):
+                    if match['data']['attributes']['matchType'] not in MATCH_TYPES_NAMES.keys():
                         click.secho('  Pas un match qui nous intéresse', fg='yellow')
 
                         continue
@@ -208,14 +208,12 @@ def chicken_dinner() -> None:
 
                         continue
 
-                    map_id = match['data']['attributes']['mapName']
-                    game_mode_id = match['data']['attributes']['gameMode']
-
                     send_chicken_dinner_message(
                         outcome,
                         match['data']['id'],
-                        MAP_NAMES.get(map_id),
-                        GAME_MODES.get(game_mode_id),
+                        match['data']['attributes']['mapName'],
+                        match['data']['attributes']['gameMode'],
+                        match['data']['attributes']['matchType'],
                         participants
                     )
             else:

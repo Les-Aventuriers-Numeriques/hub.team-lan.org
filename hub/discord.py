@@ -1,5 +1,6 @@
 from flask_discord_interactions import Message, Embed, ActionRow, ButtonStyles, Button
 from hub.models import User, Game, VoteType, LanGameProposal, LanGameProposalVote
+from hub.pubg import MAPS_NAMES, GAME_MODES_NAMES, MATCH_TYPES_NAMES
 from flask_discord_interactions.models.embed import Media, Field
 from app import app, db, discord_interactions
 from sqlalchemy.exc import IntegrityError
@@ -196,8 +197,9 @@ def send_proposal_message(user: User, game: Game) -> Response:
 def send_chicken_dinner_message(
     outcome: str,
     match_id: str,
-    map_name: str,
-    game_mode_name: str,
+    map_id: str,
+    game_mode_id: str,
+    match_type_id: str,
     participants: List[Dict]
 ) -> Response:
     def _participant_name(participant: Dict) -> str:
@@ -227,27 +229,36 @@ def send_chicken_dinner_message(
         participant['attributes']['stats']['name'] for participant in participants
     ]
 
+    map_name = MAPS_NAMES.get(map_id, '?')
+    game_mode_name = GAME_MODES_NAMES.get(game_mode_id, '?')
+    match_type_name = MATCH_TYPES_NAMES.get(match_type_id, '?')
+
+    won_term = secrets.choice(['top 1', 'Chicken Dinner'])
+
     if outcome == 'won':
+        emojis = ['🥇', '🐔']
+
         contents = [
-            f'🥇 Les parents de {participants_names} peuvent enfin être fiers grâce à {"leur" if pluralize else "son"} top 1 en **{game_mode_name}** sur **{map_name}** !',
-            f'🐔 On y croyait plus, un Chicken Dinner de plus pour {participants_names} en **{game_mode_name}** sur **{map_name}** !',
-            f'🥇 C\'est sur **{map_name}** en **{game_mode_name}** que {participants_names} {"ont" if pluralize else "a"} brillé (pour une fois) par {"leur" if pluralize else "son"} Chicken Dinner !',
-            f'🥇 Dieu existe et le prouve à travers {participants_names} et {"leur" if pluralize else "son"} top 1 en **{game_mode_name}** sur **{map_name}** !',
-            f'🥇 {participants_names} {"dormiront" if pluralize else "dormira"} l\'esprit tranquille ce soir grâce à {"leur" if pluralize else "son"} top 1 en **{game_mode_name}** sur **{map_name}** !',
-            f'🐔 C\'est {participants_names} qui {"régalent" if pluralize else "régale"} ce soir avec {"leur" if pluralize else "son"} Chicken Dinner en **{game_mode_name}** sur **{map_name}** !',
-            f'🥇 La zone est pacifiée sur **{map_name}** en **{game_mode_name}** grâce au top 1 de {participants_names} !',
-            f'🥇 C\'était mal barré comme d\'habitude sur **{map_name}** en **{game_mode_name}**, mais le skill (plus probablement la chance) a fait que {participants_names} {"finissent" if pluralize else "finisse"} top 1 !',
-            f'🥇 Vous ne devinerez jamais comment ce top 1 hallucinant a été atteint par {participants_names} en **{game_mode_name}** sur **{map_name}** !',
+            f'Les parents de {participants_names} peuvent enfin être fiers grâce à {"leur" if pluralize else "son"} {won_term} !',
+            f'On y croyait vraiment plus, un {won_term} de plus pour {participants_names} en !',
+            f'{participants_names} {"ont" if pluralize else "a"} brillé (pour une fois) par {"leur" if pluralize else "son"} {won_term} !',
+            f'Dieu existe et le prouve à travers {participants_names} et {"leur" if pluralize else "son"} {won_term} !',
+            f'{participants_names} {"dormiront" if pluralize else "dormira"} l\'esprit tranquille ce soir grâce à {"leur" if pluralize else "son"} {won_term} !',
+            f'C\'est {participants_names} qui {"régalent" if pluralize else "régale"} ce soir avec {"leur" if pluralize else "son"} {won_term} !',
+            f'La zone est pacifiée grâce au {won_term} de {participants_names} !',
+            f'C\'était mal barré comme d\'habitude, mais le skill (plus probablement la chance) a fait que {participants_names} {"finissent" if pluralize else "finisse"} {won_term} !',
+            f'Vous ne devinerez jamais comment ce {won_term} hallucinant a été atteint par {participants_names} !',
+            f'Et ben voilà {participants_names}, c\'était pas si compliqué ce {won_term} !',
         ]
 
         if 'Pepsite' in participants_names_list:
             contents.append(
-                f'🥇 {participants_names} {"ont" if pluralize else "a"} atteint le top 1 sur **{map_name}** en **{game_mode_name}**, heureusement que (pour une fois) la conduite de Pepsite ne l\'a pas empêché !'
+                f'{participants_names} {"ont" if pluralize else "a"} atteint le {won_term}, heureusement que (pour une fois) la conduite de Pepsite ne l\'a pas empêché !'
             )
 
         if 'DrMastock' in participants_names_list:
             contents.append(
-                f'🐔 Chicken Dinner pour {participants_names}, sûrement grâce à la x8 de DrMastock trouvée au dernier moment sur **{map_name}** en **{game_mode_name}** !'
+                f'{won_term} pour {participants_names}, sûrement grâce à la x8 de DrMastock trouvée au dernier moment !'
             )
 
         images = [
@@ -261,14 +272,16 @@ def send_chicken_dinner_message(
             'https://c.tenor.com/6XA-L01v3RQAAAAC/tenor.gif',
         ]
     elif outcome == 'worst':
+        emojis = ['🤦‍♂️', '🤕️']
+
         contents = [
-            f'🤦‍♂️ Toucher le fond sur **{map_name}** : c\'est tout ce que {participants_names} {"ont" if pluralize else "a"} pu faire en **{game_mode_name}**.',
-            f'🤕️ {participants_names} {"ont" if pluralize else "a"} brillé par {"leur" if pluralize else "sa"} médiocrité sur **{map_name}** en **{game_mode_name}**.',
-            f'🤦‍♂️ Tout ce qu\'il ne fallait pas faire, {participants_names} l\'{"ont" if pluralize else "a"} fait sur **{map_name}** en **{game_mode_name}**.',
-            f'🤕️ {participants_names} {"étaient" if pluralize else "était"} loin, très loin du Chicken Dinner sur **{map_name}** en **{game_mode_name}**.',
-            f'🤦‍♂️ C\'était très rapide cette fois pour {participants_names} sur **{map_name}** en **{game_mode_name}**.',
-            f'🤕️ {participants_names} : {"vous étiez les maillons faibles" if pluralize else "tu était le maillon faible"} sur **{map_name}** en **{game_mode_name}**. Au revoir.',
-            f'🤦‍♂️ Etait-ce la malchance ? Le manque de skill ? La carte ? Sûrement un peu des trois pour {participants_names} sur **{map_name}** en **{game_mode_name}**.',
+            f'Toucher le fond : c\'est tout ce que {participants_names} {"ont" if pluralize else "a"} pu faire.',
+            f'{participants_names} {"ont" if pluralize else "a"} brillé par {"leur" if pluralize else "sa"} médiocrité.',
+            f'Tout ce qu\'il ne fallait pas faire, {participants_names} l\'{"ont" if pluralize else "a"} fait.',
+            f'{participants_names} {"étaient" if pluralize else "était"} loin, très loin du {won_term}.',
+            f'C\'était très rapide cette fois pour {participants_names}.',
+            f'{participants_names} : {"vous étiez les maillons faibles" if pluralize else "tu était le maillon faible"}. Au revoir.',
+            f'Etait-ce la malchance ? Le manque de skill ? La carte ? Sûrement les trois pour {participants_names}.',
         ]
 
         images = [
@@ -282,9 +295,12 @@ def send_chicken_dinner_message(
         raise ValueError('outcome must be one of "won" or "worst"')
 
     data, content_type = Message(
-        secrets.choice(contents),
+        '{} {}'.format(
+            secrets.choice(emojis),
+            secrets.choice(contents)
+        ),
         embed=Embed(
-            title='Stats',
+            title=f'🗺️ {map_name} 🕹️ {match_type_name} 👥 {game_mode_name}',
             color=EMBEDS_COLOR,
             image=Media(secrets.choice(images)),
             fields=[

@@ -18,7 +18,7 @@ class PUBGApiErrorResponse(Exception):
         super().__init__('; '.join(self.errors))
 
 
-MAP_NAMES = {
+MAPS_NAMES = {
     'Baltic_Main': 'Erangel',
     'Chimera_Main': 'Paramo',
     'Desert_Main': 'Miramar',
@@ -33,7 +33,7 @@ MAP_NAMES = {
     'Neon_Main': 'Rondo'
 }
 
-GAME_MODES = {
+GAME_MODES_NAMES = {
     'duo': 'Duo TPP',
     'duo-fpp': 'Duo FPP',
     'solo': 'Solo TPP',
@@ -73,6 +73,14 @@ GAME_MODES = {
     'lab-tpp': 'Lab TPP',
     'lab-fpp': 'Lab FPP',
     'tdm': 'Team Deathmatch'
+}
+
+MATCH_TYPES_NAMES = {
+    'airoyale': 'Casual',
+    'official': 'Normal',
+    'seasonal': 'Saison',
+    'competitive': 'Compétitif',
+    'event': 'Évènement',
 }
 
 
