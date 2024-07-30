@@ -240,7 +240,7 @@ def send_chicken_dinner_message(
 
         contents = [
             f'Les parents de {participants_names} peuvent enfin être fiers grâce à {"leur" if pluralize else "son"} {won_term} !',
-            f'On y croyait vraiment plus, un {won_term} de plus pour {participants_names} en !',
+            f'On y croyait vraiment plus, un {won_term} de plus pour {participants_names} !',
             f'{participants_names} {"ont" if pluralize else "a"} brillé (pour une fois) par {"leur" if pluralize else "son"} {won_term} !',
             f'Dieu existe et le prouve à travers {participants_names} et {"leur" if pluralize else "son"} {won_term} !',
             f'{participants_names} {"dormiront" if pluralize else "dormira"} l\'esprit tranquille ce soir grâce à {"leur" if pluralize else "son"} {won_term} !',
@@ -249,6 +249,10 @@ def send_chicken_dinner_message(
             f'C\'était mal barré comme d\'habitude, mais le skill (plus probablement la chance) a fait que {participants_names} {"finissent" if pluralize else "finisse"} sur un {won_term} !',
             f'Vous ne devinerez jamais comment ce {won_term} hallucinant a été atteint par {participants_names} !',
             f'Et ben voilà {participants_names}, c\'était pas si compliqué ce {won_term} !',
+            f'Les astres sont enfin alignés ! {won_term} pour {participants_names} !',
+            f'{won_term} pour {participants_names} ! Chaque tirage au sort a son gagnant après tout !',
+            f'Contre toute attente (et probablement grâce à un bug), {participants_names} inscri{"t" if pluralize else "vent"} un {won_term} enfin un {won_term} !',
+            f'{participants_names} marqu{"e" if pluralize else "ent"} un {won_term} ?!? Il est vrai que même une horloge cassée donne l\'heure juste deux fois par jour !',
         ]
 
         if 'Pepsite' in participants_names_list:
@@ -270,6 +274,8 @@ def send_chicken_dinner_message(
             'https://c.tenor.com/XYvg-iC6PT4AAAAC/tenor.gif',
             'https://c.tenor.com/fit861DxTeQAAAAC/tenor.gif',
             'https://c.tenor.com/6XA-L01v3RQAAAAC/tenor.gif',
+            'https://c.tenor.com/D8CKeWcZ4noAAAAC/tenor.gif',
+            'https://c.tenor.com/7hFAPpCnMJ8AAAAC/tenor.gif',
         ]
     elif outcome == 'worst':
         emojis = ['🤦‍♂️', '🤕️']
@@ -282,6 +288,10 @@ def send_chicken_dinner_message(
             f'C\'était très rapide cette fois pour {participants_names}.',
             f'{participants_names} : {"vous étiez les maillons faibles" if pluralize else "tu était le maillon faible"}. Au revoir.',
             f'Etait-ce la malchance ? Le manque de skill ? La carte ? Sûrement les trois pour {participants_names}.',
+            f'Tous les bots amorphes de la map ce sont montrés plus performant que {participants_names}.',
+            f'{participants_names} {"ont" if pluralize else "a"} un talent certain. Celui d\'explorer les bas-fonds du classement avec autant de constance.',
+            f'{participants_names}, {"tu as" if pluralize else "vous avez"} prouvé que la défaite peut être une forme d\'art. Bravo pour cette performance.',
+            f'{participants_names} {"ont" if pluralize else "a"} terminé dernier. Au moins, il n\'y a qu\'une seule direction possible maintenant : vers le haut.',
         ]
 
         images = [
@@ -290,6 +300,11 @@ def send_chicken_dinner_message(
             'https://1.bp.blogspot.com/-0a3fg-fUWdw/T3On8vGgmVI/AAAAAAAAA4A/PJg-1gRMH5Y/s200/bunk-the-wire.gif',
             'https://c.tenor.com/pclCqjkaebQAAAAC/tenor.gif',
             'https://c.tenor.com/bO1zLArkvScAAAAC/tenor.gif',
+            'https://c.tenor.com/dNknbuz05okAAAAd/tenor.gif',
+            'https://c.tenor.com/yxHvgtplhQUAAAAC/tenor.gif',
+            'https://c.tenor.com/7Blzpyg7858AAAAC/tenor.gif',
+            'https://c.tenor.com/htYX1pCbv78AAAAC/tenor.gif',
+            'https://c.tenor.com/IBB_J7rODV0AAAAC/tenor.gif',
         ]
     else:
         raise ValueError('outcome must be one of "won" or "worst"')
