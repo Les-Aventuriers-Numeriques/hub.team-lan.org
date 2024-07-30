@@ -250,9 +250,9 @@ def send_chicken_dinner_message(
             f'Vous ne devinerez jamais comment ce {won_term} hallucinant a été atteint par {participants_names} !',
             f'Et ben voilà {participants_names}, c\'était pas si compliqué ce {won_term} !',
             f'Les astres sont enfin alignés ! {won_term} pour {participants_names} !',
-            f'{won_term} pour {participants_names} ! Chaque tirage au sort a son gagnant après tout !',
-            f'Contre toute attente (et probablement grâce à un bug), {participants_names} inscri{"t" if pluralize else "vent"} enfin un {won_term} !',
-            f'{participants_names} marqu{"e" if pluralize else "ent"} un {won_term} ?!? Il est vrai que même une horloge cassée donne l\'heure juste deux fois par jour !',
+            f'{won_term} pour {participants_names} ! Chaque tirage au sort a {"ses" if pluralize else "son"} {"gagnants" if pluralize else "gagnant"} après tout !',
+            f'Contre toute attente (et probablement grâce à un bug), {participants_names} {"inscrivent" if pluralize else "inscrit"} enfin un {won_term} !',
+            f'{participants_names} {"marquent" if pluralize else "marque"} un {won_term} ?!? Il est vrai que même une horloge cassée donne l\'heure juste deux fois par jour !',
         ]
 
         if 'Pepsite' in participants_names_list:
@@ -276,6 +276,7 @@ def send_chicken_dinner_message(
             'https://c.tenor.com/6XA-L01v3RQAAAAC/tenor.gif',
             'https://c.tenor.com/D8CKeWcZ4noAAAAC/tenor.gif',
             'https://c.tenor.com/7hFAPpCnMJ8AAAAC/tenor.gif',
+            'https://c.tenor.com/1ml7iQMOEXMAAAAd/tenor.gif',
         ]
     elif outcome == 'worst':
         emojis = ['🤦‍♂️', '🤕️', '🚮']
@@ -290,7 +291,7 @@ def send_chicken_dinner_message(
             f'Etait-ce la malchance ? Le manque de skill ? La carte ? Sûrement les trois pour {participants_names}.',
             f'Tous les bots amorphes de la map ce sont montrés plus performant que {participants_names}.',
             f'{participants_names} {"ont" if pluralize else "a"} un talent certain. Celui d\'explorer les bas-fonds du classement avec autant de constance.',
-            f'{participants_names}, {"tu as" if pluralize else "vous avez"} prouvé que la défaite peut être une forme d\'art. Bravo pour cette performance.',
+            f'{participants_names}, {"vous avez" if pluralize else "tu as"} prouvé que la défaite peut être une forme d\'art. Bravo pour cette performance.',
             f'{participants_names} {"ont" if pluralize else "a"} terminé dernier. Au moins, il n\'y a qu\'une seule direction possible maintenant : vers le haut.',
         ]
 
