@@ -246,7 +246,7 @@ def send_chicken_dinner_message(
             f'{participants_names} {"dormiront" if pluralize else "dormira"} l\'esprit tranquille ce soir grâce à {"leur" if pluralize else "son"} {won_term} !',
             f'C\'est {participants_names} qui {"régalent" if pluralize else "régale"} ce soir avec {"leur" if pluralize else "son"} {won_term} !',
             f'La zone est pacifiée grâce au {won_term} de {participants_names} !',
-            f'C\'était mal barré comme d\'habitude, mais le skill (plus probablement la chance) a fait que {participants_names} {"finissent" if pluralize else "finisse"} {won_term} !',
+            f'C\'était mal barré comme d\'habitude, mais le skill (plus probablement la chance) a fait que {participants_names} {"finissent" if pluralize else "finisse"} sur un {won_term} !',
             f'Vous ne devinerez jamais comment ce {won_term} hallucinant a été atteint par {participants_names} !',
             f'Et ben voilà {participants_names}, c\'était pas si compliqué ce {won_term} !',
         ]
