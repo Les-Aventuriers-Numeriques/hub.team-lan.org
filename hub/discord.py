@@ -236,7 +236,7 @@ def send_chicken_dinner_message(
     won_term = secrets.choice(['top 1', 'Chicken Dinner'])
 
     if outcome == 'won':
-        emojis = ['🥇', '🐔']
+        emojis = ['🥇', '🐔', '🍗']
 
         contents = [
             f'Les parents de {participants_names} peuvent enfin être fiers grâce à {"leur" if pluralize else "son"} {won_term} !',
@@ -251,7 +251,7 @@ def send_chicken_dinner_message(
             f'Et ben voilà {participants_names}, c\'était pas si compliqué ce {won_term} !',
             f'Les astres sont enfin alignés ! {won_term} pour {participants_names} !',
             f'{won_term} pour {participants_names} ! Chaque tirage au sort a son gagnant après tout !',
-            f'Contre toute attente (et probablement grâce à un bug), {participants_names} inscri{"t" if pluralize else "vent"} un {won_term} enfin un {won_term} !',
+            f'Contre toute attente (et probablement grâce à un bug), {participants_names} inscri{"t" if pluralize else "vent"} enfin un {won_term} !',
             f'{participants_names} marqu{"e" if pluralize else "ent"} un {won_term} ?!? Il est vrai que même une horloge cassée donne l\'heure juste deux fois par jour !',
         ]
 
@@ -278,7 +278,7 @@ def send_chicken_dinner_message(
             'https://c.tenor.com/7hFAPpCnMJ8AAAAC/tenor.gif',
         ]
     elif outcome == 'worst':
-        emojis = ['🤦‍♂️', '🤕️']
+        emojis = ['🤦‍♂️', '🤕️', '🚮']
 
         contents = [
             f'Toucher le fond : c\'est tout ce que {participants_names} {"ont" if pluralize else "a"} pu faire.',
@@ -305,6 +305,7 @@ def send_chicken_dinner_message(
             'https://c.tenor.com/7Blzpyg7858AAAAC/tenor.gif',
             'https://c.tenor.com/htYX1pCbv78AAAAC/tenor.gif',
             'https://c.tenor.com/IBB_J7rODV0AAAAC/tenor.gif',
+            'https://c.tenor.com/U6tMT8K4cZIAAAAC/tenor.gif',
         ]
     else:
         raise ValueError('outcome must be one of "won" or "worst"')
