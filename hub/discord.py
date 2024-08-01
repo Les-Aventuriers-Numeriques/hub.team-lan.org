@@ -236,7 +236,7 @@ def send_chicken_dinner_message(
     won_term = secrets.choice(['top 1', 'Chicken Dinner'])
 
     if outcome == 'won':
-        emojis = ['🥇', '🐔', '🍗']
+        emojis = ['🥇', '🐔', '🍗', '🏆', '🍀']
 
         contents = [
             f'Les parents de {participants_names} peuvent enfin être fiers grâce à {"leur" if pluralize else "son"} {won_term} !',
@@ -257,12 +257,14 @@ def send_chicken_dinner_message(
 
         if 'Pepsite' in participants_names_list:
             contents.append(
-                f'{participants_names} {"ont" if pluralize else "a"} atteint le {won_term}, heureusement que (pour une fois) la conduite de Pepsite ne l\'a pas empêché !'
+                f'{participants_names} {"ont" if pluralize else "a"} atteint le {won_term}, heureusement que (pour une fois) la conduite de Pepsite n\'a pas laissé à désirer !',
+                f'{won_term} pour {participants_names}, {"véhiculés" if pluralize else "véhiculé"} par Pepsite qui a enfin réussit à éviter tous les arbres et rochers sur sa route, son assurance auto le remercie pour cet exploit !',
             )
 
         if 'DrMastock' in participants_names_list:
             contents.append(
-                f'{won_term} pour {participants_names}, sûrement grâce à la x8 de DrMastock trouvée au dernier moment !'
+                f'{won_term} pour {participants_names}, sûrement grâce à la x8 de DrMastock trouvée au dernier moment !',
+                f'{won_term} pour {participants_names}, la lunette x8 tant réclamée par DrMastock durant la partie lui a ouvert la vision pour le tir décisif !',
             )
 
         images = [
@@ -279,7 +281,7 @@ def send_chicken_dinner_message(
             'https://c.tenor.com/1ml7iQMOEXMAAAAd/tenor.gif',
         ]
     elif outcome == 'worst':
-        emojis = ['🤦‍♂️', '🤕️', '🚮']
+        emojis = ['🤦‍♂️', '🤕️', '🚮', '🤡', '☠️', '💩', '⚰️']
 
         contents = [
             f'Toucher le fond : c\'est tout ce que {participants_names} {"ont" if pluralize else "a"} pu faire.',
@@ -289,11 +291,16 @@ def send_chicken_dinner_message(
             f'C\'était très rapide cette fois pour {participants_names}.',
             f'{participants_names} : {"vous étiez les maillons faibles" if pluralize else "tu était le maillon faible"}. Au revoir.',
             f'Etait-ce la malchance ? Le manque de skill ? La carte ? Sûrement les trois pour {participants_names}.',
-            f'Tous les bots amorphes de la map ce sont montrés plus performant que {participants_names}.',
+            f'Tous les bots amorphes de la map se sont montrés plus performant que {participants_names}.',
             f'{participants_names} {"ont" if pluralize else "a"} un talent certain. Celui d\'explorer les bas-fonds du classement avec autant de constance.',
             f'{participants_names}, {"vous avez" if pluralize else "tu as"} prouvé que la défaite peut être une forme d\'art. Bravo pour cette performance.',
             f'{participants_names} {"ont" if pluralize else "a"} terminé dernier. Au moins, il n\'y a qu\'une seule direction possible maintenant : vers le haut.',
         ]
+
+        if 'Pepsite' in participants_names_list:
+            contents.append(
+                f'La prochaine fois {participants_names}, ne {"laissez" if pluralize else "laisse"} pas Pepsite conduire.',
+            )
 
         images = [
             'https://c.tenor.com/-huJTdSu9PkAAAAd/tenor.gif',
