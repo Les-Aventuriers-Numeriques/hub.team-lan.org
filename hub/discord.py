@@ -200,6 +200,7 @@ def send_chicken_dinner_message(
     map_id: str,
     game_mode_id: str,
     match_type_id: str,
+    duration: int,
     participants: List[Dict]
 ) -> Response:
     def _participant_name(participant: Dict) -> str:
@@ -235,6 +236,12 @@ def send_chicken_dinner_message(
 
     won_term = secrets.choice(['top 1', 'Chicken Dinner'])
 
+    duration_minutes, duration_seconds = divmod(duration, 60)
+    duration_humanized = f'{duration_minutes} {"minutes" if duration_minutes > 1 else "minute"}'
+
+    if duration_seconds > 0:
+        duration_humanized += f' et {duration_seconds} {"secondes" if duration_seconds > 1 else "seconde"}'
+
     if outcome == 'won':
         emojis = ['🥇', '🐔', '🍗', '🏆', '🍀']
 
@@ -248,7 +255,7 @@ def send_chicken_dinner_message(
             f'La zone est pacifiée grâce au {won_term} de {participants_names} !',
             f'C\'était mal barré comme d\'habitude, mais le skill (plus probablement la chance) a fait que {participants_names} {"finissent" if pluralize else "finisse"} sur un {won_term} !',
             f'Vous ne devinerez jamais comment ce {won_term} hallucinant a été atteint par {participants_names} !',
-            f'Et ben voilà {participants_names}, c\'était pas si compliqué ce {won_term} !',
+            f'Et ben voilà {participants_names}, {duration_humanized} ! C\'était pas si compliqué ce {won_term} !',
             f'Les astres sont enfin alignés ! {won_term} pour {participants_names} !',
             f'{won_term} pour {participants_names} ! Chaque tirage au sort a {"ses" if pluralize else "son"} {"gagnants" if pluralize else "gagnant"} après tout !',
             f'Contre toute attente (et probablement grâce à un bug), {participants_names} {"inscrivent" if pluralize else "inscrit"} enfin un {won_term} !',
@@ -256,16 +263,16 @@ def send_chicken_dinner_message(
         ]
 
         if 'Pepsite' in participants_names_list:
-            contents.append(
+            contents.extend([
                 f'{participants_names} {"ont" if pluralize else "a"} atteint le {won_term}, heureusement que (pour une fois) la conduite de Pepsite n\'a pas laissé à désirer !',
                 f'{won_term} pour {participants_names}, {"véhiculés" if pluralize else "véhiculé"} par Pepsite qui a enfin réussit à éviter tous les arbres et rochers sur sa route, son assurance auto le remercie pour cet exploit !',
-            )
+            ])
 
         if 'DrMastock' in participants_names_list:
-            contents.append(
+            contents.extend([
                 f'{won_term} pour {participants_names}, sûrement grâce à la x8 de DrMastock trouvée au dernier moment !',
                 f'{won_term} pour {participants_names}, la lunette x8 tant réclamée par DrMastock durant la partie lui a ouvert la vision pour le tir décisif !',
-            )
+            ])
 
         images = [
             'https://pbs.twimg.com/media/EXfqIngWsAA6gBq.jpg',
@@ -288,19 +295,21 @@ def send_chicken_dinner_message(
             f'{participants_names} {"ont" if pluralize else "a"} brillé par {"leur" if pluralize else "sa"} médiocrité.',
             f'Tout ce qu\'il ne fallait pas faire, {participants_names} l\'{"ont" if pluralize else "a"} fait.',
             f'{participants_names} {"étaient" if pluralize else "était"} loin, très loin du {won_term}.',
-            f'C\'était très rapide cette fois pour {participants_names}.',
+            f'{duration_humanized} : c\'était très rapide cette fois pour {participants_names}.',
             f'{participants_names} : {"vous étiez les maillons faibles" if pluralize else "tu était le maillon faible"}. Au revoir.',
             f'Etait-ce la malchance ? Le manque de skill ? La carte ? Sûrement les trois pour {participants_names}.',
             f'Tous les bots amorphes de la map se sont montrés plus performant que {participants_names}.',
             f'{participants_names} {"ont" if pluralize else "a"} un talent certain. Celui d\'explorer les bas-fonds du classement avec autant de constance.',
             f'{participants_names}, {"vous avez" if pluralize else "tu as"} prouvé que la défaite peut être une forme d\'art. Bravo pour cette performance.',
             f'{participants_names} {"ont" if pluralize else "a"} terminé dernier. Au moins, il n\'y a qu\'une seule direction possible maintenant : vers le haut.',
+            f'Purée {participants_names}, {duration_humanized} de jeu, {"vous déconnez" if pluralize else "tu déconnes"}.',
+            f'{participants_names} : Jack Bauer {"vous" if pluralize else "te"} regarde l\'air mauvais, {"vous" if pluralize else "toi"} et {"vos" if pluralize else "tes"} {duration_humanized} de temps de jeu.',
         ]
 
         if 'Pepsite' in participants_names_list:
-            contents.append(
+            contents.extend([
                 f'La prochaine fois {participants_names}, ne {"laissez" if pluralize else "laisse"} pas Pepsite conduire.',
-            )
+            ])
 
         images = [
             'https://c.tenor.com/-huJTdSu9PkAAAAd/tenor.gif',

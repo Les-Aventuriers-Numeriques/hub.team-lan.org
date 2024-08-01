@@ -214,6 +214,7 @@ def chicken_dinner() -> None:
                         match['data']['attributes']['mapName'],
                         match['data']['attributes']['gameMode'],
                         match['data']['attributes']['matchType'],
+                        match['data']['attributes']['duration'],
                         participants
                     )
             else:
