@@ -4,6 +4,7 @@ from datetime import datetime, timezone, timedelta
 from sqlalchemy.dialects import postgresql
 from app import app, db, cache
 from hub.models import Game
+import sqlalchemy as sa
 import requests
 import click
 import csv
@@ -30,6 +31,7 @@ def update_games() -> None:
 
     have_more_results = True
     last_appid = None
+    all_app_ids = set()
 
     while have_more_results:
         click.echo('  Téléchargement du paquet...')
@@ -69,6 +71,10 @@ def update_games() -> None:
 
         click.echo('  Mise à jour de la BDD...')
 
+        all_app_ids.update([
+            str(game['id']) for game in games
+        ])
+
         db.session.execute(query.on_conflict_do_update(
             index_elements=[Game.id],
             set_={
@@ -91,6 +97,10 @@ def update_games() -> None:
 
             i -= 1
 
+    all_app_ids.update([
+        str(game['id']) for game in games
+    ])
+
     query = postgresql.insert(Game).values(games)
 
     click.echo('  Mise à jour de la BDD...')
@@ -102,6 +112,14 @@ def update_games() -> None:
             Game.custom_url: query.excluded.custom_url,
         }
     ))
+
+    db.session.commit()
+
+    click.echo('Suppression des anciens jeux...')
+
+    db.session.execute(
+        sa.text(f'DELETE FROM {Game.__tablename__} WHERE id NOT IN ({",".join(all_app_ids)});')
+    )
 
     db.session.commit()
 
