@@ -195,7 +195,8 @@ def send_proposal_message(user: User, game: Game) -> Response:
 
 
 def send_chicken_dinner_message(
-    outcome: str,
+    participants_rank: int,
+    total_teams: int,
     match_id: str,
     map_id: str,
     game_mode_id: str,
@@ -242,22 +243,22 @@ def send_chicken_dinner_message(
     if duration_seconds > 0:
         duration_humanized += f' et {duration_seconds} {"secondes" if duration_seconds > 1 else "seconde"}'
 
-    if outcome == 'won':
+    if participants_rank == 1:
         emojis = ['🥇', '🐔', '🍗', '🏆', '🍀']
 
         contents = [
-            f'Les parents de {participants_names} peuvent enfin être fiers grâce à {"leur" if pluralize else "son"} {won_term} !',
-            f'On y croyait vraiment plus, un {won_term} de plus pour {participants_names} !',
-            f'{participants_names} {"ont" if pluralize else "a"} brillé (pour une fois) par {"leur" if pluralize else "son"} {won_term} !',
-            f'Dieu existe et le prouve à travers {participants_names} et {"leur" if pluralize else "son"} {won_term} !',
-            f'{participants_names} {"dormiront" if pluralize else "dormira"} l\'esprit tranquille ce soir grâce à {"leur" if pluralize else "son"} {won_term} !',
-            f'C\'est {participants_names} qui {"régalent" if pluralize else "régale"} ce soir avec {"leur" if pluralize else "son"} {won_term} !',
-            f'La zone est pacifiée grâce au {won_term} de {participants_names} !',
+            f'Les parents de {participants_names} peuvent enfin être fiers !',
+            f'On y croyait vraiment plus, {participants_names} !',
+            f'{participants_names} {"ont" if pluralize else "a"} brillé (pour une fois) !',
+            f'Dieu existe et le prouve à travers {participants_names} !',
+            f'{participants_names} {"dormiront" if pluralize else "dormira"} l\'esprit tranquille ce soir !',
+            f'C\'est {participants_names} qui {"régalent" if pluralize else "régale"} ce soir !',
+            f'La zone est pacifiée grâce à {participants_names} !',
             f'C\'était mal barré comme d\'habitude, mais le skill (plus probablement la chance) a fait que {participants_names} {"finissent" if pluralize else "finisse"} sur un {won_term} !',
             f'Vous ne devinerez jamais comment ce {won_term} hallucinant a été atteint par {participants_names} !',
-            f'Et ben voilà {participants_names}, {duration_humanized} ! C\'était pas si compliqué ce {won_term} !',
-            f'Les astres sont enfin alignés ! {won_term} pour {participants_names} !',
-            f'{won_term} pour {participants_names} ! Chaque tirage au sort a {"ses" if pluralize else "son"} {"gagnants" if pluralize else "gagnant"} après tout !',
+            f'Et ben voilà {participants_names}, {duration_humanized} ! C\'était pas si compliqué !',
+            f'Les planètes se sont enfin alignées pour {participants_names} !',
+            f'Chaque tirage au sort a {"ses" if pluralize else "son"} {"gagnants" if pluralize else "gagnant"} après tout !',
             f'Contre toute attente (et probablement grâce à un bug), {participants_names} {"inscrivent" if pluralize else "inscrit"} enfin un {won_term} !',
             f'{participants_names} {"marquent" if pluralize else "marque"} un {won_term} ?!? Il est vrai que même une horloge cassée donne l\'heure juste deux fois par jour !',
         ]
@@ -287,7 +288,25 @@ def send_chicken_dinner_message(
             'https://c.tenor.com/7hFAPpCnMJ8AAAAC/tenor.gif',
             'https://c.tenor.com/1ml7iQMOEXMAAAAd/tenor.gif',
         ]
-    elif outcome == 'worst':
+    elif participants_rank in (2, 3):
+        emojis = [] # TODO
+
+        if participants_rank == 2:
+            emojis.extend(['🥈'])
+        elif participants_rank == 3:
+            emojis.extend(['🥉'])
+
+        contents = [
+            f'Ah là là {participants_names}, il manquait juste un tout petit peu de cette chose (le skill) pour atteindre le {won_term} !',
+            f'"Peut mieux faire", exactement ce qu\'il y avait écrit jadis sur {"les bulletins" if pluralize else "le bulletin"} de {participants_names} !',
+            f'Tristesse pour {participants_names}, {duration_humanized} de jeu pour échouer si proche du {won_term} !',
+        ]
+
+        images = [
+            'https://c.tenor.com/pE_YL3nfwZsAAAAd/tenor.gif',
+            'https://c.tenor.com/YaDhkmcINSsAAAAC/tenor.gif',
+        ]
+    else:
         emojis = ['🤦‍♂️', '🤕️', '🚮', '🤡', '☠️', '💩', '⚰️']
 
         contents = [
@@ -324,16 +343,16 @@ def send_chicken_dinner_message(
             'https://c.tenor.com/IBB_J7rODV0AAAAC/tenor.gif',
             'https://c.tenor.com/U6tMT8K4cZIAAAAC/tenor.gif',
         ]
-    else:
-        raise ValueError('outcome must be one of "won" or "worst"')
 
     data, content_type = Message(
-        '{} {}'.format(
-            secrets.choice(emojis),
-            secrets.choice(contents)
-        ),
+        content=secrets.choice(contents),
         embed=Embed(
             title=f'🗺️ {map_name} 🕹️ {match_type_name} 👥 {game_mode_name}',
+            description='{} Top {} sur {}'.format(
+                secrets.choice(emojis),
+                participants_rank,
+                total_teams
+            ),
             color=EMBEDS_COLOR,
             image=Media(secrets.choice(images)),
             fields=[

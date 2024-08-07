@@ -188,6 +188,8 @@ def chicken_dinner() -> None:
                         participant for participant in match['included'] if participant['type'] == 'participant' and participant['attributes']['stats']['name'] in player_names_to_match
                     ]
 
+                    participants.sort(key=lambda p: p['attributes']['stats']['kills'], reverse=True)
+
                     participants_ids = [
                         participant['id'] for participant in participants
                     ]
@@ -201,33 +203,36 @@ def chicken_dinner() -> None:
                         key=lambda roster: roster['attributes']['stats']['rank']
                     )
 
-                    winning_team = rosters[0]
+                    total_teams = len(rosters)
+                    participants_roster = None
 
-                    winning_team_participants_ids = [
-                        participant['id'] for participant in winning_team['relationships']['participants']['data']
-                    ]
+                    for roster in rosters:
+                        roster_participant_ids = [
+                            roster_participant['id'] for roster_participant in roster['relationships']['participants']['data']
+                        ]
 
-                    worst_team = rosters[-1]
+                        if any(True for participant_id in participants_ids if participant_id in roster_participant_ids):
+                            participants_roster = roster
 
-                    worst_team_participants_ids = [
-                        participant['id'] for participant in worst_team['relationships']['participants']['data']
-                    ]
+                            break
 
-                    if any(True for participant_id in participants_ids if participant_id in winning_team_participants_ids):
-                        click.secho('  Gagné', fg='green')
+                    if not participants_roster:
+                        click.secho('  Equipe pas trouvée', fg='red')
 
-                        outcome = 'won'
-                    elif any(True for participant_id in participants_ids if participant_id in worst_team_participants_ids):
-                        click.secho('  Dernière équipe', fg='red')
+                        continue
 
-                        outcome = 'worst'
+                    participants_rank = participants_roster['attributes']['stats']['rank']
+
+                    if participants_rank <= 3 or participants_rank == total_teams:
+                        click.secho(f'  {participants_rank} sur {total_teams}', fg='green')
                     else:
                         click.secho('  Pas à envoyer', fg='yellow')
 
                         continue
 
                     send_chicken_dinner_message(
-                        outcome,
+                        participants_rank,
+                        total_teams,
                         match['data']['id'],
                         match['data']['attributes']['mapName'],
                         match['data']['attributes']['gameMode'],
