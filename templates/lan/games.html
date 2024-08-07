@@ -1,6 +1,6 @@
 {% extends 'layout.html' %}
 
-{% from 'macros.html' import vote with context %}
+{% from 'macros.html' import vote, field with context %}
 
 {% block title %}LAN party : voter pour des jeux{% endblock %}
 
@@ -9,11 +9,22 @@
 {% endblock %}
 
 {% block content %}
-    {% if g.lan_games_status == 'enabled' %}
-        <p>Ici, on choisit les jeux principaux de la LAN en votant. <a href="{{ url_for('lan_games_proposal') }}">Pour proposer des jeux, c'est par ici</a>.</p>
-    {% else %}
-        <p>Voici les résultats finaux des jeux pour la LAN !</p>
-    {% endif %}
+    <div class="subheading">
+        <p class="mb-0">
+            {% if g.lan_games_status == 'enabled' %}
+                Ici, on choisit les jeux principaux de la LAN en votant. <a href="{{ url_for('lan_games_proposal') }}">Pour proposer des jeux, c'est par ici</a>.
+            {% else %}
+                Voici les résultats finaux des jeux pour la LAN !
+            {% endif %}
+        </p>
+        <form method="get" action="{{ url_for('lan_games_vote') }}">
+            <fieldset role="group" class="mb-0">
+                {{ field(form.filter, with_label=False) }}
+
+                <button type="submit">Filtrer</button>
+            </fieldset>
+        </form>
+    </div>
 
     {% if proposals %}
         <div class="games">
@@ -34,6 +45,14 @@
             {% endfor %}
         </div>
     {% else %}
-        <p class="mb-0"><strong>Aucun jeu pour l'instant. Proposes-en !</strong></p>
+        <p class="mb-0">
+            <strong>
+                {% if validated %}
+                    Aucun jeu à afficher.
+                {% else %}
+                    Aucun jeu pour l'instant. Proposes-en !
+                {% endif %}
+            </strong>
+        </p>
     {% endif %}
 {% endblock %}

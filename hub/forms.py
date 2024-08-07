@@ -10,15 +10,27 @@ import sqlalchemy as sa
 class LanGamesProposalSearchForm(FlaskForm):
     terms = SearchField(
         'Nom du jeu',
-        [validators.DataRequired(),
-         validators.Length(min=2)],
+        [validators.DataRequired(), validators.Length(min=2)],
         render_kw={
             'placeholder': 'Tape le nom d\'un jeu...',
         }
     )
 
 
-class LanGamesSettings(FlaskForm):
+class LanGamesVoteFilterForm(FlaskForm):
+    filter = SelectField(
+        'Filtre',
+        choices=[
+            ('', 'Afficher uniquement les jeux...'),
+            ('voted', '...pour lesquels j\'ai voté'),
+            ('not-voted', '...pour lesquels je n\'ai PAS voté'),
+            ('all-voted', '...pour lesquels tout le monde a voté'),
+            ('not-all-voted', '...pour lesquels tout le monde n\'a PAS voté'),
+        ]
+    )
+
+
+class LanGamesSettingsForm(FlaskForm):
     lan_games_status = SelectField(
         'Statut de la section',
         [validators.DataRequired()],

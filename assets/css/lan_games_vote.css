@@ -26,3 +26,26 @@ body > main .games > * > div > div > span {
     font-size: 0.7em;
     white-space: nowrap;
 }
+
+/************************************************************************
+ * Sous-en-tête */
+
+body > main .subheading {
+    display: flex;
+    flex-direction: column;
+    column-gap: var(--pico-grid-column-gap);
+    row-gap: var(--pico-grid-row-gap);
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--pico-spacing);
+}
+
+body > main .subheading > p {
+    flex-shrink: 0;
+}
+
+@media (min-width: 768px) {
+    body > main .subheading {
+        flex-direction: row;
+    }
+}

@@ -1,11 +1,12 @@
+from hub.forms import LanGamesProposalSearchForm, LanGamesSettingsForm, LanGamesVoteFilterForm
 from hub.models import User, Game, LanGameProposal, LanGameProposalVote, VoteType, Setting
 from flask import render_template, redirect, url_for, flash, session, request, g
 from flask_login import login_required, current_user, logout_user, login_user
-from hub.forms import LanGamesProposalSearchForm, LanGamesSettings
 from sqlalchemy_searchable import search, inspect_search_vectors
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import NotFound
+from sqlalchemy import func as sa_func
 from werkzeug import Response
 from functools import wraps
 from typing import Union
@@ -211,6 +212,9 @@ def home() -> str:
 @logout_if_must_relogin
 @to_home_if_cannot_access_lan_section
 def lan_games_vote() -> Union[str, Response]:
+    form = LanGamesVoteFilterForm(request.args, meta={'csrf': False})
+    validated = len(request.args) > 0 and form.validate()
+
     proposals = db.session.execute(
         sa.select(LanGameProposal)
         .options(
@@ -220,10 +224,48 @@ def lan_games_vote() -> Union[str, Response]:
         )
     ).scalars().all()
 
+    if validated and form.filter.data:
+        lan_participants_count = db.session.execute(
+            sa.select(sa_func.count('*')).select_from(User)
+            .where(User.is_lan_participant == True)
+        ).scalar()
+
+        def _voted(proposal: LanGameProposal) -> bool:
+            return current_user.id in [
+                vote.user_id for vote in proposal.votes
+            ]
+
+        def _not_voted(proposal: LanGameProposal) -> bool:
+            return not _voted(proposal)
+
+        def _all_voted(proposal: LanGameProposal) -> bool:
+            return len(proposal.votes) == lan_participants_count
+
+        def _not_all_voted(proposal: LanGameProposal) -> bool:
+            return not _all_voted(proposal)
+
+        filter_func = None
+
+        if form.filter.data == 'voted':
+            filter_func = _voted
+        elif form.filter.data == 'not-voted':
+            filter_func = _not_voted
+        elif form.filter.data == 'all-voted':
+            filter_func = _all_voted
+        elif form.filter.data == 'not-all-voted':
+            filter_func = _not_all_voted
+
+        if filter_func:
+            proposals = [
+                proposal for proposal in proposals if filter_func(proposal)
+            ]
+
     proposals.sort(key=lambda p: p.score, reverse=True)
 
     return render_template(
         'lan/games.html',
+        form=form,
+        validated=validated,
         proposals=proposals,
         VoteType=VoteType
     )
@@ -423,7 +465,7 @@ def admin_lan_games() -> Union[str, Response]:
         str(value) for value in form_data.get('lan_games_excluded', []) or []
     ])
 
-    form = LanGamesSettings(data=form_data)
+    form = LanGamesSettingsForm(data=form_data)
 
     if form.validate_on_submit():
         Setting.set({
