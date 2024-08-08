@@ -113,7 +113,7 @@ class PUBGApiClient:
         return self.call(
             f'shards/{shard}/matches/{match_id}',
             needs_auth=False,
-            cache_timeout=60 * 60 * 24 * 14 # 14 jours
+            cache_timeout=60 * 60 * 24 * 15 # 15 jours
         )
 
     def call(self, resource: str, params: Optional[Dict] = None, needs_auth: bool = True, cache_timeout: Optional[int] = None) -> Dict:
