@@ -146,7 +146,7 @@ def chicken_dinner() -> None:
         players = client.get_players(PUBG_SHARD, player_names=app.config['PUBG_PLAYER_NAMES_INTERNAL'])['data']
 
         now = datetime.now(timezone.utc)
-        fifteen_days_ago = now - timedelta(days=15)
+        cached_since = now - timedelta(days=20)
 
         click.echo('  {} joueurs récupérés'.format(len(players)))
 
@@ -244,7 +244,7 @@ def chicken_dinner() -> None:
                 click.secho('Aucun nouveau match à envoyer', fg='yellow')
 
             processed = {
-                mid: dt for mid, dt in processed.items() if dt >= fifteen_days_ago
+                mid: dt for mid, dt in processed.items() if dt >= cached_since
             }
         else:
             processed.update({
