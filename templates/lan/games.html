@@ -18,11 +18,7 @@
             {% endif %}
         </p>
         <form method="get" action="{{ url_for('lan_games_vote') }}">
-            <fieldset role="group" class="mb-0">
-                {{ field(form.filter, with_label=False) }}
-
-                <button type="submit">Filtrer</button>
-            </fieldset>
+            {{ field(form.filter, with_label=False, class='mb-0', onchange='this.form.submit()') }}
         </form>
     </div>
 

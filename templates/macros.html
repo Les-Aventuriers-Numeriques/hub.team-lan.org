@@ -31,7 +31,7 @@
         {{ field.label(class='required' if field.flags.required else '') }}
     {% endif %}
 
-    {{ field(aria_invalid='true' if field.errors else '', class=class) }}
+    {{ field(aria_invalid='true' if field.errors else '', class=class, **kwargs) }}
 
     {% if field.errors or field.description %}
         <small>
