@@ -26,12 +26,12 @@
     </div>
 {%- endmacro %}
 
-{% macro field(field, with_label=True, class='') -%}
+{% macro field(field, with_label=True) -%}
     {% if with_label and field.label.text %}
         {{ field.label(class='required' if field.flags.required else '') }}
     {% endif %}
 
-    {{ field(aria_invalid='true' if field.errors else '', class=class, **kwargs) }}
+    {{ field(aria_invalid='true' if field.errors else '', **kwargs) }}
 
     {% if field.errors or field.description %}
         <small>
