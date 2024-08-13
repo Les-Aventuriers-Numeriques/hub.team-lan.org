@@ -9,7 +9,6 @@ Flask-Discord-Interactions==2.1.2
 Flask-Caching==2.3.0
 sqlalchemy-searchable==2.1.0
 environs==11.0.0
-cssutils==2.11.1
-jsmin==3.0.1
+rcssmin==1.1.2
 psycopg[binary]==3.2.1
 requests==2.32.3
