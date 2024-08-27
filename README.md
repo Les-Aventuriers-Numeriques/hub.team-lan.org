@@ -1,6 +1,6 @@
 # Les Aventuriers Numériques / Hub
 
-L'[intranet](https://hub.team-lan.org/) utilisé par la team multigaming [Les Aventuriers Numériques](https://team-lan.org/).
+L'[intranet](https://hub.team-lan.org/) utilisé par la team multigaming [Les Aventuriers Numériques](https://team-lan.org/) (ancienne version).
 
 Il s'agit d'une application web propulsée par [Flask](https://flask.palletsprojects.com/en/3.0.x/). Elle permet :
 
