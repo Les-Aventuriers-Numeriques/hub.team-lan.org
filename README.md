@@ -1,12 +1,14 @@
-# Les Aventuriers Numériques / Hub
+# Les Aventuriers Numériques / Hub (ancienne version)
 
 L'[intranet](https://hub.team-lan.org/) utilisé par la team multigaming [Les Aventuriers Numériques](https://team-lan.org/) (ancienne version).
+
+> [!WARNING]
+> Ce projet a été abandonné. Il a été réécrit [ici](https://github.com/Les-Aventuriers-Numeriques/hub.team-lan.org-django) en utilisant [Django](https://www.djangoproject.com/).
 
 Il s'agit d'une application web propulsée par [Flask](https://flask.palletsprojects.com/en/3.0.x/). Elle permet :
 
   - De nous aider à choisir les jeux principaux pour notre prochaine [LAN annuelle](https://team-lan.org/lan)
   - D'envoyer sur notre Discord des messages à propos de nos Chicken Dinner [PUBG](https://www.pubg.com/fr/main)
-  - De nous aider à choisir le lieu de notre prochaine [LAN annuelle](https://team-lan.org/lan) (prochainement)
 
 ## Prérequis
 
