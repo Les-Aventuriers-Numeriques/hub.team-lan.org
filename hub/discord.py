@@ -258,7 +258,7 @@ def send_chicken_dinner_message(
             f'Vous ne devinerez jamais comment ce {won_term} hallucinant a été atteint par {participants_names} !',
             f'Et ben voilà {participants_names}, {duration_humanized} ! C\'était pas si compliqué !',
             f'Les planètes se sont enfin alignées pour {participants_names} !',
-            f'Chaque tirage au sort a {"ses" if pluralize else "son"} {"gagnants" if pluralize else "gagnant"} après tout !',
+            f'{participants_names} : chaque tirage au sort a {"ses" if pluralize else "son"} {"gagnants" if pluralize else "gagnant"} après tout !',
             f'Contre toute attente (et probablement grâce à un bug), {participants_names} {"inscrivent" if pluralize else "inscrit"} enfin un {won_term} !',
             f'{participants_names} {"marquent" if pluralize else "marque"} un {won_term} ?!? Il est vrai que même une horloge cassée donne l\'heure juste deux fois par jour !',
         ]
@@ -266,13 +266,13 @@ def send_chicken_dinner_message(
         if 'Pepsite' in participants_names_list:
             contents.extend([
                 f'{participants_names} {"ont" if pluralize else "a"} atteint le {won_term}, heureusement que (pour une fois) la conduite de Pepsite n\'a pas laissé à désirer !',
-                f'{won_term} pour {participants_names}, {"véhiculés" if pluralize else "véhiculé"} par Pepsite qui a enfin réussit à éviter tous les arbres et rochers sur sa route, son assurance auto le remercie pour cet exploit !',
+                f'{won_term.capitalize()} pour {participants_names}, {"véhiculés" if pluralize else "véhiculé"} par Pepsite qui a enfin réussit à éviter tous les arbres et rochers sur sa route, son assurance auto le remercie pour cet exploit !',
             ])
 
         if 'DrMastock' in participants_names_list:
             contents.extend([
-                f'{won_term} pour {participants_names}, sûrement grâce à la x8 de DrMastock trouvée au dernier moment !',
-                f'{won_term} pour {participants_names}, la lunette x8 tant réclamée par DrMastock durant la partie lui a ouvert la vision pour le tir décisif !',
+                f'{won_term.capitalize()} pour {participants_names}, sûrement grâce à la x8 de DrMastock trouvée au dernier moment !',
+                f'{won_term.capitalize()} pour {participants_names}, la lunette x8 tant réclamée par DrMastock durant la partie lui a ouvert la vision pour le tir décisif !',
             ])
 
         images = [
