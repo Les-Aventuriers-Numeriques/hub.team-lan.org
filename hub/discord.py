@@ -275,6 +275,12 @@ def send_chicken_dinner_message(
                 f'{won_term.capitalize()} pour {participants_names}, la lunette x8 tant réclamée par DrMastock durant la partie lui a ouvert la vision pour le tir décisif !',
             ])
 
+        if match_type_id == 'airoyale':
+            contents.extend([
+                f'Oui mais {participants_names} : tranquille, c\'était en casu !',
+                f'Impressionnant ce {won_term} contre des bots, {participants_names} !',
+            ])
+
         images = [
             'https://pbs.twimg.com/media/EXfqIngWsAA6gBq.jpg',
             'https://i.imgur.com/M33pWNM.png',
@@ -289,7 +295,7 @@ def send_chicken_dinner_message(
             'https://c.tenor.com/1ml7iQMOEXMAAAAd/tenor.gif',
         ]
     elif participants_rank in (2, 3):
-        emojis = [] # TODO
+        emojis = ['😐']
 
         if participants_rank == 2:
             emojis.extend(['🥈'])
@@ -302,10 +308,23 @@ def send_chicken_dinner_message(
             f'Tristesse pour {participants_names}, {duration_humanized} de jeu pour échouer si proche du {won_term} !',
         ]
 
+        if match_type_id == 'airoyale':
+            contents.extend([
+                f'Comment ça {participants_names} ? Échouer si près du {won_term} contre des bots !',
+            ])
+
         images = [
             'https://c.tenor.com/pE_YL3nfwZsAAAAd/tenor.gif',
             'https://c.tenor.com/YaDhkmcINSsAAAAC/tenor.gif',
+            'https://c.tenor.com/4VPgpSl9Pm8AAAAC/tenor.gif',
+            'https://c.tenor.com/EI6kCtkMm6sAAAAC/tenor.gif',
+            'https://c.tenor.com/Twp3GsrGEYIAAAAC/tenor.gif',
         ]
+
+        if participants_rank == 2:
+            images.extend({
+                'https://c.tenor.com/mNDuJOeUqgEAAAAC/tenor.gif',
+            })
     else:
         emojis = ['🤦‍♂️', '🤕️', '🚮', '🤡', '☠️', '💩', '⚰️']
 
@@ -317,7 +336,6 @@ def send_chicken_dinner_message(
             f'{duration_humanized} : c\'était très rapide cette fois pour {participants_names}.',
             f'{participants_names} : {"vous étiez les maillons faibles" if pluralize else "tu était le maillon faible"}. Au revoir.',
             f'Etait-ce la malchance ? Le manque de skill ? La carte ? Sûrement les trois pour {participants_names}.',
-            f'Tous les bots amorphes de la map se sont montrés plus performant que {participants_names}.',
             f'{participants_names} {"ont" if pluralize else "a"} un talent certain. Celui d\'explorer les bas-fonds du classement avec autant de constance.',
             f'{participants_names}, {"vous avez" if pluralize else "tu as"} prouvé que la défaite peut être une forme d\'art. Bravo pour cette performance.',
             f'{participants_names} {"ont" if pluralize else "a"} terminé dernier. Au moins, il n\'y a qu\'une seule direction possible maintenant : vers le haut.',
@@ -328,6 +346,11 @@ def send_chicken_dinner_message(
         if 'Pepsite' in participants_names_list:
             contents.extend([
                 f'La prochaine fois {participants_names}, ne {"laissez" if pluralize else "laisse"} pas Pepsite conduire.',
+            ])
+
+        if match_type_id == 'airoyale':
+            contents.extend([
+                f'Tous les bots amorphes de la map se sont montrés plus performant que {participants_names}.',
             ])
 
         images = [
