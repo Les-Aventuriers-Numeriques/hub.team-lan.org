@@ -204,6 +204,7 @@ def chicken_dinner() -> None:
                     )
 
                     total_teams = len(rosters)
+                    roster_participant_ids = []
                     participants_roster = None
 
                     for roster in rosters:
@@ -220,6 +221,12 @@ def chicken_dinner() -> None:
                         click.secho('  Equipe pas trouvée', fg='red')
 
                         continue
+
+                    other_participant_ids = [
+                        roster_participant_id for roster_participant_id in roster_participant_ids if roster_participant_id not in participants_ids
+                    ]
+
+                    other_participants_count = len(other_participant_ids)
 
                     participants_rank = participants_roster['attributes']['stats']['rank']
 
@@ -238,7 +245,8 @@ def chicken_dinner() -> None:
                         match['data']['attributes']['gameMode'],
                         match['data']['attributes']['matchType'],
                         match['data']['attributes']['duration'],
-                        participants
+                        participants,
+                        other_participants_count
                     )
             else:
                 click.secho('Aucun nouveau match à envoyer', fg='yellow')

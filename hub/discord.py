@@ -202,7 +202,8 @@ def send_chicken_dinner_message(
     game_mode_id: str,
     match_type_id: str,
     duration: int,
-    participants: List[Dict]
+    participants: List[Dict],
+    other_participants_count: int
 ) -> Response:
     def _participant_name(participant: Dict) -> str:
         return '[{0}](https://pubg.sh/{0}/{1}/{2})'.format(
@@ -214,7 +215,7 @@ def send_chicken_dinner_message(
     last_participant = None
     participants_for_player_names = participants
 
-    if len(participants) > 1:
+    if len(participants) > 1 and other_participants_count == 0:
         last_participant = participants[-1]
         participants_for_player_names = participants[:-1]
 
@@ -224,6 +225,8 @@ def send_chicken_dinner_message(
 
     if last_participant:
         participants_names += ' et ' + _participant_name(last_participant)
+    elif other_participants_count > 0:
+        participants_names += f' et {other_participants_count} {"autres" if other_participants_count > 1 else "autre"} joueur'
 
     pluralize = len(participants) > 1
 
