@@ -20,5 +20,6 @@ Il s'agit d'une application web propulsée par [Flask](https://flask.palletsproj
   1. Clonez ce dépôt quelque part 
   2. Copiez `.env.example` vers `.env` et remplissez les variables requises / souhaitées (elles peuvent également être définies dans l'environnement)
   3. `pip install -r requirements-dev.txt` (`requirements-prod.txt` est à utiliser dans un environnement de production)
-  4. `flask db upgrade`
-  5. `flask update-games`
+  4. `docker compose up -d`
+  5. `flask db upgrade`
+  6. `flask update-games`
