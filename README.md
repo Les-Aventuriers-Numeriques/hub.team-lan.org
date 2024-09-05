@@ -1,3 +1,10 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://team-lan.org/images/logo_full_dark.png">
+    <img src="https://team-lan.org/images/logo_full_light.png">
+  </picture>
+</p>
+
 # Les Aventuriers Numériques / Hub
 
 L'[intranet](https://hub.team-lan.org/) utilisé par la team multigaming [Les Aventuriers Numériques](https://team-lan.org/).
