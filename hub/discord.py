@@ -226,7 +226,7 @@ def send_chicken_dinner_message(
     if last_participant:
         participants_names += ' et ' + _participant_name(last_participant)
     elif other_participants_count > 0:
-        participants_names += f' et {other_participants_count} {"autres" if other_participants_count > 1 else "autre"} joueur'
+        participants_names += f' et {other_participants_count} {"autres joueurs" if other_participants_count > 1 else "autre joueur"}'
 
     pluralize = len(participants) > 1
 
