@@ -288,7 +288,7 @@ def lan_games_proposal_vote(game_id: int, vote_type: str) -> Response:
     except IntegrityError:
         flash('Identifiant de jeu invalide.', 'error')
 
-    return redirect(url_for('lan_games_vote', _anchor=anchor))
+    return redirect(url_for('lan_games_vote', filter=request.args.get('filter'), _anchor=anchor))
 
 
 @app.route('/lan/jeux/proposer')

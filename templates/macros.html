@@ -1,7 +1,7 @@
 {% macro vote(vote_type, proposal, my_vote=None) -%}
     <div>
         {% if g.lan_games_status == 'enabled' and (not my_vote or my_vote.type != vote_type) %}
-            <a href="{{ url_for('lan_games_proposal_vote', game_id=proposal.game.id, vote_type=vote_type.value) }}">
+            <a href="{{ url_for('lan_games_proposal_vote', game_id=proposal.game.id, vote_type=vote_type.value, filter=request.args.get('filter')) }}">
         {%- endif -%}
 
             {%- if vote_type == VoteType.YES -%}
