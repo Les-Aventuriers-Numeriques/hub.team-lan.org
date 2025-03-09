@@ -1,6 +1,8 @@
+name: team-lan-hub
 services:
   db:
     image: postgres:16.4
+    container_name: db
     volumes:
       - db-data:/var/lib/postgresql/data
     environment:
