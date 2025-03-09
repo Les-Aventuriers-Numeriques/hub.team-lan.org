@@ -19,37 +19,55 @@ from environs import Env
 env = Env()
 env.read_env()
 
-app = Flask(__name__)
+app = application = Flask(__name__)
 
 app.config.update(
-    # Valeurs de configuration par défaut qui peuvent être surchargées par des variables d'environnement
+    # -----------------------------------------------------------
+    # Configuration Flask
+
     SECRET_KEY=env.str('SECRET_KEY'),
     SERVER_NAME=env.str('SERVER_NAME', default='localhost:8080'),
     PREFERRED_URL_SCHEME=env.str('PREFERRED_URL_SCHEME', default='http'),
 
+    # -----------------------------------------------------------
+    # Configuration extensions
+
+    # sentry-sdk[flask]
     SENTRY_DSN=env.str('SENTRY_DSN', default=None),
     SENTRY_TRACES_SAMPLE_RATE=env.float('SENTRY_TRACES_SAMPLE_RATE', default=None),
 
-    CACHE_TYPE=env.str('CACHE_TYPE', default='FileSystemCache'),
-    CACHE_DIR=env.str('CACHE_DIR', default='instance/cache'),
-
-    ASSETS_CACHE=env.str('ASSETS_CACHE', default='instance/webassets-cache'),
-
+    # Flask-DebugToolbar
     DEBUG_TB_INTERCEPT_REDIRECTS=env.bool('DEBUG_TB_INTERCEPT_REDIRECTS', False),
 
+    # Flask-Compress
+    COMPRESS_REGISTER=env.bool('COMPRESS_REGISTER', default=False),
+
+    # Flask-HTMLmin
     MINIFY_HTML=env.bool('MINIFY_HTML', default=False),
 
-    COMPRESS_REGISTER=env.bool('COMPRESS_REGISTER', default=False),
-    COMPRESS_MIN_SIZE=env.int('COMPRESS_MIN_SIZE', 512),
+    # Flask-Caching
+    CACHE_TYPE=env.str('CACHE_TYPE', default='FileSystemCache'),
+    CACHE_DIR=env.str('CACHE_DIR', default='instance/cache'),
+    CACHE_THRESHOLD=env.int('CACHE_THRESHOLD', default=500),
 
+    # Flask-Assets
+    ASSETS_CACHE=env.str('ASSETS_CACHE', default='instance/webassets-cache'),
+
+    # Flask-Babel
     BABEL_DEFAULT_LOCALE=env.str('BABEL_DEFAULT_LOCALE', default='fr'),
     BABEL_DEFAULT_TIMEZONE=env.str('BABEL_DEFAULT_TIMEZONE', default='Europe/Paris'),
 
+    # Flask-SQLAlchemy
     SQLALCHEMY_SCHEMA_NAME=env.str('SQLALCHEMY_SCHEMA_NAME', default='postgres'),
     SQLALCHEMY_DATABASE_URI=env.str('SQLALCHEMY_DATABASE_URI', default='postgresql+psycopg://postgres:postgres@localhost/postgres'),
 
+    # -----------------------------------------------------------
+    # Configuration app
+
+    # API Steam
     STEAM_API_KEY=env.str('STEAM_API_KEY'),
 
+    # API Discord
     DISCORD_CLIENT_ID=env.int('DISCORD_CLIENT_ID'),
     DISCORD_CLIENT_SECRET=env.str('DISCORD_CLIENT_SECRET'),
     DISCORD_PUBLIC_KEY=env.str('DISCORD_PUBLIC_KEY'),
@@ -61,11 +79,14 @@ app.config.update(
     DISCORD_LAN_CHANNEL_ID=env.int('DISCORD_LAN_CHANNEL_ID', None),
     DISCORD_PUBG_CHANNEL_ID=env.int('DISCORD_PUBG_CHANNEL_ID', None),
 
+    # API PUBG
     PUBG_API_JWT_TOKEN=env.str('PUBG_API_JWT_TOKEN', None),
     PUBG_PLAYER_NAMES_INTERNAL=env.list('PUBG_PLAYER_NAMES_INTERNAL', []),
     PUBG_PLAYER_NAMES_EXTERNAL=env.list('PUBG_PLAYER_NAMES_EXTERNAL', []),
 
+    # -----------------------------------------------------------
     # Valeurs de configuration qui ne peuvent pas être surchargées
+
     PERMANENT_SESSION_LIFETIME=timedelta(days=365),
     BUNDLE_ERRORS=True,
     USE_SESSION_FOR_NEXT=True,
@@ -76,7 +97,7 @@ app.config.update(
 )
 
 # -----------------------------------------------------------
-# Comportements relatifs au debug
+# Initialisation du SDK Sentry
 
 if app.config['SENTRY_DSN']:
     try:
@@ -191,14 +212,14 @@ def context_processor() -> Dict:
 
 
 # -----------------------------------------------------------
-# Page d'erreur
+# Gestionnaire de page d'erreur personalisée
 
 @app.errorhandler(HTTPException)
 def http_error_handler(e: HTTPException) -> Tuple[str, int]:
     return render_template(
         'error.html',
-        title=e.name,
-        text=e.description,
+        name=e.name,
+        description=e.description,
     ), e.code
 
 

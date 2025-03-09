@@ -1,11 +1,11 @@
 {% extends 'layout.html' %}
 
-{% block title %}{{ title }}{% endblock %}
+{% block title %}{{ name }}{% endblock %}
 
 {% block cssfiles %}
     {% assets 'css_base' %}<link rel="stylesheet" href="{{ ASSET_URL }}">{% endassets %}
 {% endblock %}
 
 {% block content %}
-    <p class="mb-0">{{ text }}</p>
+    <p class="mb-0">{{ description }}</p>
 {% endblock %}
