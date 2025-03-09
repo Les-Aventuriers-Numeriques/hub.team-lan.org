@@ -35,7 +35,7 @@ Il s'agit d'une application web propulsée par [Flask](https://flask.palletsproj
 Configurer un serveur web / WSGI est hors du périmètre de ce document, toutefois voici les choses à connaître :
 
   - Le fichier WSGI est `./app.py`
-  - Le "callable" WSGI est `app` or `application`
+  - Le "callable" WSGI est `app` ou `application`
   - N'oubliez pas de définir `FLASK_DEBUG` à `false` (ou de le supprimer carrément, c'est désactivé par défaut)
   - Mappez le répertoire des fichiers statiques `./static` vers `/static`
   - Mappez les fichiers statiques suivants (ils ne sont pas situés dans le répertoire des fichiers statiques et doivent être trouvés dans la racine de l'URL du site) :
