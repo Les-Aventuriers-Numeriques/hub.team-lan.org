@@ -19,7 +19,7 @@ from environs import Env
 env = Env()
 env.read_env()
 
-app = application = Flask(__name__)
+app =Flask(__name__)
 
 app.config.update(
     # -----------------------------------------------------------
