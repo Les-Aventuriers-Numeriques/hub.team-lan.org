@@ -167,8 +167,6 @@ db = SQLAlchemy(app, model_class=AppDeclarativeBase)
 
 make_searchable(db.metadata, options={'regconfig': app.config['SQLALCHEMY_SCHEMA_NAME'] + '.english_nostop'})
 
-import hub.models
-
 # Flask-Migrate
 migrate = Migrate(app, db)
 
@@ -181,7 +179,9 @@ login_manager.login_message_category = 'error'
 
 @login_manager.user_loader
 def load_user(user_id: str):
-    return db.session.get(hub.models.User, user_id)
+    from hub.models import User
+
+    return db.session.get(User, user_id)
 
 
 # -----------------------------------------------------------
@@ -189,10 +189,12 @@ def load_user(user_id: str):
 
 @app.before_request
 def before_request():
+    from hub.models import Setting
+
     if request.endpoint and request.endpoint.startswith(('static', 'debugtoolbar', '_debug_toolbar')):
         return
 
-    g.lan_games_status =  hub.models.Setting.get('lan_games_status', 'disabled')
+    g.lan_games_status =  Setting.get('lan_games_status', 'disabled')
 
     if request.path == app.config['DISCORD_INTERACTIONS_PATH']:
         return
@@ -226,5 +228,6 @@ def http_error_handler(e: HTTPException) -> Tuple[str, int]:
 # -----------------------------------------------------------
 # Imports post-initialisation
 
+import hub.models
 import hub.routes
 import hub.commands
