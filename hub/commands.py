@@ -130,9 +130,7 @@ def update_games() -> None:
 def chicken_dinner() -> None:
     """Envoie nos Chicken Dinner sur Discord."""
     if cache.get(CHICKEN_DINNER_LOCK_CACHE_KEY):
-        click.secho('Un traitement est déjà en cours', fg='yellow')
-
-        return
+        raise click.Abort('Un traitement est déjà en cours')
 
     cache.set(CHICKEN_DINNER_LOCK_CACHE_KEY, True, 0)
 
