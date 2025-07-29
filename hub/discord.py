@@ -296,6 +296,7 @@ def send_chicken_dinner_message(
             'https://c.tenor.com/D8CKeWcZ4noAAAAC/tenor.gif',
             'https://c.tenor.com/7hFAPpCnMJ8AAAAC/tenor.gif',
             'https://c.tenor.com/1ml7iQMOEXMAAAAd/tenor.gif',
+            'https://c.tenor.com/xq1W-BtokTEAAAAd/tenor.gif',
         ]
     elif participants_rank in (2, 3):
         emojis = ['😐']
