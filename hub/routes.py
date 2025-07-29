@@ -301,11 +301,8 @@ def lan_games_proposal() -> Union[str, Response]:
     validated = len(request.args) > 0 and form.validate()
 
     games = []
-    excluded_game_ids = []
 
     if validated:
-        excluded_game_ids = Setting.get('lan_games_excluded', [])
-
         games = db.session.execute(
             search(
                 sa.select(Game)
@@ -327,8 +324,7 @@ def lan_games_proposal() -> Union[str, Response]:
         'lan/games_proposal.html',
         form=form,
         validated=validated,
-        games=games,
-        excluded_game_ids=excluded_game_ids
+        games=games
     )
 
 
@@ -341,11 +337,6 @@ def lan_games_proposal_submit(game_id: int) -> Response:
     anchor = None
 
     try:
-        excluded_game_ids = Setting.get('lan_games_excluded', [])
-
-        if game_id in excluded_game_ids:
-            raise ValueError()
-
         proposal = LanGameProposal()
         proposal.game_id = game_id
         proposal.user_id = current_user.id
@@ -364,8 +355,6 @@ def lan_games_proposal_submit(game_id: int) -> Response:
         flash('Ce jeu a déjà été proposé (ou identifiant de jeu invalide).', 'error')
     except NotFound:
         flash('Identifiant de jeu invalide.', 'error')
-    except ValueError:
-        flash('Ce jeu est exclu des propositions.', 'error')
 
     return redirect(url_for('lan_games_proposal', **request.args, _anchor=anchor))
 
@@ -460,17 +449,13 @@ def admin_lan_games() -> Union[str, Response]:
 
     proposals.sort(key=lambda p: p.game.name)
 
-    form_data = Setting.get(['lan_games_status', 'lan_games_excluded'])
-    form_data['lan_games_excluded'] = ', '.join([
-        str(value) for value in form_data.get('lan_games_excluded', []) or []
-    ])
+    form_data = Setting.get(['lan_games_status'])
 
     form = LanGamesSettingsForm(data=form_data)
 
     if form.validate_on_submit():
         Setting.set({
             'lan_games_status': form.lan_games_status.data,
-            'lan_games_excluded': form.lan_games_excluded.data,
         })
 
         db.session.commit()

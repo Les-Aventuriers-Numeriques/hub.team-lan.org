@@ -3,8 +3,8 @@ instance/webassets-cache/*
 instance/cache/*
 instance/data/*
 !instance/data/.gitkeep
-static/css/*.min.css
-static/js/*.min.js
+static/css/*.css
+static/js/*.js
 venv
 .env
 
