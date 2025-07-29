@@ -1,4 +1,4 @@
 -r requirements.txt
 sentry-sdk[flask]~=2.22
-Flask-Compress~=1.17
+Flask-Compress~=1.18
 Flask-HTMLmin~=3.0
