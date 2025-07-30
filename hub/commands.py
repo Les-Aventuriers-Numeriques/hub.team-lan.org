@@ -5,6 +5,7 @@ from sqlalchemy.dialects import postgresql
 from app import app, db, cache
 from hub.models import Game
 import sqlalchemy as sa
+from hub import igdb
 import requests
 import click
 import time
@@ -13,6 +14,17 @@ import csv
 CHICKEN_DINNER_LOCK_CACHE_KEY = 'chicken_dinner_processing'
 CHICKEN_DINNER_PROCESSED_CACHE_KEY = 'chicken_dinner_processed'
 PUBG_SHARD = 'steam'
+
+
+@app.cli.command()
+def hey() -> None:
+    client = igdb.IgdbApiClient(
+        app.config['TWITCH_API_CLIENT_ID'],
+        app.config['TWITCH_API_CLIENT_SECRET'],
+        cache
+    )
+
+    print(client.call('games', 'fields: id, name;'))
 
 
 @app.cli.command()
