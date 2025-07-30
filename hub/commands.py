@@ -57,6 +57,9 @@ def update_games() -> None:
 
         json = response.json()['response']
 
+        if 'apps' not in json:
+            raise ValueError(f'"apps" key not found in JSON: {json}')
+
         games = [
             {
                 'id': game['appid'],
