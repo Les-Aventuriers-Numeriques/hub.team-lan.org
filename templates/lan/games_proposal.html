@@ -9,7 +9,7 @@
 {% endblock %}
 
 {% block content %}
-    <p>Propose ici des jeux pour la LAN. Tu as accès à l'entièreté du catalogue Steam. <a href="{{ url_for('lan_games_vote') }}">Pour voter pour des jeux, c'est par là</a>.</p>
+    <p>Propose ici des jeux pour la LAN. <a href="{{ url_for('lan_games_vote') }}">Pour voter pour des jeux, c'est par là</a>.</p>
 
     <form method="get" action="{{ url_for('lan_games_proposal') }}">
         {{ field(form.terms, with_label=False, class='mb-0' if not validated else '') }}
@@ -21,7 +21,7 @@
                 {% for game in games %}
                     <article id="g={{ game.id }}">
                         <a href="{{ game.url }}" target="_blank" data-tooltip="{{ game.name }}{% if game.proposal %} [déjà proposé par {{ game.proposal.user.display_name if game.proposal.user_id != current_user.id else 'toi' }}]{% elif game.id in excluded_game_ids %} [exclu des propositions]{% endif %}">
-                            <img src="{{ game.image_url }}" alt="Illustration {{ game.name }}" width="231" height="87">
+                            <img src="{{ game.image_url }}" alt="Illustration {{ game.name }}">
                         </a>
 
                         {% if game.id in excluded_game_ids %}

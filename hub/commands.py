@@ -2,29 +2,16 @@ from hub.pubg import PUBGApiClient, MATCH_TYPES_NAMES
 from hub.discord import send_chicken_dinner_message
 from datetime import datetime, timezone, timedelta
 from sqlalchemy.dialects import postgresql
+from typing import Dict, Optional
 from app import app, db, cache
 from hub.models import Game
 import sqlalchemy as sa
 from hub import igdb
-import requests
 import click
-import time
-import csv
 
 CHICKEN_DINNER_LOCK_CACHE_KEY = 'chicken_dinner_processing'
 CHICKEN_DINNER_PROCESSED_CACHE_KEY = 'chicken_dinner_processed'
 PUBG_SHARD = 'steam'
-
-
-@app.cli.command()
-def hey() -> None:
-    client = igdb.IgdbApiClient(
-        app.config['TWITCH_API_CLIENT_ID'],
-        app.config['TWITCH_API_CLIENT_SECRET'],
-        cache
-    )
-
-    print(client.call('games', 'fields: id, name;'))
 
 
 @app.cli.command()
@@ -39,57 +26,76 @@ def cc() -> None:
 
 @app.cli.command()
 def update_games() -> None:
-    """Met à jour la base de données interne des jeux Steam."""
-    click.echo('Mise à jour des jeux Steam...')
+    """Met à jour la base de données interne des jeux depuis IGDB."""
+    click.echo('Mise à jour des jeux depuis IGDB...')
 
-    have_more_results = True
-    last_appid = None
-    all_app_ids = set()
+    offset = 0
+    limit = 500
+    all_game_ids = set()
 
-    while have_more_results:
-        click.echo('  Téléchargement du paquet...')
+    client = igdb.IgdbApiClient(
+        app.config['TWITCH_API_CLIENT_ID'],
+        app.config['TWITCH_API_CLIENT_SECRET'],
+        cache
+    )
 
-        response = requests.get(
-            'https://api.steampowered.com/IStoreService/GetAppList/v1/',
-            params={
-                'key': app.config['STEAM_API_KEY'],
-                'include_games': 'true',
-                'include_dlc': 'false',
-                'include_software': 'false',
-                'include_videos': 'false',
-                'include_hardware': 'false',
-                'max_results': 8000,
-                'last_appid': last_appid,
-            },
-            headers={
-                'Accept': 'application/json'
-            }
-        )
+    def get_url(game: Dict) -> Optional[str]:
+        if 'websites' not in game or not game['websites']:
+            return None
 
-        response.raise_for_status()
+        websites = {
+            website['type']: website['url'] for website in game['websites']
+        }
 
-        json = response.json()['response']
+        url = websites.get(igdb.Website.Steam)
 
-        if 'apps' not in json:
-            click.secho('Got empty response from Steam', fg='red')
+        if not url:
+            url = websites.get(igdb.Website.Epic)
 
-            return
+        if not url:
+            url = websites.get(igdb.Website.Gog)
+
+        if not url:
+            url = websites.get(igdb.Website.Official)
+
+        if not url:
+            url = websites.get(next(iter(websites)))
+
+        return url
+
+    def get_image_id(game: Dict) -> Optional[str]:
+        if 'cover' not in game or not game['cover']:
+            return None
+
+        return game['cover']['image_id']
+
+    while True:
+        click.echo(f'  Téléchargement du paquet {offset} - {offset + limit}...')
+
+        raw_games = client.call('games', {
+            'fields': 'id, name, websites.type, websites.url, cover.image_id',
+            'where': f'game_type = ({igdb.GameType.MainGame}, {igdb.GameType.Mod}, {igdb.GameType.Remake}, {igdb.GameType.Remaster}) & game_status = ({igdb.GameStatus.Released}, {igdb.GameStatus.EarlyAccess}) & game_modes != ({igdb.GameMode.SinglePlayer}) & platforms = ({igdb.Platform.Linux}, {igdb.Platform.Windows}, {igdb.Platform.OculusVr}, {igdb.Platform.SteamVr})',
+            'offset': offset,
+            'limit': limit
+        })
+
+        if not raw_games:
+            break
 
         games = [
             {
-                'id': game['appid'],
+                'id': game['id'],
                 'name': game['name'],
-            } for game in json['apps'] if game['name']
+                'url': get_url(game),
+                'image_id': get_image_id(game),
+            } for game in raw_games
         ]
-
-        have_more_results = json.get('have_more_results', False)
-        last_appid = json.get('last_appid')
 
         query = postgresql.insert(Game).values(games)
 
         click.echo('  Mise à jour de la BDD...')
 
-        all_app_ids.update([
+        all_game_ids.update([
             str(game['id']) for game in games
         ])
 
@@ -97,48 +103,17 @@ def update_games() -> None:
             index_elements=[Game.id],
             set_={
                 Game.name: query.excluded.name,
+                Game.url: query.excluded.url,
+                Game.image_id: query.excluded.image_id,
             }
         ))
 
-        time.sleep(1)
-
-    click.echo('Mise à jour des jeux personnalisés...')
-
-    with open('storage/data/games.csv', 'r', encoding='utf-8') as f:
-        i = -1
-        games = []
-
-        for row in csv.DictReader(f):
-            games.append({
-                'id': i,
-                'name': row['name'],
-                'custom_url': row['url'],
-            })
-
-            i -= 1
-
-    all_app_ids.update([
-        str(game['id']) for game in games
-    ])
-
-    query = postgresql.insert(Game).values(games)
-
-    click.echo('  Mise à jour de la BDD...')
-
-    db.session.execute(query.on_conflict_do_update(
-        index_elements=[Game.id],
-        set_={
-            Game.name: query.excluded.name,
-            Game.custom_url: query.excluded.custom_url,
-        }
-    ))
-
-    db.session.commit()
+        offset += limit
 
     click.echo('Suppression des anciens jeux...')
 
     db.session.execute(
-        sa.text(f'DELETE FROM {Game.__tablename__} WHERE id NOT IN ({",".join(all_app_ids)});')
+        sa.text(f'DELETE FROM {Game.__tablename__} WHERE id NOT IN ({",".join(all_game_ids)});')
     )
 
     db.session.commit()

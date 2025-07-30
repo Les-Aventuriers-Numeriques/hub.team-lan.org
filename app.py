@@ -64,9 +64,6 @@ app.config.update(
     # -----------------------------------------------------------
     # Configuration app
 
-    # API Steam
-    STEAM_API_KEY=env.str('STEAM_API_KEY'),
-
     # API Discord
     DISCORD_CLIENT_ID=env.int('DISCORD_CLIENT_ID'),
     DISCORD_CLIENT_SECRET=env.str('DISCORD_CLIENT_SECRET'),

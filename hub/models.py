@@ -4,10 +4,10 @@ from typing import Optional, Union, List, Dict, Any
 from sqlalchemy_utils.types import TSVectorType
 from sqlalchemy.util import memoized_property
 from sqlalchemy.dialects import postgresql
+from urllib.parse import quote_plus
 from enum import Enum as PythonEnum
 from datetime import UTC, datetime
 from flask_login import UserMixin
-from flask import url_for
 from app import db
 import sqlalchemy as sa
 
@@ -62,24 +62,17 @@ class Game(db.Model):
 
     name = mapped_column(sa.String(255), nullable=False)
     search_vector = mapped_column(TSVectorType('name', regconfig='english_nostop'))
-    custom_url = mapped_column(sa.String(255), nullable=True)
+    url = mapped_column(sa.String(255))
+    image_id = mapped_column(sa.String(25))
 
     proposal = relationship('LanGameProposal', uselist=False, back_populates='game')
 
     @property
-    def is_custom(self) -> bool:
-        return self.id < 0
-
-    @property
-    def url(self) -> str:
-        return self.custom_url if self.is_custom else f'https://store.steampowered.com/app/{self.id}'
-
-    @property
     def image_url(self) -> str:
-        if self.is_custom:
-            return url_for('static', filename=f'images/games/{self.id}.png', _external=True)
+        if not self.image_id:
+            return f'https://placehold.co/264x374/1b212c/8891a4.png?text={quote_plus(self.name)}'
 
-        return f'https://cdn.cloudflare.steamstatic.com/steam/apps/{self.id}/capsule_231x87.jpg'
+        return f'https://images.igdb.com/igdb/image/upload/t_cover_big/{self.image_id}.png'
 
     def __repr__(self) -> str:
         return f'Game:{self.id}'
