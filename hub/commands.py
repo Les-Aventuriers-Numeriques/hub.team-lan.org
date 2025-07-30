@@ -7,6 +7,7 @@ from hub.models import Game
 import sqlalchemy as sa
 import requests
 import click
+import time
 import csv
 
 CHICKEN_DINNER_LOCK_CACHE_KEY = 'chicken_dinner_processing'
@@ -45,7 +46,7 @@ def update_games() -> None:
                 'include_software': 'false',
                 'include_videos': 'false',
                 'include_hardware': 'false',
-                'max_results': 5000,
+                'max_results': 8000,
                 'last_appid': last_appid,
             },
             headers={
@@ -58,7 +59,9 @@ def update_games() -> None:
         json = response.json()['response']
 
         if 'apps' not in json:
-            raise ValueError(response.json())
+            click.secho('Got empty response from Steam', fg='red')
+
+            return
 
         games = [
             {
@@ -84,6 +87,8 @@ def update_games() -> None:
                 Game.name: query.excluded.name,
             }
         ))
+
+        time.sleep(1)
 
     click.echo('Mise à jour des jeux personnalisés...')
 
