@@ -34,8 +34,8 @@ def update_games() -> None:
     all_game_ids = set()
 
     client = igdb.IgdbApiClient(
-        app.config['TWITCH_API_CLIENT_ID'],
-        app.config['TWITCH_API_CLIENT_SECRET'],
+        app.config['IGDB_API_CLIENT_ID'],
+        app.config['IGDB_API_CLIENT_SECRET'],
         cache
     )
 

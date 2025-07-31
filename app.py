@@ -82,8 +82,8 @@ app.config.update(
     PUBG_PLAYER_NAMES_EXTERNAL=env.list('PUBG_PLAYER_NAMES_EXTERNAL', []),
 
     # API IGDB
-    TWITCH_API_CLIENT_ID=env.str('TWITCH_API_CLIENT_ID'),
-    TWITCH_API_CLIENT_SECRET=env.str('TWITCH_API_CLIENT_SECRET'),
+    IGDB_API_CLIENT_ID=env.str('IGDB_API_CLIENT_ID'),
+    IGDB_API_CLIENT_SECRET=env.str('IGDB_API_CLIENT_SECRET'),
 
     # -----------------------------------------------------------
     # Valeurs de configuration qui ne peuvent pas être surchargées
