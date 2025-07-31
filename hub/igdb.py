@@ -65,8 +65,8 @@ class Website(IntEnum):
     Twitch = 6
     Instagram = 8
     YouTube = 9
-    AppStoreiPhone = 10
-    AppStoreiPad = 11
+    AppStoreIphone = 10
+    AppStoreIpad = 11
     GooglePlay = 12
     Steam = 13
     Subreddit = 14

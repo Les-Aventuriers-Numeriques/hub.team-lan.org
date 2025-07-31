@@ -43,25 +43,30 @@ def update_games() -> None:
         if 'websites' not in game or not game['websites']:
             return None
 
+        excluded = [
+            igdb.Website.Discord,
+            igdb.Website.Twitch,
+        ]
+
+        priorities = [
+            igdb.Website.Steam,
+            igdb.Website.Epic,
+            igdb.Website.Gog,
+            igdb.Website.Official,
+            igdb.Website.Wiki,
+        ]
+
         websites = {
-            website['type']: website['url'] for website in game['websites']
+            website['type']: website['url'] for website in game['websites'] if website['type'] not in excluded
         }
 
-        url = websites.get(igdb.Website.Steam)
+        for priority in priorities:
+            url = websites.get(priority)
 
-        if not url:
-            url = websites.get(igdb.Website.Epic)
+            if url:
+                return url
 
-        if not url:
-            url = websites.get(igdb.Website.Gog)
-
-        if not url:
-            url = websites.get(igdb.Website.Official)
-
-        if not url:
-            url = websites.get(next(iter(websites)))
-
-        return url
+        return websites.get(next(iter(websites)))
 
     def get_image_id(game: Dict) -> Optional[str]:
         if 'cover' not in game or not game['cover']:
