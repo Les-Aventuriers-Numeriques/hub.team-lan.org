@@ -49,3 +49,13 @@
         </small>
     {% endif %}
 {%- endmacro %}
+
+{% macro game_cover(game, tooltip) -%}
+    {% if game.url %}
+        <a href="{{ game.url }}" target="_blank">
+    {% endif %}
+        <img src="{{ game.image_url }}" alt="Illustration {{ game.name }}" data-tooltip="{{ tooltip }}">
+    {% if game.url %}
+        </a>
+    {% endif %}
+{%- endmacro %}

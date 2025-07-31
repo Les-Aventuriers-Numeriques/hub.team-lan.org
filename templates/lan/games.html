@@ -1,6 +1,6 @@
 {% extends 'layout.html' %}
 
-{% from 'macros.html' import vote, field with context %}
+{% from 'macros.html' import vote, field, game_cover with context %}
 
 {% block title %}LAN party : voter pour des jeux{% endblock %}
 
@@ -28,9 +28,7 @@
                 {% set my_vote = current_user.my_vote(proposal) %}
 
                 <article id="g={{ proposal.game.id }}">
-                    <a href="{{ proposal.game.url }}" target="_blank" data-tooltip="{{ proposal.game.name }} [proposé par {{ proposal.user.display_name if proposal.user_id != current_user.id else 'toi' }}]">
-                        <img src="{{ proposal.game.image_url }}" alt="Illustration {{ proposal.game.name }}">
-                    </a>
+                    {{ game_cover(proposal.game, proposal.game.name + ' [proposé par ' + (proposal.user.display_name if proposal.user_id != current_user.id else 'toi') + ']') }}
 
                     <div>
                         {% for vote_type in VoteType %}
