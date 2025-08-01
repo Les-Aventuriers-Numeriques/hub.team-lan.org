@@ -64,9 +64,6 @@ app.config.update(
     # -----------------------------------------------------------
     # Configuration app
 
-    # API Steam
-    STEAM_API_KEY=env.str('STEAM_API_KEY'),
-
     # API Discord
     DISCORD_CLIENT_ID=env.int('DISCORD_CLIENT_ID'),
     DISCORD_CLIENT_SECRET=env.str('DISCORD_CLIENT_SECRET'),
@@ -83,6 +80,10 @@ app.config.update(
     PUBG_API_JWT_TOKEN=env.str('PUBG_API_JWT_TOKEN', None),
     PUBG_PLAYER_NAMES_INTERNAL=env.list('PUBG_PLAYER_NAMES_INTERNAL', []),
     PUBG_PLAYER_NAMES_EXTERNAL=env.list('PUBG_PLAYER_NAMES_EXTERNAL', []),
+
+    # API IGDB
+    IGDB_API_CLIENT_ID=env.str('IGDB_API_CLIENT_ID'),
+    IGDB_API_CLIENT_SECRET=env.str('IGDB_API_CLIENT_SECRET'),
 
     # -----------------------------------------------------------
     # Valeurs de configuration qui ne peuvent pas être surchargées

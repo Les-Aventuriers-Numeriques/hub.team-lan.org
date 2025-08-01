@@ -12,3 +12,4 @@ environs~=14.1
 rcssmin~=1.2
 psycopg[binary]~=3.2
 requests~=2.32
+ratelimit~=2.2

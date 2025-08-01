@@ -309,7 +309,7 @@ def lan_games_proposal() -> Union[str, Response]:
                 .options(
                     sa_orm.selectinload(Game.proposal).selectinload(LanGameProposal.user)
                 )
-                .limit(20)
+                .limit(24)
                 .order_by(
                     sa.desc(
                         sa.func.ts_rank_cd(inspect_search_vectors(Game)[0], sa.func.parse_websearch(form.terms.data), 2)

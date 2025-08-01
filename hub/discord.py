@@ -72,7 +72,8 @@ def can_send_messages() -> bool:
 def _handle_top_button(ctx):
     if g.lan_games_status == 'disabled':
         return Message(
-            'On ne choisis pas encore les jeux pour la LAN !'
+            'On ne choisis pas encore les jeux pour la LAN !',
+            ephemeral=True
         )
 
     proposals = db.session.execute(
