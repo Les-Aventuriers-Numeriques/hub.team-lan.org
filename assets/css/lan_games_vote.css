@@ -10,6 +10,7 @@ body > main .games > * > div {
     grid-auto-flow: column;
     column-gap: var(--pico-grid-column-gap);
     row-gap: var(--pico-grid-row-gap);
+    line-height: initial;
 }
 
 body > main .games > * > div > div {
@@ -19,6 +20,10 @@ body > main .games > * > div > div {
     row-gap: var(--pico-grid-row-gap);
     justify-content: space-between;
     align-items: center;
+}
+
+body > main .games > * > div > div .my-vote {
+    color: var(--pico-primary);
 }
 
 body > main .games > * > div > div > span {
