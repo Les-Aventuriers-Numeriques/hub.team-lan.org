@@ -66,7 +66,10 @@ def update_games() -> None:
             if url:
                 return url
 
-        return websites.get(next(iter(websites)))
+        try:
+            return websites.get(next(iter(websites)))
+        except StopIteration:
+            return None
 
     def get_image_id(game: Dict) -> Optional[str]:
         if 'cover' not in game or not game['cover']:
@@ -79,7 +82,7 @@ def update_games() -> None:
 
         raw_games = client.call('games', {
             'fields': 'id, name, websites.type, websites.url, cover.image_id',
-            'where': f'game_type = ({igdb.GameType.MainGame}, {igdb.GameType.Mod}, {igdb.GameType.Remake}, {igdb.GameType.Remaster}) & game_status = ({igdb.GameStatus.Released}, {igdb.GameStatus.EarlyAccess}) & game_modes != ({igdb.GameMode.SinglePlayer}) & platforms = ({igdb.Platform.Linux}, {igdb.Platform.Windows}, {igdb.Platform.OculusVr}, {igdb.Platform.SteamVr})',
+            'where': f'game_type = ({igdb.GameType.MainGame}, {igdb.GameType.Mod}, {igdb.GameType.Remake}, {igdb.GameType.Remaster}) & (game_status = ({igdb.GameStatus.Released}, {igdb.GameStatus.EarlyAccess}) | game_status = null) & game_modes = ({igdb.GameMode.Multiplayer}, {igdb.GameMode.CoOperative}, {igdb.GameMode.SplitScreen}, {igdb.GameMode.Mmo}, {igdb.GameMode.BattleRoyale}) & platforms = ({igdb.Platform.Linux}, {igdb.Platform.Windows}, {igdb.Platform.OculusVr}, {igdb.Platform.SteamVr})',
             'offset': offset,
             'limit': limit
         })
