@@ -5,6 +5,7 @@ from sqlalchemy.dialects import postgresql
 from typing import Dict, Optional
 from app import app, db, cache
 from hub.models import Game
+from rich import print_json
 import sqlalchemy as sa
 from hub import igdb
 import click
@@ -22,6 +23,40 @@ def cc() -> None:
     cache.clear()
 
     click.secho('Effectué', fg='green')
+
+
+@app.cli.command()
+@click.argument('resource')
+@click.option('--fields')
+@click.option('--exclude')
+@click.option('--where')
+@click.option('--limit', type=click.IntRange(1))
+@click.option('--offset', type=click.IntRange(0))
+@click.option('--sort')
+@click.option('--search')
+def query_igdb(
+    resource: str,
+    fields: Optional[str] = None,
+    exclude: Optional[str] = None,
+    where: Optional[str] = None,
+    limit: Optional[int] = None,
+    offset: Optional[int] = None,
+    sort: Optional[str] = None,
+    search: Optional[str] = None
+) -> None:
+    """Envoie une requête à l'API IGDB et affiche le résultat."""
+    client = igdb.IgdbApiClient(
+        app.config['IGDB_API_CLIENT_ID'],
+        app.config['IGDB_API_CLIENT_SECRET'],
+        cache
+    )
+
+    try:
+        print_json(
+            data=client.call(resource, fields, exclude, where, limit, offset, sort, search)
+        )
+    except Exception as e:
+        click.secho(e, fg='red')
 
 
 @app.cli.command()
@@ -80,12 +115,13 @@ def update_games() -> None:
     while True:
         click.echo(f'  Téléchargement du paquet {offset} - {offset + limit}...')
 
-        raw_games = client.call('games', {
-            'fields': 'id, name, websites.type, websites.url, cover.image_id',
-            'where': f'game_type = ({igdb.GameType.MainGame}, {igdb.GameType.Mod}, {igdb.GameType.Remake}, {igdb.GameType.Remaster}) & (game_status = ({igdb.GameStatus.Released}, {igdb.GameStatus.EarlyAccess}) | game_status = null) & game_modes = ({igdb.GameMode.Multiplayer}, {igdb.GameMode.CoOperative}, {igdb.GameMode.SplitScreen}, {igdb.GameMode.Mmo}, {igdb.GameMode.BattleRoyale}) & platforms = ({igdb.Platform.Linux}, {igdb.Platform.Windows}, {igdb.Platform.OculusVr}, {igdb.Platform.SteamVr})',
-            'offset': offset,
-            'limit': limit
-        })
+        raw_games = client.call(
+            'games',
+            fields='id, name, websites.type, websites.url, cover.image_id',
+            where=f'game_type = ({igdb.GameType.MainGame}, {igdb.GameType.Mod}, {igdb.GameType.Remake}, {igdb.GameType.Remaster}) & (game_status = ({igdb.GameStatus.Released}, {igdb.GameStatus.EarlyAccess}) | game_status = null) & game_modes = ({igdb.GameMode.Multiplayer}, {igdb.GameMode.CoOperative}, {igdb.GameMode.SplitScreen}, {igdb.GameMode.Mmo}, {igdb.GameMode.BattleRoyale}) & platforms = ({igdb.Platform.Linux}, {igdb.Platform.Windows}, {igdb.Platform.OculusVr}, {igdb.Platform.SteamVr})',
+            offset=offset,
+            limit=limit,
+        )
 
         if not raw_games:
             break
@@ -291,7 +327,6 @@ def chicken_dinner_clear_lock() -> None:
 
 
 @app.cli.command()
-@click.argument('dt')
 def chicken_dinner_clear_processed() -> None:
     """Supprime tous les matchs déjà traités."""
     click.echo('Suppression des matchs...')

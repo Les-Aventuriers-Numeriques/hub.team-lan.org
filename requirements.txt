@@ -13,3 +13,4 @@ rcssmin~=1.2
 psycopg[binary]~=3.2
 requests~=2.32
 ratelimit~=2.2
+rich~=14.1

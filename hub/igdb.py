@@ -135,7 +135,17 @@ class IgdbApiClient:
 
     @sleep_and_retry
     @limits(calls=4, period=1)
-    def call(self, resource: str, query: Optional[Dict[str, str]] = None) -> Dict:
+    def call(
+        self,
+        resource: str,
+        fields: Optional[str] = None,
+        exclude: Optional[str] = None,
+        where: Optional[str] = None,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+        sort: Optional[str] = None,
+        search: Optional[str] = None
+    ) -> Dict:
         url = API_BASE_URL + resource
 
         headers = {
@@ -143,6 +153,29 @@ class IgdbApiClient:
             'Client-ID': self.client_id,
             'Authorization': f'Bearer {self.get_token()}',
         }
+
+        query = {}
+
+        if fields:
+            query['fields'] = fields
+
+        if exclude:
+            query['exclude'] = exclude
+
+        if where:
+            query['where'] = where
+
+        if limit:
+            query['limit'] = limit
+
+        if offset:
+            query['offset'] = offset
+
+        if sort:
+            query['sort'] = sort
+
+        if search:
+            query['search'] = search
 
         data = ' '.join([
             f'{name} {value};' for name, value in query.items()
