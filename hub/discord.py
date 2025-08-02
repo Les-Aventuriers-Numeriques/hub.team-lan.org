@@ -155,7 +155,7 @@ def _handle_vote_button(ctx, game_id: int, vote_type: Literal['YES', 'NEUTRAL', 
     )
 
 
-def send_proposal_message(user: User, game: Game) -> Response:
+def send_proposal_message(user: User, game: Game) -> None:
     components = [
         Button(
             style=ButtonStyles.PRIMARY,
@@ -194,7 +194,15 @@ def send_proposal_message(user: User, game: Game) -> Response:
         ]
     ).encode(True)
 
-    return _send_message(app.config['DISCORD_LAN_CHANNEL_ID'], data, content_type)
+    response = _send_message(app.config['DISCORD_LAN_CHANNEL_ID'], data, content_type)
+
+    json = response.json()
+
+    _start_thread(
+        app.config['DISCORD_LAN_CHANNEL_ID'],
+        json.get('id'),
+        f'Discussion à propos de {game.name}'
+    )
 
 
 def send_chicken_dinner_message(
@@ -408,6 +416,18 @@ def _send_message(channel_id: int, data: Dict, content_type: str) -> Response:
         data=data,
         headers={
             'Content-Type': content_type,
+            'Authorization': 'Bot {DISCORD_BOT_TOKEN}'.format(**app.config),
+        }
+    )
+
+
+def _start_thread(channel_id: int, message_id: int, name: str) -> Response:
+    return requests.post(
+        '{API_BASE_URL}/channels/{channel_id}/messages/{message_id}/threads'.format(API_BASE_URL=API_BASE_URL, channel_id=channel_id, message_id=message_id, **app.config),
+        json={
+            'name': name,
+        },
+        headers={
             'Authorization': 'Bot {DISCORD_BOT_TOKEN}'.format(**app.config),
         }
     )
