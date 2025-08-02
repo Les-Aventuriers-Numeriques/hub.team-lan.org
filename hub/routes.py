@@ -342,6 +342,9 @@ def lan_games_proposal_submit(game_id: int) -> Response:
         proposal.user_id = current_user.id
 
         db.session.add(proposal)
+
+        LanGameProposalVote.vote(current_user, game_id, VoteType.YES)
+
         db.session.commit()
 
         if discord.can_send_messages():
