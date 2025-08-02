@@ -118,7 +118,7 @@ def update_games() -> None:
         raw_games = client.call(
             'games',
             fields='id, name, websites.type, websites.url, cover.image_id',
-            where=f'game_type = ({igdb.GameType.MainGame}, {igdb.GameType.Mod}, {igdb.GameType.Remake}, {igdb.GameType.Remaster}) & (game_status = ({igdb.GameStatus.Released}, {igdb.GameStatus.EarlyAccess}) | game_status = null) & game_modes = ({igdb.GameMode.Multiplayer}, {igdb.GameMode.CoOperative}, {igdb.GameMode.SplitScreen}, {igdb.GameMode.Mmo}, {igdb.GameMode.BattleRoyale}) & platforms = ({igdb.Platform.Linux}, {igdb.Platform.Windows}, {igdb.Platform.OculusVr}, {igdb.Platform.SteamVr})',
+            where=f'game_type = ({igdb.GameType.MainGame}, {igdb.GameType.Mod}, {igdb.GameType.Remake}, {igdb.GameType.Remaster}) & (game_status = ({igdb.GameStatus.Released}, {igdb.GameStatus.Beta}, {igdb.GameStatus.EarlyAccess}) | game_status = null) & game_modes = ({igdb.GameMode.Multiplayer}, {igdb.GameMode.CoOperative}, {igdb.GameMode.SplitScreen}, {igdb.GameMode.Mmo}, {igdb.GameMode.BattleRoyale}) & platforms = ({igdb.Platform.Linux}, {igdb.Platform.Windows}, {igdb.Platform.OculusVr}, {igdb.Platform.SteamVr})',
             offset=offset,
             limit=limit,
         )
