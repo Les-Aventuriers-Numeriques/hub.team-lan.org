@@ -201,7 +201,7 @@ def send_proposal_message(user: User, game: Game) -> None:
     _start_thread(
         app.config['DISCORD_LAN_CHANNEL_ID'],
         json.get('id'),
-        f'Discussion à propos de {game.name}'
+        game.name
     )
 
 
