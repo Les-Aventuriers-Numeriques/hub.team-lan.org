@@ -129,7 +129,7 @@ def _handle_vote_button(ctx, game_id: int, vote_type: Literal['YES', 'NEUTRAL', 
             url_for('lan_games_vote', _external=True),
         )
     elif user.must_relogin:
-        message = f'Merci de te reconnecter sur notre intranet puis réessaye : {url_for('login', _external=True)} (tu ne devra effectuer cette action qu\'une fois).'
+        message = f'Merci de te reconnecter sur notre intranet puis réessaye : {url_for('login', _external=True)} (tu ne devras effectuer cette action qu\'une fois).'
     elif not user.is_lan_participant:
         message = 'Désolé, tu ne fais pas partie des participants à la LAN.'
     else:
