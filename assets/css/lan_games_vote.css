@@ -33,14 +33,14 @@ body > main .games > * > div > div > span {
 }
 
 @keyframes pulsate {
-    0%   { box-shadow: 0 0 1px 1px #f5ea22; }
-    50%  { box-shadow: 0 0 16px 1px #f5ea22; }
-    100% { box-shadow: 0 0 1px 1px #f5ea22; }
+    0%   { box-shadow: 0 0 5px 1px #f5ea22; }
+    50%  { box-shadow: 0 0 20px 1px #f5ea22; }
+    100% { box-shadow: 0 0 5px 1px #f5ea22; }
 }
 
 body > main .games > .essential img {
     border-color: #f5ea22;
-    animation: pulsate 3s ease-out infinite !important;
+    animation: pulsate 3s linear infinite !important;
 }
 
 /************************************************************************
