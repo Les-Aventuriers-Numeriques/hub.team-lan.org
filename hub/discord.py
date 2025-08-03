@@ -91,7 +91,7 @@ def _handle_top_button(ctx):
     ).scalar()
 
     for proposal in proposals:
-        proposal.is_essential = len(proposal.votes_count(VoteType.YES)) == lan_participants_count
+        proposal.is_essential = proposal.votes_count(VoteType.YES) == lan_participants_count
 
     proposals.sort(key=lambda p: p.score, reverse=True)
 
