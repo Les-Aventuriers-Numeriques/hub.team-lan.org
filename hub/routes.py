@@ -261,7 +261,7 @@ def lan_games_vote() -> Union[str, Response]:
             ]
 
     for proposal in proposals:
-        proposal.is_essential = len(proposal.votes) == lan_participants_count
+        proposal.is_essential = len(proposal.votes_count(VoteType.YES)) == lan_participants_count
 
     proposals.sort(key=lambda p: p.score, reverse=True)
 

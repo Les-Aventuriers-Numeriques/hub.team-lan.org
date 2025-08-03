@@ -4,6 +4,7 @@ from hub.pubg import MAPS_NAMES, GAME_MODES_NAMES, MATCH_TYPES_NAMES
 from flask_discord_interactions.models.embed import Media, Field
 from app import app, db, discord_interactions
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import func as sa_func
 from typing import Dict, Literal, List
 from flask import url_for, session, g
 from urllib.parse import urlencode
@@ -84,6 +85,14 @@ def _handle_top_button(ctx):
         )
     ).scalars().all()
 
+    lan_participants_count = db.session.execute(
+        sa.select(sa_func.count('*')).select_from(User)
+        .where(User.is_lan_participant == True)
+    ).scalar()
+
+    for proposal in proposals:
+        proposal.is_essential = len(proposal.votes_count(VoteType.YES)) == lan_participants_count
+
     proposals.sort(key=lambda p: p.score, reverse=True)
 
     proposals = proposals[:app.config['TOP_LAN_GAME_PROPOSALS']]
@@ -94,7 +103,10 @@ def _handle_top_button(ctx):
             color=EMBEDS_COLOR,
             fields=[
                 Field(
-                    name=proposal.game.name,
+                    name='{}{}'.format(
+                        '⭐️ ' if proposal.is_essential else '',
+                        proposal.game.name
+                    ),
                     value='  '.join([
                         '{} {}'.format(
                             _vote_type_emoji(vote_type),
