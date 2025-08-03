@@ -88,6 +88,8 @@ class LanGameProposal(CreatedAtMixin, db.Model):
     game = relationship('Game', uselist=False, back_populates='proposal')
     user = relationship('User', uselist=False, back_populates='proposals')
 
+    is_essential: bool = False
+
     def votes_by_type(self, type_: VoteType) -> List[LanGameProposalVote]:
         return [
             vote for vote in self.votes if vote.type == type_

@@ -224,12 +224,12 @@ def lan_games_vote() -> Union[str, Response]:
         )
     ).scalars().all()
 
-    if validated and form.filter.data:
-        lan_participants_count = db.session.execute(
-            sa.select(sa_func.count('*')).select_from(User)
-            .where(User.is_lan_participant == True)
-        ).scalar()
+    lan_participants_count = db.session.execute(
+        sa.select(sa_func.count('*')).select_from(User)
+        .where(User.is_lan_participant == True)
+    ).scalar()
 
+    if validated and form.filter.data:
         def _voted(proposal: LanGameProposal) -> bool:
             return current_user.id in [
                 vote.user_id for vote in proposal.votes
@@ -259,6 +259,9 @@ def lan_games_vote() -> Union[str, Response]:
             proposals = [
                 proposal for proposal in proposals if filter_func(proposal)
             ]
+
+    for proposal in proposals:
+        proposal.is_essential = len(proposal.votes) == lan_participants_count
 
     proposals.sort(key=lambda p: p.score, reverse=True)
 
