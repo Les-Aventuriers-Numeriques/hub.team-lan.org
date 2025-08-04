@@ -34,7 +34,7 @@ def generate_authorize_url() -> str:
 
     discord_qs = urlencode({
         'client_id': app.config['DISCORD_CLIENT_ID'],
-        'redirect_uri': url_for('login_callback', _external=True),
+        'redirect_uri': url_for('login_callback', _external=True, _scheme=app.config['PREFERRED_URL_SCHEME']),
         'response_type': 'code',
         'scope': ' '.join(SCOPES),
         'state': session['oauth2_state'],
@@ -51,7 +51,7 @@ def get_oauth_token(code: str) -> Response:
             'client_secret': app.config['DISCORD_CLIENT_SECRET'],
             'code': code,
             'grant_type': 'authorization_code',
-            'redirect_uri': url_for('login_callback', _external=True),
+            'redirect_uri': url_for('login_callback', _external=True, _scheme=app.config['PREFERRED_URL_SCHEME']),
         }
     )
 

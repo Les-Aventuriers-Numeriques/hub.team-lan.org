@@ -43,6 +43,10 @@ body > main .games > .essential img {
     animation: pulsate 3s linear infinite !important;
 }
 
+body > main .games > .essential .vote-yes {
+    color: #f5ea22;
+}
+
 /************************************************************************
  * Sous-en-tête */
 
