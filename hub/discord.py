@@ -1,4 +1,4 @@
-from flask_discord_interactions import Message, Embed, ActionRow, ButtonStyles, Button
+from flask_discord_interactions import Message, Embed, ActionRow, ButtonStyles, Button, Context, Autocomplete, Option
 from hub.models import User, Game, VoteType, LanGameProposal, LanGameProposalVote
 from hub.pubg import MAPS_NAMES, GAME_MODES_NAMES, MATCH_TYPES_NAMES
 from flask_discord_interactions.models.embed import Media, Field
@@ -70,7 +70,7 @@ def can_send_messages() -> bool:
 
 
 @discord_interactions.custom_handler('top')
-def _handle_top_button(ctx):
+def _handle_top_button(ctx: Context) -> Message:
     if g.lan_games_status == 'disabled':
         return Message(
             'On ne choisis pas encore les jeux pour la LAN !',
@@ -132,7 +132,7 @@ def _handle_top_button(ctx):
 
 
 @discord_interactions.custom_handler('vote')
-def _handle_vote_button(ctx, game_id: int, vote_type: Literal['YES', 'NEUTRAL', 'NO']):
+def _handle_vote_button(ctx: Context, game_id: int, vote_type: Literal['YES', 'NEUTRAL', 'NO']) -> Message:
     user = db.session.get(User, ctx.author.id)
 
     if not user:
@@ -165,6 +165,22 @@ def _handle_vote_button(ctx, game_id: int, vote_type: Literal['YES', 'NEUTRAL', 
         message,
         ephemeral=True
     )
+
+
+@discord_interactions.command(
+    'soumettre',
+    'Soumet une proposition de jeu pour notre LAN',
+    annotations={
+        'jeu': 'Le jeu que tu souhaites soumettre',
+    }
+)
+def submit_game_proposal_command(ctx: Context, jeu: Autocomplete(str)) -> Message:
+    return Message()
+
+
+@submit_game_proposal_command.autocomplete()
+def more_autocomplete_handler(ctx: Context, jeu: Option = None):
+    pass
 
 
 def send_proposal_message(user: User, game: Game) -> None:

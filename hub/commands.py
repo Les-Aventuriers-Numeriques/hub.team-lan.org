@@ -1,9 +1,9 @@
 from hub.pubg import PUBGApiClient, MATCH_TYPES_NAMES
+from app import app, db, cache, discord_interactions
 from hub.discord import send_chicken_dinner_message
 from datetime import datetime, timezone, timedelta
 from sqlalchemy.dialects import postgresql
 from typing import Dict, Optional
-from app import app, db, cache
 from hub.models import Game
 from rich import print_json
 import sqlalchemy as sa
@@ -21,6 +21,16 @@ def cc() -> None:
     click.echo('Suppression du cache')
 
     cache.clear()
+
+    click.secho('Effectué', fg='green')
+
+
+@app.cli.command()
+def update_discord_commands() -> None:
+    """Met à jour les commandes Discord."""
+    click.echo('Mise à jour des commandes Discord...')
+
+    discord_interactions.update_commands(guild_id=app.config['DISCORD_GUILD_ID'])
 
     click.secho('Effectué', fg='green')
 
