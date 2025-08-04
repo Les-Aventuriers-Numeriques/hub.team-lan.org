@@ -120,7 +120,7 @@ def update_games() -> None:
         str(game_type) for game_type in [
             igdb.GameType.MainGame,
             igdb.GameType.Mod,
-            gdb.GameType.Remake,
+            igdb.GameType.Remake,
             igdb.GameType.Remaster,
         ]
     ])
@@ -145,7 +145,7 @@ def update_games() -> None:
 
     platforms = ', '.join([
         str(platform) for platform in [
-            gdb.Platform.Linux,
+            igdb.Platform.Linux,
             igdb.Platform.Windows,
             igdb.Platform.OculusVr,
             igdb.Platform.SteamVr,
