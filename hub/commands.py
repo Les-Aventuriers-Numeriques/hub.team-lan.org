@@ -112,13 +112,53 @@ def update_games() -> None:
 
         return game['cover']['image_id']
 
+    forced_game_ids = ', '.join([
+        str(game_id) for game_id in app.config['IGDB_API_FORCED_GAMES']
+    ])
+
+    game_types = ', '.join([
+        str(game_type) for game_type in [
+            igdb.GameType.MainGame,
+            igdb.GameType.Mod,
+            gdb.GameType.Remake,
+            igdb.GameType.Remaster,
+        ]
+    ])
+
+    game_statuses = ', '.join([
+        str(game_status) for game_status in [
+            igdb.GameStatus.Released,
+            igdb.GameStatus.Beta,
+            igdb.GameStatus.EarlyAccess,
+        ]
+    ])
+
+    game_modes = ', '.join([
+        str(game_mode) for game_mode in [
+            igdb.GameMode.Multiplayer,
+            igdb.GameMode.CoOperative,
+            igdb.GameMode.SplitScreen,
+            igdb.GameMode.Mmo,
+            igdb.GameMode.BattleRoyale,
+        ]
+    ])
+
+    platforms = ', '.join([
+        str(platform) for platform in [
+            gdb.Platform.Linux,
+            igdb.Platform.Windows,
+            igdb.Platform.OculusVr,
+            igdb.Platform.SteamVr,
+        ]
+    ])
+
     while True:
         click.echo(f'  Téléchargement du paquet {offset} - {offset + limit}...')
 
         raw_games = client.call(
             'games',
             fields='id, name, websites.type, websites.url, cover.image_id',
-            where=f'game_type = ({igdb.GameType.MainGame}, {igdb.GameType.Mod}, {igdb.GameType.Remake}, {igdb.GameType.Remaster}) & (game_status = ({igdb.GameStatus.Released}, {igdb.GameStatus.Beta}, {igdb.GameStatus.EarlyAccess}) | game_status = null) & game_modes = ({igdb.GameMode.Multiplayer}, {igdb.GameMode.CoOperative}, {igdb.GameMode.SplitScreen}, {igdb.GameMode.Mmo}, {igdb.GameMode.BattleRoyale}) & platforms = ({igdb.Platform.Linux}, {igdb.Platform.Windows}, {igdb.Platform.OculusVr}, {igdb.Platform.SteamVr})',
+            where=f'id = ({forced_game_ids}) | (game_type = ({game_types}) & (game_status = ({game_statuses}) | game_status = null) & game_modes = ({game_modes}) & platforms = ({platforms}))',
             offset=offset,
             limit=limit,
         )

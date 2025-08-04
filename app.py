@@ -95,6 +95,10 @@ app.config.update(
     TOP_LAN_GAME_PROPOSALS=12,
 
     DISCORD_INTERACTIONS_PATH='/discord-interactions',
+   
+    IGDB_API_FORCED_GAMES=[
+        3102, # Kerbal Space Program
+    ],
 )
 
 # -----------------------------------------------------------
