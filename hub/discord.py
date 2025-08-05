@@ -172,7 +172,7 @@ def _handle_vote_button(ctx: Context, game_id: int, vote_type: Literal['YES', 'N
 
 @discord_interactions.command(
     'proposer',
-    'Permet de proposer un jeu pour notre LAN.',
+    'Permet de proposer un jeu pour notre LAN annuelle.',
     annotations={
         'jeu': 'Le jeu que tu souhaites proposer (les jeux déjà proposés sont exclus)',
     }
@@ -227,7 +227,7 @@ def submit_game_proposal_command(ctx: Context, jeu: Autocomplete(int)) -> Messag
 
 @submit_game_proposal_command.autocomplete()
 def more_autocomplete_handler(ctx: Context, jeu: Option = None) -> List[Dict]:
-    if jeu or not jeu.focused or not jeu.value:
+    if not jeu or not jeu.focused or not jeu.value:
         return []
 
     games = db.session.execute(
