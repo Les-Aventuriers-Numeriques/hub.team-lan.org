@@ -1,8 +1,10 @@
-from flask_discord_interactions import Message, Embed, ActionRow, ButtonStyles, Button
+from flask_discord_interactions import Message, Embed, ActionRow, ButtonStyles, Button, Context, Autocomplete, Option
 from hub.models import User, Game, VoteType, LanGameProposal, LanGameProposalVote
 from hub.pubg import MAPS_NAMES, GAME_MODES_NAMES, MATCH_TYPES_NAMES
 from flask_discord_interactions.models.embed import Media, Field
+from sqlalchemy_searchable import search, inspect_search_vectors
 from app import app, db, discord_interactions
+from sqlalchemy.dialects import postgresql
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import func as sa_func
 from typing import Dict, Literal, List
@@ -70,7 +72,7 @@ def can_send_messages() -> bool:
 
 
 @discord_interactions.custom_handler('top')
-def _handle_top_button(ctx):
+def _handle_top_button(ctx: Context) -> Message:
     if g.lan_games_status == 'disabled':
         return Message(
             'On ne choisis pas encore les jeux pour la LAN !',
@@ -132,7 +134,7 @@ def _handle_top_button(ctx):
 
 
 @discord_interactions.custom_handler('vote')
-def _handle_vote_button(ctx, game_id: int, vote_type: Literal['YES', 'NEUTRAL', 'NO']):
+def _handle_vote_button(ctx: Context, game_id: int, vote_type: Literal['YES', 'NEUTRAL', 'NO']) -> Message:
     user = db.session.get(User, ctx.author.id)
 
     if not user:
@@ -141,30 +143,113 @@ def _handle_vote_button(ctx, game_id: int, vote_type: Literal['YES', 'NEUTRAL', 
             url_for('lan_games_vote', _external=True),
         )
     elif user.must_relogin:
-        message = f'Merci de te reconnecter sur notre intranet puis réessaye : {url_for('login', _external=True)} (tu ne devras effectuer cette action qu\'une fois).'
+        message = 'Merci de te reconnecter sur notre intranet puis réessaye : {} (tu ne devras effectuer cette action qu\'une fois).'.format(
+            url_for('login', _external=True)
+        )
     elif not user.is_lan_participant:
         message = 'Désolé, tu ne fais pas partie des participants à la LAN.'
+    elif g.lan_games_status == 'disabled':
+        message = 'On ne choisis pas encore les jeux pour la LAN, revient plus tard !'
+    elif g.lan_games_status == 'read_only':
+        message = 'Trop tard, la date de la LAN approche, les propositions et votes sont figés !'
     else:
-        if g.lan_games_status == 'disabled':
-            message = 'On ne choisis pas encore les jeux pour la LAN, revient plus tard !'
-        elif g.lan_games_status == 'read_only':
-            message = 'Trop tard, la date de la LAN approche, les propositions et votes sont figés !'
-        else:
-            try:
-                LanGameProposalVote.vote(user, game_id, VoteType(vote_type))
+        try:
+            LanGameProposalVote.vote(user, game_id, VoteType(vote_type))
 
-                db.session.commit()
+            db.session.commit()
 
-                message = 'A voté !'
-            except ValueError:
-                message = 'Type de vote invalide.'
-            except IntegrityError:
-                message = 'Identifiant de jeu invalide.'
+            message = 'A voté !'
+        except ValueError:
+            message = 'Type de vote invalide.'
+        except IntegrityError:
+            message = 'Identifiant de jeu invalide.'
 
     return Message(
         message,
         ephemeral=True
     )
+
+
+@discord_interactions.command(
+    'proposer',
+    'Propose un jeu pour notre LAN annuelle.',
+    annotations={
+        'jeu': 'Le jeu que tu souhaites proposer (les jeux déjà proposés sont exclus)',
+    }
+)
+def submit_game_proposal_command(ctx: Context, jeu: Autocomplete(int)) -> Message:
+    user = db.session.get(User, ctx.author.id)
+
+    if not user:
+        message = 'Tu n\'a pas encore de compte sur notre intranet. Crée-le ici {} et rééssaye. Tu peux également proposer ici {}.'.format(
+            url_for('login', _external=True),
+            url_for('lan_games_proposal', _external=True),
+        )
+    elif user.must_relogin:
+        message = 'Merci de te reconnecter sur notre intranet puis réessaye : {} (tu ne devras effectuer cette action qu\'une fois).'.format(
+            url_for('login', _external=True)
+        )
+    elif not user.is_lan_participant:
+        message = 'Désolé, tu ne fais pas partie des participants à la LAN.'
+    elif g.lan_games_status == 'disabled':
+        message = 'On ne choisis pas encore les jeux pour la LAN, revient plus tard !'
+    elif g.lan_games_status == 'read_only':
+        message = 'Trop tard, la date de la LAN approche, les propositions et votes sont figés !'
+    else:
+        try:
+            proposal = LanGameProposal()
+            proposal.game_id = jeu
+            proposal.user_id = user.id
+
+            db.session.add(proposal)
+
+            LanGameProposalVote.vote(user, jeu, VoteType.YES)
+
+            db.session.commit()
+
+            if can_send_messages():
+                send_proposal_message(
+                    user,
+                    db.session.get(Game, jeu)
+                )
+
+            message = 'Merci pour ta proposition !'
+        except IntegrityError:
+            message = 'Ce jeu a déjà été proposé (ou identifiant de jeu invalide).'
+
+    return Message(
+        message,
+        ephemeral=True
+    )
+
+
+@submit_game_proposal_command.autocomplete()
+def more_autocomplete_handler(ctx: Context, jeu: Option = None) -> List[Dict]:
+    if not jeu or not jeu.focused or not jeu.value:
+        return []
+
+    games = db.session.execute(
+        search(
+            sa.select(Game.id, Game.name)
+            .outerjoin(LanGameProposal)
+            .filter(LanGameProposal.game_id == None)
+            .limit(25)
+            .order_by(
+                sa.desc(
+                    sa.func.ts_rank_cd(inspect_search_vectors(Game)[0], sa.func.parse_websearch(jeu.value), 2)
+                )
+            ),
+            jeu.value,
+            regconfig=sa.cast('english_nostop', postgresql.REGCONFIG)
+        )
+    ).all()
+
+    return [
+        {
+            'value': game.id,
+            'name': game.name
+        } for game in games
+    ]
 
 
 def send_proposal_message(user: User, game: Game) -> None:
