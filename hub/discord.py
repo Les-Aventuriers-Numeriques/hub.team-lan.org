@@ -2,7 +2,9 @@ from flask_discord_interactions import Message, Embed, ActionRow, ButtonStyles, 
 from hub.models import User, Game, VoteType, LanGameProposal, LanGameProposalVote
 from hub.pubg import MAPS_NAMES, GAME_MODES_NAMES, MATCH_TYPES_NAMES
 from flask_discord_interactions.models.embed import Media, Field
+from sqlalchemy_searchable import search, inspect_search_vectors
 from app import app, db, discord_interactions
+from sqlalchemy.dialects import postgresql
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import func as sa_func
 from typing import Dict, Literal, List
@@ -169,18 +171,43 @@ def _handle_vote_button(ctx: Context, game_id: int, vote_type: Literal['YES', 'N
 
 @discord_interactions.command(
     'soumettre',
-    'Soumet une proposition de jeu pour notre LAN',
+    'Soumet une proposition de jeu pour notre LAN.',
     annotations={
-        'jeu': 'Le jeu que tu souhaites soumettre',
+        'jeu': 'Le jeu que tu souhaites soumettre (les jeux déjà soumis ne sont pas retourné lors de la recherche)',
     }
 )
-def submit_game_proposal_command(ctx: Context, jeu: Autocomplete(str)) -> Message:
+def submit_game_proposal_command(ctx: Context, jeu: Autocomplete(int)) -> Message:
     return Message()
 
 
 @submit_game_proposal_command.autocomplete()
-def more_autocomplete_handler(ctx: Context, jeu: Option = None):
-    pass
+def more_autocomplete_handler(ctx: Context, jeu: Option = None) -> List[Dict]:
+    if not jeu.focused or not jeu.value:
+        return []
+
+    # FIXME Exclure jeux déjà proposés (tester)
+    games = db.session.execute(
+        search(
+            sa.select(Game.id, Game.name)
+            .outerjoin(LanGameProposal)
+            .filter(LanGameProposal.id == None)
+            .limit(25)
+            .order_by(
+                sa.desc(
+                    sa.func.ts_rank_cd(inspect_search_vectors(Game)[0], sa.func.parse_websearch(jeu.value), 2)
+                )
+            ),
+            jeu.value,
+            regconfig=sa.cast('english_nostop', postgresql.REGCONFIG)
+        )
+    ).scalars().all()
+
+    return [
+        {
+            'value': game.id,
+            'name': game.name
+        } for game in games
+    ]
 
 
 def send_proposal_message(user: User, game: Game) -> None:
