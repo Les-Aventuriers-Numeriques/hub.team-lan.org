@@ -227,7 +227,7 @@ def submit_game_proposal_command(ctx: Context, jeu: Autocomplete(int)) -> Messag
 
 @submit_game_proposal_command.autocomplete()
 def more_autocomplete_handler(ctx: Context, jeu: Option = None) -> List[Dict]:
-    if not jeu.focused or not jeu.value:
+    if jeu or not jeu.focused or not jeu.value:
         return []
 
     games = db.session.execute(
