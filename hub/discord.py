@@ -143,25 +143,26 @@ def _handle_vote_button(ctx: Context, game_id: int, vote_type: Literal['YES', 'N
             url_for('lan_games_vote', _external=True),
         )
     elif user.must_relogin:
-        message = f'Merci de te reconnecter sur notre intranet puis réessaye : {url_for('login', _external=True)} (tu ne devras effectuer cette action qu\'une fois).'
+        message = 'Merci de te reconnecter sur notre intranet puis réessaye : {} (tu ne devras effectuer cette action qu\'une fois).'.format(
+            url_for('login', _external=True)
+        )
     elif not user.is_lan_participant:
         message = 'Désolé, tu ne fais pas partie des participants à la LAN.'
+    elif g.lan_games_status == 'disabled':
+        message = 'On ne choisis pas encore les jeux pour la LAN, revient plus tard !'
+    elif g.lan_games_status == 'read_only':
+        message = 'Trop tard, la date de la LAN approche, les propositions et votes sont figés !'
     else:
-        if g.lan_games_status == 'disabled':
-            message = 'On ne choisis pas encore les jeux pour la LAN, revient plus tard !'
-        elif g.lan_games_status == 'read_only':
-            message = 'Trop tard, la date de la LAN approche, les propositions et votes sont figés !'
-        else:
-            try:
-                LanGameProposalVote.vote(user, game_id, VoteType(vote_type))
+        try:
+            LanGameProposalVote.vote(user, game_id, VoteType(vote_type))
 
-                db.session.commit()
+            db.session.commit()
 
-                message = 'A voté !'
-            except ValueError:
-                message = 'Type de vote invalide.'
-            except IntegrityError:
-                message = 'Identifiant de jeu invalide.'
+            message = 'A voté !'
+        except ValueError:
+            message = 'Type de vote invalide.'
+        except IntegrityError:
+            message = 'Identifiant de jeu invalide.'
 
     return Message(
         message,
@@ -170,14 +171,58 @@ def _handle_vote_button(ctx: Context, game_id: int, vote_type: Literal['YES', 'N
 
 
 @discord_interactions.command(
-    'soumettre',
-    'Soumet une proposition de jeu pour notre LAN.',
+    'proposer',
+    'Permet de proposer un jeu pour notre LAN.',
     annotations={
-        'jeu': 'Le jeu que tu souhaites soumettre (les jeux déjà soumis ne sont pas retourné lors de la recherche)',
+        'jeu': 'Le jeu que tu souhaites proposer (les jeux déjà proposés sont exclus)',
     }
 )
 def submit_game_proposal_command(ctx: Context, jeu: Autocomplete(int)) -> Message:
-    return Message()
+    user = db.session.get(User, ctx.author.id)
+
+    if not user:
+        message = 'Tu n\'a pas encore de compte sur notre intranet. Crée-le ici {} et rééssaye. Tu peux également proposer ici {}.'.format(
+            url_for('login', _external=True),
+            url_for('lan_games_proposal', _external=True),
+        )
+    elif user.must_relogin:
+        message = 'Merci de te reconnecter sur notre intranet puis réessaye : {} (tu ne devras effectuer cette action qu\'une fois).'.format(
+            url_for('login', _external=True)
+        )
+    elif not user.is_lan_participant:
+        message = 'Désolé, tu ne fais pas partie des participants à la LAN.'
+    elif g.lan_games_status == 'disabled':
+        message = 'On ne choisis pas encore les jeux pour la LAN, revient plus tard !'
+    elif g.lan_games_status == 'read_only':
+        message = 'Trop tard, la date de la LAN approche, les propositions et votes sont figés !'
+    else:
+        try:
+            proposal = LanGameProposal()
+            proposal.game_id = jeu
+            proposal.user_id = user.id
+
+            db.session.add(proposal)
+
+            LanGameProposalVote.vote(user, jeu, VoteType.YES)
+
+            db.session.commit()
+
+            if can_send_messages():
+                send_proposal_message(
+                    user,
+                    db.get_or_404(Game, jeu)
+                )
+
+            message = 'Merci pour ta proposition !'
+        except IntegrityError:
+            message = 'Ce jeu a déjà été proposé (ou identifiant de jeu invalide).'
+        except NotFound:
+            message = 'Identifiant de jeu invalide.'
+
+    return Message(
+        message,
+        ephemeral=True
+    )
 
 
 @submit_game_proposal_command.autocomplete()
@@ -185,7 +230,6 @@ def more_autocomplete_handler(ctx: Context, jeu: Option = None) -> List[Dict]:
     if not jeu.focused or not jeu.value:
         return []
 
-    # FIXME Exclure jeux déjà proposés (tester)
     games = db.session.execute(
         search(
             sa.select(Game.id, Game.name)

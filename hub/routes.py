@@ -357,6 +357,8 @@ def lan_games_proposal_submit(game_id: int) -> Response:
             )
 
         anchor = f'g={game_id}'
+
+        flash('Merci pour ta proposition !', 'success')
     except IntegrityError:
         flash('Ce jeu a déjà été proposé (ou identifiant de jeu invalide).', 'error')
     except NotFound:
