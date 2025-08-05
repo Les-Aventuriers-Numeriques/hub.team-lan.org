@@ -172,7 +172,7 @@ def _handle_vote_button(ctx: Context, game_id: int, vote_type: Literal['YES', 'N
 
 @discord_interactions.command(
     'proposer',
-    'Permet de proposer un jeu pour notre LAN annuelle.',
+    'Propose un jeu pour notre LAN annuelle.',
     annotations={
         'jeu': 'Le jeu que tu souhaites proposer (les jeux déjà proposés sont exclus)',
     }
@@ -210,14 +210,12 @@ def submit_game_proposal_command(ctx: Context, jeu: Autocomplete(int)) -> Messag
             if can_send_messages():
                 send_proposal_message(
                     user,
-                    db.get_or_404(Game, jeu)
+                    db.session.get(Game, jeu)
                 )
 
             message = 'Merci pour ta proposition !'
         except IntegrityError:
             message = 'Ce jeu a déjà été proposé (ou identifiant de jeu invalide).'
-        except NotFound:
-            message = 'Identifiant de jeu invalide.'
 
     return Message(
         message,
@@ -234,7 +232,7 @@ def more_autocomplete_handler(ctx: Context, jeu: Option = None) -> List[Dict]:
         search(
             sa.select(Game.id, Game.name)
             .outerjoin(LanGameProposal)
-            .filter(LanGameProposal.id == None)
+            .filter(LanGameProposal.game_id == None)
             .limit(25)
             .order_by(
                 sa.desc(
@@ -244,7 +242,7 @@ def more_autocomplete_handler(ctx: Context, jeu: Option = None) -> List[Dict]:
             jeu.value,
             regconfig=sa.cast('english_nostop', postgresql.REGCONFIG)
         )
-    ).scalars().all()
+    ).all()
 
     return [
         {

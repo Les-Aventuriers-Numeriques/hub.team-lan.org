@@ -5,7 +5,6 @@ from flask_login import login_required, current_user, logout_user, login_user
 from sqlalchemy_searchable import search, inspect_search_vectors
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.exc import IntegrityError
-from werkzeug.exceptions import NotFound
 from sqlalchemy import func as sa_func
 from werkzeug import Response
 from functools import wraps
@@ -353,7 +352,7 @@ def lan_games_proposal_submit(game_id: int) -> Response:
         if discord.can_send_messages():
             discord.send_proposal_message(
                 current_user,
-                db.get_or_404(Game, game_id)
+                db.session.get(Game, game_id)
             )
 
         anchor = f'g={game_id}'
@@ -361,8 +360,6 @@ def lan_games_proposal_submit(game_id: int) -> Response:
         flash('Merci pour ta proposition !', 'success')
     except IntegrityError:
         flash('Ce jeu a déjà été proposé (ou identifiant de jeu invalide).', 'error')
-    except NotFound:
-        flash('Identifiant de jeu invalide.', 'error')
 
     return redirect(url_for('lan_games_proposal', **request.args, _anchor=anchor))
 
