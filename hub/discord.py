@@ -1,7 +1,7 @@
 from flask_discord_interactions import Message, Embed, ActionRow, ButtonStyles, Button, Context, Autocomplete, Option
 from hub.models import User, Game, VoteType, LanGameProposal, LanGameProposalVote
+from flask_discord_interactions.models.embed import Media, Field, Footer
 from hub.pubg import MAPS_NAMES, GAME_MODES_NAMES, MATCH_TYPES_NAMES
-from flask_discord_interactions.models.embed import Media, Field
 from sqlalchemy_searchable import search, inspect_search_vectors
 from app import app, db, discord_interactions
 from sqlalchemy.dialects import postgresql
@@ -224,7 +224,7 @@ def submit_game_proposal_command(ctx: Context, jeu: Autocomplete(int)) -> Messag
 
 
 @submit_game_proposal_command.autocomplete()
-def more_autocomplete_handler(ctx: Context, jeu: Option = None) -> List[Dict]:
+def submit_game_proposal_command_autocomplete(ctx: Context, jeu: Option = None) -> List[Dict]:
     if not jeu or not jeu.focused or not jeu.value:
         return []
 
@@ -282,7 +282,8 @@ def send_proposal_message(user: User, game: Game) -> None:
             title=game.name,
             color=EMBEDS_COLOR,
             url=game.url,
-            image=Media(game.image_url)
+            image=Media(game.image_url),
+            footer=Footer('👤 Un seul détenteur suffit pour que tout le monde puisse y jouer !') if game.single_owner_enough else None
         ),
         components=[
             ActionRow(

@@ -30,7 +30,7 @@
                 <article id="g={{ proposal.game.id }}" class="{{ 'essential' if proposal.is_essential }}">
                     {{ game_cover(proposal.game, proposal.game.name + ' [proposé par ' + (proposal.user.display_name if proposal.user_id != current_user.id else 'toi') + ']') }}
 
-                    <div>
+                    <div class="votes">
                         {% for vote_type in VoteType %}
                             {{ vote(vote_type, proposal, my_vote) }}
                         {% endfor %}

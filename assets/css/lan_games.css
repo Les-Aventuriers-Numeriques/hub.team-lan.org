@@ -11,7 +11,7 @@ body > main .games {
     row-gap: var(--pico-grid-row-gap);
 }
 
-body > main .games > * {
+body > main .games > article {
     --pico-grid-row-gap: 0.5rem;
 
     min-width: 0;
@@ -24,7 +24,32 @@ body > main .games > * {
     margin-bottom: 0;
 }
 
-body > main .games > *:target {
+body > main .games > article > .cover {
+    position: relative;
+}
+
+body > main .games > article > .cover > a {
+    position: initial;
+}
+
+body > main .games > article > .cover > span {
+    position: absolute;
+    right: 0.3rem;
+    bottom: 0.3rem;
+    z-index: 2;
+    color: rgb(51, 210, 163);
+    border-bottom: none;
+}
+
+body > main .games > article > .cover > svg {
+    position: absolute;
+    right: 0.35rem;
+    bottom: 0.25rem;
+    z-index: 1;
+    color: rgb(0, 0, 0);
+}
+
+body > main .games > article:target {
     border-width: var(--pico-border-width);
     border-style: solid;
     border-color: var(--pico-primary-border);

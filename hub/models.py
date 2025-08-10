@@ -64,6 +64,7 @@ class Game(db.Model):
     search_vector = mapped_column(TSVectorType('name', regconfig='english_nostop'))
     url = mapped_column(sa.String(255))
     image_id = mapped_column(sa.String(25))
+    single_owner_enough = mapped_column(sa.Boolean, nullable=False, default=False, server_default=sa.text('false'))
 
     proposal = relationship('LanGameProposal', uselist=False, back_populates='game')
 
