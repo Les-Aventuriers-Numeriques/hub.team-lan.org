@@ -28,6 +28,10 @@ body > main .games > article > .cover {
     position: relative;
 }
 
+body > main .games > article > .cover > a {
+    position: initial;
+}
+
 body > main .games > article > .cover > span {
     position: absolute;
     right: 0.3rem;

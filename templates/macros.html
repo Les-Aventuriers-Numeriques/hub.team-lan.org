@@ -22,7 +22,7 @@
             </a>
         {% endif %}
 
-        <span{% if proposal.votes_count(vote_type) %} data-tooltip="{{ proposal.votes_by_type(vote_type)|join(', ', attribute='user.display_name') }}" data-placement="bottom"{% endif %} class="vote-{{ vote_type.value|lower }}">{{ proposal.votes_count(vote_type) }} ({{ proposal.votes_percentage(vote_type)|percentformat }})</span>
+        <span{% if proposal.votes_count(vote_type) %} data-tooltip="{{ proposal.votes_by_type(vote_type)|join(', ', attribute='user.display_name') }}" data-placement="bottom"{% endif %}>{{ proposal.votes_count(vote_type) }} ({{ proposal.votes_percentage(vote_type)|percentformat }})</span>
     </div>
 {%- endmacro %}
 
@@ -51,7 +51,7 @@
 {%- endmacro %}
 
 {% macro game_cover(game, tooltip) -%}
-    <div class="cover" >
+    <div class="cover">
         {% if game.single_owner_enough %}
             <span data-tooltip="Un seul détenteur suffit pour que tout le monde puisse y jouer !">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-person-check" viewBox="0 0 16 16">

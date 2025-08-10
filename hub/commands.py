@@ -123,7 +123,38 @@ def update_games() -> None:
         return game['cover']['image_id']
 
     def get_single_owner_enough(game: Dict) -> bool:
-        return False
+        if 'multiplayer_modes' not in game or not game['multiplayer_modes']:
+            return False
+
+        multiplayer_modes = {
+            multiplayer_mode.get('platform'): multiplayer_mode for multiplayer_mode in game['multiplayer_modes']
+        }
+
+        priorities = [
+            None, # Oui.
+            igdb.Platform.Windows,
+            igdb.Platform.Linux,
+            igdb.Platform.OculusVr,
+            igdb.Platform.SteamVr,
+        ]
+
+        multiplayer_mode = None
+
+        for priority in priorities:
+            multiplayer_mode = multiplayer_modes.get(priority)
+
+            if multiplayer_mode:
+                break
+
+        if not multiplayer_mode:
+            return False
+
+        offlinecoop = multiplayer_mode.get('offlinecoop', False)
+        offlinecoopmax = multiplayer_mode.get('offlinecoopmax', 0)
+        offlinemax = multiplayer_mode.get('offlinemax', 0)
+        splitscreen = multiplayer_mode.get('splitscreen', False)
+
+        return offlinecoop or offlinecoopmax > 0 or offlinemax > 0 or splitscreen
 
     forced_game_ids = ', '.join([
         str(game_id) for game_id in app.config['IGDB_API_FORCED_GAMES']
@@ -170,7 +201,7 @@ def update_games() -> None:
 
         raw_games = client.call(
             'games',
-            fields='id, name, websites.type, websites.url, cover.image_id',
+            fields='id, name, websites.type, websites.url, cover.image_id, multiplayer_modes.*',
             where=f'id = ({forced_game_ids}) | (game_type = ({game_types}) & (game_status = ({game_statuses}) | game_status = null) & game_modes = ({game_modes}) & platforms = ({platforms}))',
             offset=offset,
             limit=limit,
@@ -203,6 +234,7 @@ def update_games() -> None:
                 Game.name: query.excluded.name,
                 Game.url: query.excluded.url,
                 Game.image_id: query.excluded.image_id,
+                Game.single_owner_enough: query.excluded.single_owner_enough,
             }
         ))
 
