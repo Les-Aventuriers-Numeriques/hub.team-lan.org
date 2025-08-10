@@ -122,6 +122,9 @@ def update_games() -> None:
 
         return game['cover']['image_id']
 
+    def get_single_owner_enough(game: Dict) -> bool:
+        return False
+
     forced_game_ids = ', '.join([
         str(game_id) for game_id in app.config['IGDB_API_FORCED_GAMES']
     ])
@@ -182,6 +185,7 @@ def update_games() -> None:
                 'name': game['name'],
                 'url': get_url(game),
                 'image_id': get_image_id(game),
+                'single_owner_enough': get_single_owner_enough(game),
             } for game in raw_games
         ]
 
