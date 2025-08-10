@@ -283,7 +283,7 @@ def send_proposal_message(user: User, game: Game) -> None:
             color=EMBEDS_COLOR,
             url=game.url,
             image=Media(game.image_url),
-            footer=Footer('👤 Un seul détenteur suffit pour que tout le monde puisse y jouer !') if game.single_owner_enough else None
+            footer=Footer('👤 Un seul détenteur suffit potentiellement !') if game.single_owner_enough else None
         ),
         components=[
             ActionRow(
