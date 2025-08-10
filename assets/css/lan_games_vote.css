@@ -4,7 +4,7 @@
 /************************************************************************
  * Liste des jeux */
 
-body > main .games > * > div {
+body > main .games > article > .votes {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-auto-flow: column;
@@ -13,7 +13,7 @@ body > main .games > * > div {
     line-height: initial;
 }
 
-body > main .games > * > div > div {
+body > main .games > article > .votes > div {
     display: flex;
     flex-direction: column;
     column-gap: var(--pico-grid-column-gap);
@@ -22,29 +22,25 @@ body > main .games > * > div > div {
     align-items: center;
 }
 
-body > main .games > * > div > div .my-vote {
+body > main .games > article > .votes > div .my-vote {
     color: var(--pico-primary);
 }
 
-body > main .games > * > div > div > span {
+body > main .games > article > .votes > div > span {
     color: var(--pico-muted-color);
     font-size: 0.7em;
     white-space: nowrap;
 }
 
 @keyframes pulsate {
-    0%   { box-shadow: 0 0 5px 1px #f5ea22; }
-    50%  { box-shadow: 0 0 20px 1px #f5ea22; }
-    100% { box-shadow: 0 0 5px 1px #f5ea22; }
+    0%   { box-shadow: 0 0 5px 1px var(--pico-color); }
+    50%  { box-shadow: 0 0 20px 1px var(--pico-color); }
+    100% { box-shadow: 0 0 5px 1px var(--pico-color); }
 }
 
-body > main .games > .essential img {
-    border-color: #f5ea22;
+body > main .games > article.essential .cover img {
+    border-color: var(--pico-color);
     animation: pulsate 3s linear infinite !important;
-}
-
-body > main .games > .essential .vote-yes {
-    color: #f5ea22;
 }
 
 /************************************************************************

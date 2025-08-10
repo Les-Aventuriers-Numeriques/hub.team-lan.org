@@ -8,6 +8,6 @@ body > main .games {
     margin-bottom: var(--pico-spacing);
 }
 
-body > main .games > * {
+body > main .games > article {
     flex-direction: row;
 }
