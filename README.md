@@ -40,6 +40,6 @@ Configurer un serveur web / WSGI est hors du périmètre de ce document, toutefo
   - Le "callable" WSGI est `application`
   - N'oubliez pas de définir `FLASK_DEBUG` à `false` (ou de le supprimer carrément, c'est désactivé par défaut)
   - Mappez le répertoire des fichiers statiques `./static` vers `/static`
-  - Mappez les fichiers statiques suivants (ils ne sont pas situés dans le répertoire des fichiers statiques et doivent être trouvés dans la racine de l'URL du site) :
+  - Mappez les fichiers statiques suivants (ils doivent être trouvés dans la racine de l'URL du site) :
     - `./static/favicon.ico` vers `/favicon.ico` pour qu'une belle icône soit affichée dans votre navigateur
     - `./static/robots.txt` vers `/robots.txt` pour que rien ne soit indexé par les moteurs de recherche
