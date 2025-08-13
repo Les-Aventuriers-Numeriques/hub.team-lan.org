@@ -18,9 +18,9 @@ Il s'agit d'une application web propulsée par [Flask](https://flask.palletsproj
 
   - Python >= 3.10 (développé sous 3.12)
   - Un navigateur web moderne
-  - Un [bot Discord](https://discord.com/developers)
+  - Un [bot Discord](https://discord.com/developers) avec les accès qui vont bien
   - Un accès à l'[API IGDB](https://api-docs.igdb.com/#getting-started)
-  - (Production **et** développement) Un serveur PostgreSQL
+  - (Production **et** développement) Un serveur PostgreSQL (via Docker en développement)
   - (Production) Un serveur WSGI
 
 ## Installation
