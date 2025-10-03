@@ -71,7 +71,6 @@ def can_send_messages() -> bool:
     return app.config['DISCORD_LAN_CHANNEL_ID'] and app.config['DISCORD_BOT_TOKEN']
 
 
-@discord_interactions.custom_handler('top')
 def _handle_top(ctx: Context) -> Message:
     if g.lan_games_status == 'disabled':
         return Message(
@@ -131,6 +130,11 @@ def _handle_top(ctx: Context) -> Message:
             )
         ]
     )
+
+
+@discord_interactions.custom_handler('top')
+def _handle_top_button(ctx: Context) -> Message:
+    return _handle_top(ctx)
 
 
 @discord_interactions.custom_handler('vote')
