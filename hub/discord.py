@@ -72,7 +72,7 @@ def can_send_messages() -> bool:
 
 
 @discord_interactions.custom_handler('top')
-def _handle_top_button(ctx: Context) -> Message:
+def _handle_top(ctx: Context) -> Message:
     if g.lan_games_status == 'disabled':
         return Message(
             'On ne choisis pas encore les jeux pour la LAN !',
@@ -252,6 +252,14 @@ def submit_game_proposal_command_autocomplete(ctx: Context, jeu: Option = None) 
     ]
 
 
+@discord_interactions.command(
+    'top',
+    'Affiche le top {TOP_LAN_GAME_PROPOSALS} actuel des jeux proposés.'.format(**app.config)
+)
+def top_command(ctx: Context) -> Message:
+    return _handle_top(ctx)
+
+
 def send_proposal_message(user: User, game: Game) -> None:
     components = [
         Button(
@@ -266,7 +274,7 @@ def send_proposal_message(user: User, game: Game) -> None:
     components.extend([
         Button(
             style=ButtonStyles.SECONDARY,
-            custom_id=_handle_top_button,
+            custom_id=_handle_top,
             label='Voir le top {TOP_LAN_GAME_PROPOSALS}'.format(**app.config),
         ),
         Button(
