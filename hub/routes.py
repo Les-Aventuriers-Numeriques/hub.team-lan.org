@@ -426,7 +426,7 @@ def admin_user_force_relogin(user_id: int) -> Response:
 @to_home_if_not_admin
 def admin_users_lan_participants_force_relogin() -> Response:
     result = db.session.execute(
-        sa.update(User).where(User.is_lan_participant == True).values(must_relogin=True)
+        sa.update(User).where(User.is_lan_participant == True).values(must_relogin=True, is_lan_participant=False)
     )
 
     db.session.commit()
