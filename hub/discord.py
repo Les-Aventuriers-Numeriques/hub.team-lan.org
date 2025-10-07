@@ -278,7 +278,7 @@ def send_proposal_message(user: User, game: Game) -> None:
     components.extend([
         Button(
             style=ButtonStyles.SECONDARY,
-            custom_id=_handle_top,
+            custom_id=_handle_top_button,
             label='Voir le top {TOP_LAN_GAME_PROPOSALS}'.format(**app.config),
         ),
         Button(
