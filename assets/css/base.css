@@ -42,11 +42,6 @@ body > header > div {
     row-gap: var(--pico-grid-row-gap);
 }
 
-body > header > div > a > img {
-    border: var(--pico-border-width) solid var(--pico-muted-border-color);
-    border-radius: var(--pico-border-radius);
-}
-
 body > header > div > div > a {
     font-weight: 700;
     font-size: 2rem;
