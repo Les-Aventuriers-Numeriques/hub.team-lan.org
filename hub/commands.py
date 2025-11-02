@@ -248,7 +248,7 @@ def update_games(delete: bool = False) -> None:
             sa.text(f'DELETE FROM {Game.__tablename__} WHERE id NOT IN ({",".join(all_game_ids)});')
         )
 
-        db.session.commit()
+    db.session.commit()
 
     click.secho('Effectué', fg='green')
 
