@@ -70,7 +70,8 @@ def query_igdb(
 
 
 @app.cli.command()
-def update_games() -> None:
+@click.option('--delete', is_flag=True)
+def update_games(delete: bool = False) -> None:
     """Met à jour la base de données interne des jeux depuis IGDB."""
     click.echo('Mise à jour des jeux depuis IGDB...')
 
@@ -240,13 +241,14 @@ def update_games() -> None:
 
         offset += limit
 
-    click.echo('Suppression des anciens jeux...')
+    if delete:
+        click.echo('Suppression des anciens jeux...')
 
-    db.session.execute(
-        sa.text(f'DELETE FROM {Game.__tablename__} WHERE id NOT IN ({",".join(all_game_ids)});')
-    )
+        db.session.execute(
+            sa.text(f'DELETE FROM {Game.__tablename__} WHERE id NOT IN ({",".join(all_game_ids)});')
+        )
 
-    db.session.commit()
+        db.session.commit()
 
     click.secho('Effectué', fg='green')
 
