@@ -82,8 +82,8 @@ class Website(IntEnum):
 
 
 class IgdbApiErrorResponse(Exception):
-    def __init__(self, code: int, message: str) -> None:
-        super().__init__(f'[{code}] {message}')
+    def __init__(self, code: int, message: str, url: str, body: Optional[str] = None) -> None:
+        super().__init__(f'[{code}] {message}\nURL: {url}\nBody: {body}')
 
 
 class IgdbApiClient:
@@ -123,7 +123,7 @@ class IgdbApiClient:
                 code = error['status']
                 message = error['message']
 
-                raise IgdbApiErrorResponse(code, message) from e
+                raise IgdbApiErrorResponse(code, message, response.url, response.request.body) from e
             else:
                 raise
 
@@ -198,7 +198,7 @@ class IgdbApiClient:
                     code = 0
                     message = error['message']
 
-                raise IgdbApiErrorResponse(code, message) from e
+                raise IgdbApiErrorResponse(code, message, response.url, response.request.body) from e
             else:
                 raise
 

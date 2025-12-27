@@ -70,6 +70,63 @@ def query_igdb(
 
 
 @app.cli.command()
+def games_for_main_site() -> None:
+    """Génère la liste des jeux joués pour le site principal."""
+    games = {
+        'games_being_played': (
+            147187, # Broken Arrow
+            153807, # Call to Arms - Gates of Hell
+            59078, # Door Kickers 2
+            15894, # Hearts of Iron IV
+            83368, # Mindustry
+            18871, # Parkitect
+            3277, # Rust
+            90558, # Satisfactory
+            9495, # Squad
+        ),
+        'previously_played_games': (
+            122809, # 10 Miles To Safety
+            572, # Arma 2
+            1881, # Arma 3
+            55056, # Age of Empires II
+            127910, # Blitzkrieg Mod
+            17432, # Call to Arms
+            654, # Company of Heroes
+            1369, # Company of Heroes 2
+            124954, # Crusader Kings III
+            358615, # Delta Force
+            3099, # Door Kickers
+            32365, # Hell Let Loose
+            2949, # Killing Floor
+            6748, # Killing Floor 2
+            # TODO LA Mod
+            121, # Minecraft
+            5572, # Men of War: Assault Squad 2
+            1338, # Prison Architect
+            27789, # PUBG
+            79694, # Project Reality: Battlefield 2
+            11198, # Rocket League
+            11584, # RUNNING WITH RIFLES
+            35073, # Thunder Tier One
+            2165, # War Thunder
+            20910, # World War Z
+        )
+    }
+
+    for section_name, game_ids in games.items():
+        click.echo(f'\'{section_name}\': [')
+
+        games = db.session.execute(
+            sa.select(Game).where(Game.id.in_(game_ids))
+        ).scalars().all()
+
+        for game in games:
+            click.echo(f'    (\'{game.name}\', \'{game.url}\', \'{game.image_url}\'),')
+
+        click.echo('],')
+
+
+@app.cli.command()
 @click.option('--delete', is_flag=True)
 def update_games(delete: bool = False) -> None:
     """Met à jour la base de données interne des jeux depuis IGDB."""

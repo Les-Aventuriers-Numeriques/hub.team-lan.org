@@ -75,6 +75,13 @@ class Game(db.Model):
 
         return f'https://images.igdb.com/igdb/image/upload/t_cover_big/{self.image_id}.png'
 
+    @property
+    def image_url_small(self) -> str:
+        if not self.image_id:
+            return f'https://placehold.co/90x128/1b212c/8891a4.png?text={quote_plus(self.name)}'
+
+        return f'https://images.igdb.com/igdb/image/upload/t_cover_small/{self.image_id}.png'
+
     def __repr__(self) -> str:
         return f'Game:{self.id}'
 
