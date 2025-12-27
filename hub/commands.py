@@ -94,7 +94,7 @@ def games_for_main_site() -> None:
             654, # Company of Heroes
             1369, # Company of Heroes 2
             124954, # Crusader Kings III
-            358615, # Delta Force
+            262186, # Delta Force
             3099, # Door Kickers
             32365, # Hell Let Loose
             2949, # Killing Floor
