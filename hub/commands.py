@@ -117,7 +117,7 @@ def games_for_main_site() -> None:
         click.echo(f'\'{section_name}\': [')
 
         games = db.session.execute(
-            sa.select(Game).where(Game.id.in_(game_ids))
+            sa.select(Game).where(Game.id.in_(game_ids)).order_by(Game.name.asc())
         ).scalars().all()
 
         for game in games:
