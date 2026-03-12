@@ -81,6 +81,7 @@ def games_for_main_site() -> None:
             83368, # Mindustry
             18871, # Parkitect
             3277, # Rust
+            359709, # RWR 2
             90558, # Satisfactory
             9495, # Squad
         ),
@@ -99,7 +100,7 @@ def games_for_main_site() -> None:
             32365, # Hell Let Loose
             2949, # Killing Floor
             6748, # Killing Floor 2
-            # TODO LA Mod
+            358689, # LA Mod
             121, # Minecraft
             5572, # Men of War: Assault Squad 2
             1338, # Prison Architect
