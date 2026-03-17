@@ -45,8 +45,11 @@ class User(CreatedAtMixin, UpdatedAtMixin, UserMixin, db.Model):
     is_admin = mapped_column(sa.Boolean, nullable=False, default=False, server_default=sa.text('false'))
     must_relogin = mapped_column(sa.Boolean, nullable=False, default=False, server_default=sa.text('false'))
 
-    proposals = relationship('LanGameProposal', back_populates='user')
-    votes = relationship('LanGameProposalVote', back_populates='user')
+    game_proposals = relationship('LanGameProposal', back_populates='user')
+    accommodation_proposals = relationship('LanAccommodationProposal', back_populates='user')
+
+    game_votes = relationship('LanGameProposalVote', back_populates='user')
+    accommodation_votes = relationship('LanAccommodationProposalVote', back_populates='user')
 
     def my_vote(self, proposal: LanGameProposal) -> Optional[LanGameProposalVote]:
         return next((vote for vote in proposal.votes if vote.user_id == self.id), None)
@@ -94,7 +97,7 @@ class LanGameProposal(CreatedAtMixin, db.Model):
 
     votes = relationship('LanGameProposalVote', back_populates='proposal')
     game = relationship('Game', uselist=False, back_populates='proposal')
-    user = relationship('User', uselist=False, back_populates='proposals')
+    user = relationship('User', uselist=False, back_populates='game_proposals')
 
     is_essential: bool = False
 
@@ -140,7 +143,7 @@ class LanGameProposalVote(CreatedAtMixin, UpdatedAtMixin, db.Model):
     type = mapped_column(sa.Enum(VoteType), nullable=False)
 
     proposal = relationship('LanGameProposal', uselist=False, back_populates='votes')
-    user = relationship('User', uselist=False, back_populates='votes')
+    user = relationship('User', uselist=False, back_populates='game_votes')
 
     @classmethod
     def vote(cls, user: User, game_id: int, vote_type: VoteType):
@@ -171,8 +174,17 @@ class LanAccommodationProposal(CreatedAtMixin, db.Model):
     id = mapped_column(sa.BigInteger, primary_key=True, autoincrement=True)
     user_id = mapped_column(sa.BigInteger, sa.ForeignKey('users.id', ondelete='cascade'), nullable=False)
 
+    representative_image_url = mapped_column(sa.String(500), nullable=False)
+    url = mapped_column(sa.String(500), nullable=False)
+    google_maps_url = mapped_column(sa.String(500), nullable=False)
+    price = mapped_column(sa.Numeric(6, 2), nullable=False)
+    max_persons = mapped_column(sa.SmallInteger, nullable=False)
+    rooms = mapped_column(sa.SmallInteger, nullable=False)
+    private_parking = mapped_column(sa.Boolean, nullable=False)
+    fiber = mapped_column(sa.Boolean, nullable=False)
+
     votes = relationship('LanAccommodationProposalVote', back_populates='proposal')
-    user = relationship('User', uselist=False, back_populates='proposals')
+    user = relationship('User', uselist=False, back_populates='accommodation_proposals')
 
     def votes_by_type(self, type_: VoteType) -> List[LanAccommodationProposalVote]:
         return [
@@ -213,10 +225,10 @@ class LanAccommodationProposalVote(CreatedAtMixin, UpdatedAtMixin, db.Model):
 
     accommodation_proposal_id = mapped_column(sa.BigInteger, sa.ForeignKey('lan_accommodation_proposals.id', ondelete='cascade'), primary_key=True, autoincrement=False)
     user_id = mapped_column(sa.BigInteger, sa.ForeignKey('users.id', ondelete='cascade'), primary_key=True, autoincrement=False)
-    type = mapped_column(sa.Enum(VoteType), nullable=False)
+    type = mapped_column(sa.Enum(VoteType, name='votetypeaccomodation'), nullable=False)
 
     proposal = relationship('LanAccommodationProposal', uselist=False, back_populates='votes')
-    user = relationship('User', uselist=False, back_populates='votes')
+    user = relationship('User', uselist=False, back_populates='accommodation_votes')
 
     @classmethod
     def vote(cls, user: User, proposal_id: int, vote_type: VoteType):
