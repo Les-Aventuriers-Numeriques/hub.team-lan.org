@@ -12,7 +12,6 @@ L'[intranet](https://hub.team-lan.org/) utilisé par la team multigaming [Les Av
 Il s'agit d'une application web propulsée par [Flask](https://flask.palletsprojects.com/en/3.0.x/). Elle permet :
 
   - De nous aider à choisir les jeux pour notre prochaine [LAN annuelle](https://team-lan.org/lan)
-  - D'envoyer sur notre Discord des messages à propos de nos Chicken Dinner [PUBG](https://www.pubg.com/fr/main)
 
 ## Prérequis
 
