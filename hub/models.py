@@ -165,6 +165,82 @@ class LanGameProposalVote(CreatedAtMixin, UpdatedAtMixin, db.Model):
         return f'LanGameProposalVote:{self.game_proposal_game_id}+{self.user_id}'
 
 
+class LanAccommodationProposal(CreatedAtMixin, db.Model):
+    __tablename__ = 'lan_accommodation_proposals'
+
+    id = mapped_column(sa.BigInteger, primary_key=True, autoincrement=True)
+    user_id = mapped_column(sa.BigInteger, sa.ForeignKey('users.id', ondelete='cascade'), nullable=False)
+
+    votes = relationship('LanAccommodationProposalVote', back_populates='proposal')
+    user = relationship('User', uselist=False, back_populates='proposals')
+
+    def votes_by_type(self, type_: VoteType) -> List[LanAccommodationProposalVote]:
+        return [
+            vote for vote in self.votes if vote.type == type_
+        ]
+
+    def votes_count(self, type_: VoteType) -> int:
+        return len(self.votes_by_type(type_))
+
+    def votes_percentage(self, type_: VoteType) -> float:
+        votes_total = len(self.votes)
+
+        if votes_total == 0:
+            return 0.0
+
+        return self.votes_count(type_) / votes_total
+
+    @memoized_property
+    def score(self) -> int:
+        score = 0
+
+        for vote in self.votes:
+            if vote.type == VoteType.YES:
+                score += 2
+            elif vote.type == VoteType.NEUTRAL:
+                score += 1
+            elif vote.type == VoteType.NO:
+                score -= 1
+
+        return score
+
+    def __repr__(self) -> str:
+        return f'LanAccommodationProposal:{self.id}'
+
+
+class LanAccommodationProposalVote(CreatedAtMixin, UpdatedAtMixin, db.Model):
+    __tablename__ = 'lan_accommodation_proposal_votes'
+
+    accommodation_proposal_id = mapped_column(sa.BigInteger, sa.ForeignKey('lan_accommodation_proposals.id', ondelete='cascade'), primary_key=True, autoincrement=False)
+    user_id = mapped_column(sa.BigInteger, sa.ForeignKey('users.id', ondelete='cascade'), primary_key=True, autoincrement=False)
+    type = mapped_column(sa.Enum(VoteType), nullable=False)
+
+    proposal = relationship('LanAccommodationProposal', uselist=False, back_populates='votes')
+    user = relationship('User', uselist=False, back_populates='votes')
+
+    @classmethod
+    def vote(cls, user: User, proposal_id: int, vote_type: VoteType):
+        query = postgresql.insert(cls).values(
+            accommodation_proposal_id=proposal_id,
+            user_id=user.id,
+            type=vote_type
+        )
+
+        db.session.execute(query.on_conflict_do_update(
+            index_elements=[
+                cls.accommodation_proposal_id,
+                cls.user_id,
+            ],
+            set_={
+                cls.type: query.excluded.type,
+                cls.updated_at: datetime.now(UTC),
+            }
+        ))
+
+    def __repr__(self) -> str:
+        return f'LanAccommodationProposalVote:{self.accommodation_proposal_id}+{self.user_id}'
+
+
 class Setting(UpdatedAtMixin, db.Model):
     __tablename__ = 'settings'
 
