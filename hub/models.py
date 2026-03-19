@@ -194,6 +194,10 @@ class LanAccommodationProposal(VotableMixin, UpdatedAtMixin, CreatedAtMixin, db.
     votes = relationship('LanAccommodationProposalVote', back_populates='proposal')
     user = relationship('User', uselist=False, back_populates='accommodation_proposals')
 
+    @property
+    def max_guests(self) -> int:
+        return self.single_beds + self.twin_beds * 2
+
     def __repr__(self) -> str:
         return f'LanAccommodationProposal:{self.id}'
 

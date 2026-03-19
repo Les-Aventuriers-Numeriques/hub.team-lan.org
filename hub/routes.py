@@ -1,5 +1,6 @@
-from hub.forms import LanGamesProposalSearchForm, LanGamesSettingsForm, LanGamesVoteFilterForm
-from hub.models import User, Game, LanGameProposal, LanGameProposalVote, VoteType, Setting
+from hub.models import User, Game, LanGameProposal, LanGameProposalVote, VoteType, Setting, LanAccommodationProposal
+from hub.forms import LanGamesProposalSearchForm, LanGamesSettingsForm, LanGamesVoteFilterForm, \
+    LanAccommodationsSettingsForm
 from flask import render_template, redirect, url_for, flash, session, request, g
 from flask_login import login_required, current_user, logout_user, login_user
 from sqlalchemy_searchable import search, inspect_search_vectors
@@ -472,7 +473,7 @@ def admin_lan_games() -> Union[str, Response]:
         return redirect(url_for('admin_lan_games'))
 
     return render_template(
-        'admin/lan_games.html',
+        'admin/lan/games.html',
         proposals=proposals,
         form=form
     )
@@ -546,3 +547,38 @@ def admin_lan_game_proposals_reset_votes() -> Response:
     flash('Votes réinitialisés.', 'success')
 
     return redirect(url_for('admin_lan_games'))
+
+
+@app.route('/admin/lan/logements', methods=['GET', 'POST'])
+@login_required
+@logout_if_must_relogin
+@to_home_if_not_admin
+def admin_lan_accommodations() -> Union[str, Response]:
+    proposals = db.session.execute(
+        sa.select(LanAccommodationProposal)
+        .options(
+            sa_orm.selectinload(LanAccommodationProposal.user)
+        )
+        .order_by(LanAccommodationProposal.title)
+    ).scalars().all()
+
+    form_data = Setting.get(['lan_accommodations_status'])
+
+    form = LanAccommodationsSettingsForm(data=form_data)
+
+    if form.validate_on_submit():
+        Setting.set({
+            'lan_accommodations_status': form.lan_accommodations_status.data,
+        })
+
+        db.session.commit()
+
+        flash('Paramètres enregistrés.', 'success')
+
+        return redirect(url_for('admin_lan_accommodations'))
+
+    return render_template(
+        'admin/lan/accommodations.html',
+        proposals=proposals,
+        form=form
+    )

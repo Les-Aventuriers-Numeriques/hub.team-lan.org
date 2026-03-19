@@ -1,0 +1,21 @@
+{% extends 'layout.html' %}
+
+{% from 'macros.html' import field with context %}
+
+{% block title %}Admin : LAN party : logements{% endblock %}
+
+{% block cssfiles %}
+    {% assets 'css_base' %}<link rel="stylesheet" href="{{ ASSET_URL }}">{% endassets %}
+{% endblock %}
+
+{% block content %}
+    <form method="post" action="{{ url_for('admin_lan_accommodations') }}">
+        {{ form.csrf_token }}
+
+        {{ field(form.lan_accommodations_status) }}
+
+        <p class="mb-0">
+            <button type="submit" class="mb-0">Enregistrer</button>
+        </p>
+    </form>
+{% endblock %}

@@ -38,3 +38,17 @@ class LanGamesSettingsForm(FlaskForm):
         default='disabled',
         description='<strong>Désactivée</strong> : aucun accès, période creuse ; <strong>Activée</strong> : accès normal, période de choix des jeux ; <strong>Lecture seule</strong> : consultation uniquement, date de la LAN proche.'
     )
+
+
+class LanAccommodationsSettingsForm(FlaskForm):
+    lan_accommodations_status = SelectField(
+        'Statut de la section',
+        [validators.DataRequired()],
+        choices=[
+            ('disabled', 'Désactivée'),
+            ('enabled', 'Activée'),
+            ('read_only', 'Lecture seule'),
+        ],
+        default='disabled',
+        description='<strong>Désactivée</strong> : aucun accès, période creuse ; <strong>Activée</strong> : accès normal, période de choix des logements ; <strong>Lecture seule</strong> : consultation uniquement.'
+    )
