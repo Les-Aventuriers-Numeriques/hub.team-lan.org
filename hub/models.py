@@ -76,6 +76,7 @@ class User(CreatedAtMixin, UpdatedAtMixin, UserMixin, db.Model):
     avatar_url = mapped_column(sa.String(500))
     is_member = mapped_column(sa.Boolean, nullable=False, default=False, server_default=sa.text('false'))
     is_lan_participant = mapped_column(sa.Boolean, nullable=False, default=False, server_default=sa.text('false'))
+    is_lan_organizer = mapped_column(sa.Boolean, nullable=False, default=False, server_default=sa.text('false'))
     is_admin = mapped_column(sa.Boolean, nullable=False, default=False, server_default=sa.text('false'))
     must_relogin = mapped_column(sa.Boolean, nullable=False, default=False, server_default=sa.text('false'))
 
