@@ -30,7 +30,7 @@
         {% if current_user.is_authenticated %}
             <nav>
                 <ul>
-                    {% if current_user.is_lan_participant and g.lan_games_status != 'disabled' and g.lan_accommodations_status != 'disabled' %}
+                    {% if (current_user.is_lan_participant and g.lan_games_status != 'disabled') or (current_user.is_lan_organizer and g.lan_accommodations_status != 'disabled' )%}
                         <li>
                             <details class="dropdown">
                                 <summary>LAN party</summary>
@@ -43,7 +43,7 @@
                                         {% endif %}
                                     {% endif %}
                                     {% if g.lan_accommodations_status != 'disabled' %}
-                                        <li><a href="#">Voter pour des logements</a></li>
+                                        <li><a href="{{ url_for('lan_accommodations_vote') }}">Voter pour des logements</a></li>
 
                                         {% if g.lan_accommodations_status == 'enabled' %}
                                             <li><a href="#">Proposer un logement</a></li>

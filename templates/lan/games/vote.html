@@ -1,6 +1,6 @@
 {% extends 'layout.html' %}
 
-{% from 'macros.html' import vote, field, game_cover with context %}
+{% from 'macros.html' import vote_game, field, game_cover with context %}
 
 {% block title %}LAN party : voter pour des jeux{% endblock %}
 
@@ -32,7 +32,7 @@
 
                     <div class="votes">
                         {% for vote_type in VoteType %}
-                            {{ vote(vote_type, proposal, my_vote) }}
+                            {{ vote_game(vote_type, proposal, my_vote) }}
                         {% endfor %}
                     </div>
                 </article>

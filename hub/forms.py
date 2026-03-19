@@ -26,6 +26,19 @@ class LanGamesVoteFilterForm(FlaskForm):
     )
 
 
+class LanAccommodationsVoteFilterForm(FlaskForm):
+    filter = SelectField(
+        'Filtre',
+        choices=[
+            ('', 'Afficher uniquement les logements...'),
+            ('voted', '...pour lesquels j\'ai voté'),
+            ('not-voted', '...pour lesquels je n\'ai PAS voté'),
+            ('all-voted', '...pour lesquels tout le monde a voté'),
+            ('not-all-voted', '...pour lesquels tout le monde n\'a PAS voté'),
+        ]
+    )
+
+
 class LanGamesSettingsForm(FlaskForm):
     lan_games_status = SelectField(
         'Statut de la section',

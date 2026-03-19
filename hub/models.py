@@ -1,5 +1,5 @@
 from __future__ import annotations
-from sqlalchemy.orm import mapped_column, relationship, declared_attr
+from sqlalchemy.orm import mapped_column, relationship
 from typing import Optional, Union, List, Dict, Any
 from sqlalchemy_utils.types import TSVectorType
 from sqlalchemy.util import memoized_property
@@ -86,7 +86,7 @@ class User(CreatedAtMixin, UpdatedAtMixin, UserMixin, db.Model):
     game_votes = relationship('LanGameProposalVote', back_populates='user')
     accommodation_votes = relationship('LanAccommodationProposalVote', back_populates='user')
 
-    def my_vote(self, proposal: LanGameProposal) -> Optional[LanGameProposalVote]:
+    def my_vote(self, proposal: Union[LanGameProposal, LanAccommodationProposal]) -> Optional[Union[LanGameProposal, LanAccommodationProposal]]:
         return next((vote for vote in proposal.votes if vote.user_id == self.id), None)
 
     def __repr__(self) -> str:

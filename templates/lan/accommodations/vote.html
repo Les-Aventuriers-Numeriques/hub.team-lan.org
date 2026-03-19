@@ -1,0 +1,56 @@
+{% extends 'layout.html' %}
+
+{% from 'macros.html' import vote_accommodation, field with context %}
+
+{% block title %}LAN party : voter pour des logements{% endblock %}
+
+{% block cssfiles %}
+    {% assets 'css_lan_accommodations_vote' %}<link rel="stylesheet" href="{{ ASSET_URL }}">{% endassets %}
+{% endblock %}
+
+{% block content %}
+    <div class="subheading">
+        <p class="mb-0">
+            {% if g.lan_accommodations_status == 'enabled' %}
+                Votons pour le meilleur logement de la prochaine LAN. <a href="#">Pour proposer des logements, c'est par ici</a>.
+            {% else %}
+                Voici les meilleurs logements pour la prochaine LAN !
+            {% endif %}
+        </p>
+        <form method="get" action="{{ url_for('lan_accommodations_vote') }}">
+            {{ field(form.filter, with_label=False, class='mb-0', onchange='this.form.submit()') }}
+        </form>
+    </div>
+
+    {% if proposals %}
+        <div class="accommodations">
+            {% for proposal in proposals %}
+                {% set my_vote = current_user.my_vote(proposal) %}
+
+                <article id="a={{ proposal.id }}">
+                    <h5>
+                        <a href="{{ proposal.listing_url }}">{{ proposal.title }}</a>
+                    </h5>
+
+                    <p><a href="{{ proposal.location_url }}">{{ proposal.location_name }}</a></p>
+
+                    <div class="votes">
+                        {% for vote_type in VoteType %}
+                            {{ vote_accommodation(vote_type, proposal, my_vote) }}
+                        {% endfor %}
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="mb-0">
+            <strong>
+                {% if validated %}
+                    Aucun logement à afficher.
+                {% else %}
+                    Aucun logement pour l'instant. Proposes-en !
+                {% endif %}
+            </strong>
+        </p>
+    {% endif %}
+{% endblock %}
