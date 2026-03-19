@@ -1,4 +1,5 @@
-from hub.models import User, Game, LanGameProposal, LanGameProposalVote, VoteType, Setting, LanAccommodationProposal
+from hub.models import User, Game, LanGameProposal, LanGameProposalVote, VoteType, Setting, LanAccommodationProposal, \
+    LanAccommodationProposalVote
 from hub.forms import LanGamesProposalSearchForm, LanGamesSettingsForm, LanGamesVoteFilterForm, \
     LanAccommodationsSettingsForm
 from flask import render_template, redirect, url_for, flash, session, request, g
@@ -582,3 +583,72 @@ def admin_lan_accommodations() -> Union[str, Response]:
         proposals=proposals,
         form=form
     )
+
+@app.route('/admin/lan/logements/proposition/<int(signed=True):accommodation_proposal_id>/supprimer')
+@login_required
+@logout_if_must_relogin
+@to_home_if_not_admin
+def admin_lan_accommodation_proposal_delete(accommodation_proposal_id: int) -> Response:
+    result = db.session.execute(
+        sa.delete(LanAccommodationProposal).where(LanAccommodationProposal.id == accommodation_proposal_id)
+    )
+
+    db.session.commit()
+
+    if result.rowcount == 1:
+        flash('Proposition supprimée.', 'success')
+    else:
+        flash('Aucune proposition à supprimer.', 'error')
+
+    return redirect(url_for('admin_lan_accommodations'))
+
+
+@app.route('/admin/lan/logements/proposition/<int(signed=True):accommodation_proposal_id>/supprimer-votes')
+@login_required
+@logout_if_must_relogin
+@to_home_if_not_admin
+def admin_lan_accommodation_proposal_delete_votes(accommodation_proposal_id: int) -> Response:
+    result = db.session.execute(
+        sa.delete(LanAccommodationProposalVote).where(LanAccommodationProposalVote.accommodation_proposal_id == accommodation_proposal_id)
+    )
+
+    db.session.commit()
+
+    if result.rowcount >= 1:
+        flash('Votes supprimés.', 'success')
+    else:
+        flash('Aucun vote à supprimer.', 'error')
+
+    return redirect(url_for('admin_lan_accommodations'))
+
+
+@app.route('/admin/lan/logements/propositions/reinitialiser-tout')
+@login_required
+@logout_if_must_relogin
+@to_home_if_not_admin
+def admin_lan_accommodation_proposals_reset_all() -> Response:
+    db.session.execute(
+        sa.delete(LanAccommodationProposal)
+    )
+
+    db.session.commit()
+
+    flash('Propositions et votes réinitialisés.', 'success')
+
+    return redirect(url_for('admin_lan_accommodations'))
+
+
+@app.route('/admin/lan/logements/propositions/reinitialiser-votes')
+@login_required
+@logout_if_must_relogin
+@to_home_if_not_admin
+def admin_lan_accommodation_proposals_reset_votes() -> Response:
+    db.session.execute(
+        sa.delete(LanAccommodationProposalVote)
+    )
+
+    db.session.commit()
+
+    flash('Votes réinitialisés.', 'success')
+
+    return redirect(url_for('admin_lan_accommodations'))
