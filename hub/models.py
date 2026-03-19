@@ -1,5 +1,5 @@
 from __future__ import annotations
-from sqlalchemy.orm import mapped_column, relationship
+from sqlalchemy.orm import mapped_column, relationship, declared_attr
 from typing import Optional, Union, List, Dict, Any
 from sqlalchemy_utils.types import TSVectorType
 from sqlalchemy.util import memoized_property
@@ -18,6 +18,40 @@ class CreatedAtMixin:
 
 class UpdatedAtMixin:
     updated_at = mapped_column(sa.DateTime, nullable=False, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
+
+
+class VotableMixin:
+    user_id = mapped_column(sa.BigInteger, sa.ForeignKey('users.id', ondelete='cascade'), nullable=False)
+
+    def votes_by_type(self, type_: VoteType) -> List[Union[LanGameProposalVote, LanAccommodationProposalVote]]:
+        return [
+            vote for vote in self.votes if vote.type == type_
+        ]
+
+    def votes_count(self, type_: VoteType) -> int:
+        return len(self.votes_by_type(type_))
+
+    def votes_percentage(self, type_: VoteType) -> float:
+        votes_total = len(self.votes)
+
+        if votes_total == 0:
+            return 0.0
+
+        return self.votes_count(type_) / votes_total
+
+    @memoized_property
+    def score(self) -> int:
+        score = 0
+
+        for vote in self.votes:
+            if vote.type == VoteType.YES:
+                score += 2
+            elif vote.type == VoteType.NEUTRAL:
+                score += 1
+            elif vote.type == VoteType.NO:
+                score -= 1
+
+        return score
 
 
 # ATTENTION : Ne jamais modifier cette liste. Il est possible d'ajouter des éléments, à la fin de la liste uniquement.
@@ -39,7 +73,7 @@ class User(CreatedAtMixin, UpdatedAtMixin, UserMixin, db.Model):
     id = mapped_column(sa.BigInteger, primary_key=True, autoincrement=False)
 
     display_name = mapped_column(sa.String(255), nullable=False)
-    avatar_url = mapped_column(sa.String(255))
+    avatar_url = mapped_column(sa.String(500))
     is_member = mapped_column(sa.Boolean, nullable=False, default=False, server_default=sa.text('false'))
     is_lan_participant = mapped_column(sa.Boolean, nullable=False, default=False, server_default=sa.text('false'))
     is_admin = mapped_column(sa.Boolean, nullable=False, default=False, server_default=sa.text('false'))
@@ -89,47 +123,16 @@ class Game(db.Model):
         return f'Game:{self.id}'
 
 
-class LanGameProposal(CreatedAtMixin, db.Model):
+class LanGameProposal(VotableMixin, CreatedAtMixin, db.Model):
     __tablename__ = 'lan_game_proposals'
 
     game_id = mapped_column(sa.BigInteger, sa.ForeignKey('games.id', ondelete='cascade'), primary_key=True, autoincrement=False)
-    user_id = mapped_column(sa.BigInteger, sa.ForeignKey('users.id', ondelete='cascade'), nullable=False)
 
     votes = relationship('LanGameProposalVote', back_populates='proposal')
     game = relationship('Game', uselist=False, back_populates='proposal')
     user = relationship('User', uselist=False, back_populates='game_proposals')
 
     is_essential: bool = False
-
-    def votes_by_type(self, type_: VoteType) -> List[LanGameProposalVote]:
-        return [
-            vote for vote in self.votes if vote.type == type_
-        ]
-
-    def votes_count(self, type_: VoteType) -> int:
-        return len(self.votes_by_type(type_))
-
-    def votes_percentage(self, type_: VoteType) -> float:
-        votes_total = len(self.votes)
-
-        if votes_total == 0:
-            return 0.0
-
-        return self.votes_count(type_) / votes_total
-
-    @memoized_property
-    def score(self) -> int:
-        score = 0
-
-        for vote in self.votes:
-            if vote.type == VoteType.YES:
-                score += 2
-            elif vote.type == VoteType.NEUTRAL:
-                score += 1
-            elif vote.type == VoteType.NO:
-                score -= 1
-
-        return score
 
     def __repr__(self) -> str:
         return f'LanGameProposal:{self.game_id}'
@@ -168,53 +171,27 @@ class LanGameProposalVote(CreatedAtMixin, UpdatedAtMixin, db.Model):
         return f'LanGameProposalVote:{self.game_proposal_game_id}+{self.user_id}'
 
 
-class LanAccommodationProposal(CreatedAtMixin, db.Model):
+class LanAccommodationProposal(VotableMixin, UpdatedAtMixin, CreatedAtMixin, db.Model):
     __tablename__ = 'lan_accommodation_proposals'
 
     id = mapped_column(sa.BigInteger, primary_key=True, autoincrement=True)
-    user_id = mapped_column(sa.BigInteger, sa.ForeignKey('users.id', ondelete='cascade'), nullable=False)
 
-    representative_image_url = mapped_column(sa.String(500), nullable=False)
-    url = mapped_column(sa.String(500), nullable=False)
-    google_maps_url = mapped_column(sa.String(500), nullable=False)
-    price = mapped_column(sa.Numeric(6, 2), nullable=False)
-    max_persons = mapped_column(sa.SmallInteger, nullable=False)
-    rooms = mapped_column(sa.SmallInteger, nullable=False)
-    private_parking = mapped_column(sa.Boolean, nullable=False)
-    fiber = mapped_column(sa.Boolean, nullable=False)
+    title = mapped_column(sa.String(255), nullable=False)
+    photo_url = mapped_column(sa.String(500), nullable=False)
+    listing_url = mapped_column(sa.String(500), nullable=False)
+    location_name = mapped_column(sa.String(255), nullable=False)
+    location_url = mapped_column(sa.String(500), nullable=False)
+    bedrooms = mapped_column(sa.SmallInteger, nullable=False)
+    single_beds = mapped_column(sa.SmallInteger, nullable=False)
+    twin_beds = mapped_column(sa.SmallInteger, nullable=False)
+    large_tables = mapped_column(sa.SmallInteger)
+    has_fiber = mapped_column(sa.Boolean)
+    has_private_parking = mapped_column(sa.Boolean)
+    total_price = mapped_column(sa.Numeric(6, 2), nullable=False)
+    notes = mapped_column(sa.Text)
 
     votes = relationship('LanAccommodationProposalVote', back_populates='proposal')
     user = relationship('User', uselist=False, back_populates='accommodation_proposals')
-
-    def votes_by_type(self, type_: VoteType) -> List[LanAccommodationProposalVote]:
-        return [
-            vote for vote in self.votes if vote.type == type_
-        ]
-
-    def votes_count(self, type_: VoteType) -> int:
-        return len(self.votes_by_type(type_))
-
-    def votes_percentage(self, type_: VoteType) -> float:
-        votes_total = len(self.votes)
-
-        if votes_total == 0:
-            return 0.0
-
-        return self.votes_count(type_) / votes_total
-
-    @memoized_property
-    def score(self) -> int:
-        score = 0
-
-        for vote in self.votes:
-            if vote.type == VoteType.YES:
-                score += 2
-            elif vote.type == VoteType.NEUTRAL:
-                score += 1
-            elif vote.type == VoteType.NO:
-                score -= 1
-
-        return score
 
     def __repr__(self) -> str:
         return f'LanAccommodationProposal:{self.id}'
@@ -225,7 +202,7 @@ class LanAccommodationProposalVote(CreatedAtMixin, UpdatedAtMixin, db.Model):
 
     accommodation_proposal_id = mapped_column(sa.BigInteger, sa.ForeignKey('lan_accommodation_proposals.id', ondelete='cascade'), primary_key=True, autoincrement=False)
     user_id = mapped_column(sa.BigInteger, sa.ForeignKey('users.id', ondelete='cascade'), primary_key=True, autoincrement=False)
-    type = mapped_column(sa.Enum(VoteType, name='votetypeaccomodation'), nullable=False)
+    type = mapped_column(sa.Enum(VoteType, name='accommodationvotetype'), nullable=False)
 
     proposal = relationship('LanAccommodationProposal', uselist=False, back_populates='votes')
     user = relationship('User', uselist=False, back_populates='accommodation_votes')
