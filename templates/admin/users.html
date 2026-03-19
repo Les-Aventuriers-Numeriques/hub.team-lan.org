@@ -9,6 +9,7 @@
 {% block content %}
     {% if users %}
         <p>
+            <a href="{{ url_for('admin_users_force_relogin') }}" role="button" class="secondary" onclick="return confirm('Tout le monde (y compris toi) seront forcés de se reconnecter afin de synchroniser leurs rôles Discord. Confirmer ?')">Déconnecter tout le monde</a>
             <a href="{{ url_for('admin_users_lan_participants_force_relogin') }}" role="button" class="secondary" onclick="return confirm('Tous les participants à la LAN (y compris toi, si tu en fait partie) seront forcés de se reconnecter afin de synchroniser leurs rôles Discord. Confirmer ?')">Déconnecter les participants à la LAN</a>
             <a href="{{ url_for('admin_users_lan_organizers_force_relogin') }}" role="button" class="secondary" onclick="return confirm('Tous les organisateurs de la LAN (y compris toi, si tu en fait partie) seront forcés de se reconnecter afin de synchroniser leurs rôles Discord. Confirmer ?')">Déconnecter les organisateurs de la LAN</a>
         </p>
