@@ -443,6 +443,25 @@ def admin_users_lan_participants_force_relogin() -> Response:
     return redirect(url_for('admin_users'))
 
 
+@app.route('/admin/utilisateurs/orga-lan-forcer-reconnexion')
+@login_required
+@logout_if_must_relogin
+@to_home_if_not_admin
+def admin_users_lan_organizers_force_relogin() -> Response:
+    result = db.session.execute(
+        sa.update(User).where(User.is_lan_organizer == True).values(must_relogin=True, is_lan_organizer=False)
+    )
+
+    db.session.commit()
+
+    if result.rowcount >= 1:
+        flash('Organisateurs de la LAN forcés à se reconnecter.', 'success')
+    else:
+        flash('Aucun organisateur de la LAN à forcer à se reconnecter.', 'error')
+
+    return redirect(url_for('admin_users'))
+
+
 @app.route('/admin/lan/jeux', methods=['GET', 'POST'])
 @login_required
 @logout_if_must_relogin
