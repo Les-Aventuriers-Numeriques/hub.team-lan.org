@@ -269,7 +269,7 @@ def lan_games_vote() -> Union[str, Response]:
     proposals.sort(key=lambda p: p.score, reverse=True)
 
     return render_template(
-        'lan/games.html',
+        'lan/games/vote.html',
         form=form,
         validated=validated,
         proposals=proposals,
@@ -327,7 +327,7 @@ def lan_games_proposal() -> Union[str, Response]:
         ).scalars().all()
 
     return render_template(
-        'lan/games_proposal.html',
+        'lan/games/propose.html',
         form=form,
         validated=validated,
         games=games

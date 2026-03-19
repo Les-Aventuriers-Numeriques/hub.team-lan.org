@@ -195,6 +195,7 @@ def before_request():
         return
 
     g.lan_games_status =  Setting.get('lan_games_status', 'disabled')
+    g.lan_accommodations_status =  Setting.get('lan_accommodations_status', 'disabled')
 
     if request.path == app.config['DISCORD_INTERACTIONS_PATH']:
         return
