@@ -1,6 +1,5 @@
+from hub.forms import LanGamesProposalSearchForm, LanGamesSettingsForm, LanGamesVoteFilterForm, LanAccommodationsSettingsForm, LanAccommodationsVoteFilterForm
 from hub.models import User, Game, LanGameProposal, LanGameProposalVote, VoteType, Setting, LanAccommodationProposal, LanAccommodationProposalVote
-from hub.forms import LanGamesProposalSearchForm, LanGamesSettingsForm, LanGamesVoteFilterForm, \
-    LanAccommodationsSettingsForm, LanAccommodationsVoteFilterForm
 from flask import render_template, redirect, url_for, flash, session, request, g
 from flask_login import login_required, current_user, logout_user, login_user
 from sqlalchemy_searchable import search, inspect_search_vectors
@@ -449,9 +448,6 @@ def lan_accommodations_vote() -> Union[str, Response]:
             proposals = [
                 proposal for proposal in proposals if filter_func(proposal)
             ]
-
-    for proposal in proposals:
-        proposal.is_essential = proposal.votes_count(VoteType.YES) == lan_organizers_count
 
     proposals.sort(key=lambda p: p.score, reverse=True)
 
