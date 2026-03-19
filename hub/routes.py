@@ -136,8 +136,9 @@ def login_callback() -> Union[str, Response]:
 
     is_member = str(app.config['DISCORD_MEMBER_ROLE_ID']) in user_roles
     is_lan_participant = str(app.config['DISCORD_LAN_PARTICIPANT_ROLE_ID']) in user_roles
+    is_lan_organizer = str(app.config['DISCORD_LAN_ORGANIZER_ROLE_ID']) in user_roles
     is_admin = str(app.config['DISCORD_ADMIN_ROLE_ID']) in user_roles
-    has_any_role = is_member or is_lan_participant or is_admin
+    has_any_role = is_member or is_lan_participant or is_lan_organizer or is_admin
 
     user_info = membership_info.get('user', {})
 
@@ -169,6 +170,7 @@ def login_callback() -> Union[str, Response]:
 
     user.is_member = is_member
     user.is_lan_participant = is_lan_participant
+    user.is_lan_organizer = is_lan_organizer
     user.is_admin = is_admin
     user.must_relogin = False
 
