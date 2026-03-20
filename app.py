@@ -1,6 +1,6 @@
+from sqlalchemy_searchable import make_searchable, SearchOptions
 from flask import Flask, render_template, request, session, g
 from flask_discord_interactions import DiscordInteractions
-from sqlalchemy_searchable import make_searchable
 from werkzeug.exceptions import HTTPException
 from flask_assets import Environment, Bundle
 from sqlalchemy.orm import DeclarativeBase
@@ -159,6 +159,7 @@ discord_interactions.set_route(app.config['DISCORD_INTERACTIONS_PATH'])
 # Flask-Caching
 cache = Cache(app)
 
+
 # Flask-SQLAlchemy
 class AppDeclarativeBase(DeclarativeBase):
     pass
@@ -166,7 +167,12 @@ class AppDeclarativeBase(DeclarativeBase):
 
 db = SQLAlchemy(app, model_class=AppDeclarativeBase)
 
-make_searchable(db.metadata, options={'regconfig': app.config['SQLALCHEMY_SCHEMA_NAME'] + '.english_nostop'})
+make_searchable(
+    db.metadata,
+    options=SearchOptions(
+        regconfig=app.config['SQLALCHEMY_SCHEMA_NAME'] + '.english_nostop'
+    )
+)
 
 # Flask-Migrate
 migrate = Migrate(app, db)
