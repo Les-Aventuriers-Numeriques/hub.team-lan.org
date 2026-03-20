@@ -35,14 +35,14 @@
                             <details class="dropdown">
                                 <summary>LAN party</summary>
                                 <ul>
-                                    {% if g.lan_games_status != 'disabled' %}
+                                    {% if current_user.is_lan_participant and g.lan_games_status != 'disabled' %}
                                         <li><a href="{{ url_for('lan_games_vote') }}">Voter pour des jeux</a></li>
 
                                         {% if g.lan_games_status == 'enabled' %}
                                             <li><a href="{{ url_for('lan_games_proposal') }}">Proposer un jeu</a></li>
                                         {% endif %}
                                     {% endif %}
-                                    {% if g.lan_accommodations_status != 'disabled' %}
+                                    {% if current_user.is_lan_organizer and g.lan_accommodations_status != 'disabled' %}
                                         <li><a href="{{ url_for('lan_accommodations_vote') }}">Voter pour des logements</a></li>
 
                                         {% if g.lan_accommodations_status == 'enabled' %}
