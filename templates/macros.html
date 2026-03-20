@@ -5,11 +5,11 @@
         {%- endif -%}
 
             {%- if vote_type == VoteType.YES -%}
-                {{ bi_icon('hand-thumbs-up-fill', class='my-vote' if g.lan_games_status == 'read_only' and my_vote and vote_type == my_vote.type) }}
+                {{ bi_icon('hand-thumbs-up-fill', class='my-vote' if g.lan_games_status == 'read_only' and my_vote and vote_type == my_vote.type, width='1.5em', height='1.5em') }}
             {%- elif vote_type == VoteType.NEUTRAL -%}
-                {{ bi_icon('emoji-neutral-fill', class='my-vote' if g.lan_games_status == 'read_only' and my_vote and vote_type == my_vote.type) }}
+                {{ bi_icon('emoji-neutral-fill', class='my-vote' if g.lan_games_status == 'read_only' and my_vote and vote_type == my_vote.type, width='1.5em', height='1.5em') }}
             {%- elif vote_type == VoteType.NO -%}
-                {{ bi_icon('hand-thumbs-down-fill', class='my-vote' if g.lan_games_status == 'read_only' and my_vote and vote_type == my_vote.type) }}
+                {{ bi_icon('hand-thumbs-down-fill', class='my-vote' if g.lan_games_status == 'read_only' and my_vote and vote_type == my_vote.type, width='1.5em', height='1.5em') }}
             {%- endif -%}
 
         {%- if g.lan_games_status == 'enabled' and (not my_vote or my_vote.type != vote_type) -%}
@@ -27,11 +27,11 @@
         {%- endif -%}
 
             {%- if vote_type == VoteType.YES -%}
-                {{ bi_icon('hand-thumbs-up-fill', class='my-vote' if g.lan_games_status == 'read_only' and my_vote and vote_type == my_vote.type) }}
+                {{ bi_icon('hand-thumbs-up-fill', class='my-vote' if g.lan_games_status == 'read_only' and my_vote and vote_type == my_vote.type, width='1.5em', height='1.5em') }}
             {%- elif vote_type == VoteType.NEUTRAL -%}
-                {{ bi_icon('emoji-neutral-fill', class='my-vote' if g.lan_games_status == 'read_only' and my_vote and vote_type == my_vote.type) }}
+                {{ bi_icon('emoji-neutral-fill', class='my-vote' if g.lan_games_status == 'read_only' and my_vote and vote_type == my_vote.type, width='1.5em', height='1.5em') }}
             {%- elif vote_type == VoteType.NO -%}
-                {{ bi_icon('hand-thumbs-down-fill', class='my-vote' if g.lan_games_status == 'read_only' and my_vote and vote_type == my_vote.type) }}
+                {{ bi_icon('hand-thumbs-down-fill', class='my-vote' if g.lan_games_status == 'read_only' and my_vote and vote_type == my_vote.type, width='1.5em', height='1.5em') }}
             {%- endif -%}
 
         {%- if g.lan_accommodations_status == 'enabled' and (not my_vote or my_vote.type != vote_type) -%}
@@ -70,9 +70,9 @@
     <div class="cover">
         {% if game.single_owner_enough %}
             <span data-tooltip="Un seul détenteur suffit potentiellement !">
-                {{ bi_icon('person-check') }}
+                {{ bi_icon('person-check', width='1.5em', height='1.5em') }}
             </span>
-            {{ bi_icon('person-check') }}
+            {{ bi_icon('person-check', width='1.5em', height='1.5em') }}
         {% endif %}
 
         <a {% if game.url %}href="{{ game.url }}"{% endif %} target="_blank" data-tooltip="{{ tooltip }}">

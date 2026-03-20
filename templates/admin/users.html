@@ -42,13 +42,13 @@
                         <td class="actions">
                             {% if user.id != current_user.id %}
                                 <a href="{{ url_for('admin_user_delete', user_id=user.id) }}" onclick="return confirm('{{ user.display_name }} et tout ce qui lui est lié sera supprimé. Confirmer ?')">
-                                    {{ bi_icon('x-lg') }}
+                                    {{ bi_icon('x-lg', width='1.2em', height='1.2em') }}
                                 </a>
                             {% endif %}
 
                             {% if not user.must_relogin %}
                                 <a href="{{ url_for('admin_user_force_relogin', user_id=user.id) }}" onclick="return confirm('{{ user.display_name }} va être forcé de se reconnecter afin de synchroniser ses rôles Discord. Confirmer ?')">
-                                    {{ bi_icon('box-arrow-in-right') }}
+                                    {{ bi_icon('box-arrow-in-right', width='1.2em', height='1.2em') }}
                                 </a>
                             {% endif %}
                         </td>

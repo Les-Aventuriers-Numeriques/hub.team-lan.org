@@ -1,6 +1,6 @@
 {% extends 'layout.html' %}
 
-{% from 'macros.html' import vote_accommodation, field with context %}
+{% from 'macros.html' import vote_accommodation, bi_icon, field with context %}
 
 {% block title %}LAN party : voter pour des logements{% endblock %}
 
@@ -12,7 +12,7 @@
     <div class="subheading">
         <p class="mb-0">
             {% if g.lan_accommodations_status == 'enabled' %}
-                Votons pour le meilleur logement de la prochaine LAN. <a href="#">Pour proposer des logements, c'est par ici</a>.
+                Choisissons le meilleur logement pour la prochaine LAN. <a href="#">Pour proposer des logements, c'est par ici</a>.
             {% else %}
                 Voici les meilleurs logements pour la prochaine LAN !
             {% endif %}
@@ -30,11 +30,14 @@
                 <article id="a={{ proposal.id }}">
                     <img src="{{ proposal.photo_url }}">
                     <div class="details">
-                        <h5>
-                            <a href="{{ proposal.listing_url }}">{{ proposal.title }}</a>
-                        </h5>
+                        <h4>
+                            {{ proposal.total_price|currencyformat('EUR') }} <a href="{{ proposal.listing_url }}">{{ proposal.title }}</a>
+                        </h4>
 
-                        <div><a href="{{ proposal.location_url }}">{{ proposal.location_name }}</a></div>
+                        <div>{{ bi_icon('geo-alt-fill') }} <a href="{{ proposal.location_url }}">{{ proposal.location_name }}</a></div>
+
+                        <div>{{ proposal.bedrooms }} chambres / {{ proposal.single_beds }} lits simples / {{ proposal.twin_beds }} lits doubles / {{ proposal.large_tables }} grandes tables</div>
+                        <div>{{ proposal.has_fiber }} fibre / {{ proposal.has_private_parking }} parking privé</div>
 
                         <div class="votes">
                             {% for vote_type in VoteType %}

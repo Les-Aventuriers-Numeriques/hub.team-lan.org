@@ -87,11 +87,6 @@ body > main details > summary {
     font-weight: bolder;
 }
 
-body > main svg.bi {
-    width: 1.5em;
-    height: 1.5em;
-}
-
 /************************************************************************
  * Formulaires */
 

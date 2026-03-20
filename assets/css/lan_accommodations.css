@@ -38,7 +38,7 @@ body > main .accommodations > article > .details {
     row-gap: var(--pico-grid-row-gap);
 }
 
-body > main .accommodations > article > .details > h5 {
+body > main .accommodations > article > .details > h4 {
     margin-bottom: 0;
 }
 

@@ -23,9 +23,9 @@
                         {{ game_cover(game, game.name + (' [déjà proposé par ' + (game.proposal.user.display_name if game.proposal.user_id != current_user.id else 'toi') + ']' if game.proposal else '')) }}
 
                         {% if game.proposal %}
-                            {{ bi_icon('bag-check') }}
+                            {{ bi_icon('bag-check', width='1.5em', height='1.5em') }}
                         {% else %}
-                            <a href="{{ url_for('lan_games_proposal_submit', game_id=game.id, **request.args) }}">{{ bi_icon('bag-plus') }}</a>
+                            <a href="{{ url_for('lan_games_proposal_submit', game_id=game.id, **request.args) }}">{{ bi_icon('bag-plus', width='1.5em', height='1.5em') }}</a>
                         {% endif %}
                     </article>
                 {% endfor %}
