@@ -16,36 +16,10 @@ body > main .accommodations > article {
 
     min-width: 0;
     display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+    flex-direction: row;
     column-gap: var(--pico-grid-column-gap);
     row-gap: var(--pico-grid-row-gap);
     margin-bottom: 0;
-}
-
-body > main .accommodations > article > .cover {
-    position: relative;
-}
-
-body > main .accommodations > article > .cover > a {
-    position: initial;
-}
-
-body > main .accommodations > article > .cover > span {
-    position: absolute;
-    right: 0.3rem;
-    bottom: 0.3rem;
-    z-index: 2;
-    color: rgb(51, 210, 163);
-    border-bottom: none;
-}
-
-body > main .accommodations > article > .cover > svg {
-    position: absolute;
-    right: 0.35rem;
-    bottom: 0.25rem;
-    z-index: 1;
-    color: rgb(0, 0, 0);
 }
 
 body > main .accommodations > article:target {
@@ -55,6 +29,19 @@ body > main .accommodations > article:target {
     scroll-margin-top: var(--pico-spacing);
 }
 
+body > main .accommodations > article > .details {
+    flex-grow: 1;
+
+    display: flex;
+    flex-direction: column;
+    column-gap: var(--pico-grid-column-gap);
+    row-gap: var(--pico-grid-row-gap);
+}
+
+body > main .accommodations > article > .details > h5 {
+    margin-bottom: 0;
+}
+
 body > main .accommodations img {
     border: var(--pico-border-width) solid var(--pico-muted-border-color);
     border-radius: var(--pico-border-radius);
@@ -62,6 +49,6 @@ body > main .accommodations img {
 
 @media (min-width: 768px) {
     body > main .accommodations {
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(2, 1fr);
     }
 }

@@ -28,16 +28,19 @@
                 {% set my_vote = current_user.my_vote(proposal) %}
 
                 <article id="a={{ proposal.id }}">
-                    <h5>
-                        <a href="{{ proposal.listing_url }}">{{ proposal.title }}</a>
-                    </h5>
+                    <img src="{{ proposal.photo_url }}">
+                    <div class="details">
+                        <h5>
+                            <a href="{{ proposal.listing_url }}">{{ proposal.title }}</a>
+                        </h5>
 
-                    <p><a href="{{ proposal.location_url }}">{{ proposal.location_name }}</a></p>
+                        <div><a href="{{ proposal.location_url }}">{{ proposal.location_name }}</a></div>
 
-                    <div class="votes">
-                        {% for vote_type in VoteType %}
-                            {{ vote_accommodation(vote_type, proposal, my_vote) }}
-                        {% endfor %}
+                        <div class="votes">
+                            {% for vote_type in VoteType %}
+                                {{ vote_accommodation(vote_type, proposal, my_vote) }}
+                            {% endfor %}
+                        </div>
                     </div>
                 </article>
             {% endfor %}
