@@ -83,6 +83,6 @@
 
 {% macro avatar(user) -%}
     {% if user.avatar_url -%}
-        <img src="{{ user.avatar_url }}?size=22" style="max-height: 22px; max-width: 22px" alt="Avatar de {{ user.display_name }}">
+        <img src="{{ user.avatar_url }}?size=24" alt="Avatar de {{ user.display_name }}" class="avatar">
     {%- endif %}
 {%- endmacro %}

@@ -42,11 +42,14 @@ body > main .accommodations > article > .details > h4 {
     margin-bottom: 0;
 }
 
-body > main .accommodations > article > a {
-    max-width: 30%;
+body > main .accommodations > article > .photo {
+    width: 30%;
+    flex-shrink: 0;
+    align-self: center;
+    text-align: center;
 }
 
-body > main .accommodations > article > a > img {
+body > main .accommodations > article > .photo a > img {
     border: var(--pico-border-width) solid var(--pico-muted-border-color);
     border-radius: var(--pico-border-radius);
 }

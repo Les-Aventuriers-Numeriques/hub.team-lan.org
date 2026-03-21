@@ -10,7 +10,6 @@ body > main .accommodations > article .votes {
     column-gap: var(--pico-grid-column-gap);
     row-gap: var(--pico-grid-row-gap);
     line-height: initial;
-    align-self: center;
 }
 
 body > main .accommodations > article .votes > div {
@@ -20,6 +19,11 @@ body > main .accommodations > article .votes > div {
     row-gap: var(--pico-grid-row-gap);
     justify-content: space-between;
     align-items: center;
+}
+
+body > main .accommodations > article .votes > a {
+    align-self: center;
+    margin-top: auto;
 }
 
 body > main .accommodations > article .votes > div .my-vote {

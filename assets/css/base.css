@@ -24,6 +24,11 @@ i.bi {
     vertical-align: middle;
 }
 
+img.avatar {
+    max-height: 24px;
+    max-width: 24px;
+}
+
 /************************************************************************
  * En-tête */
 
