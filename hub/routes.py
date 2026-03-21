@@ -608,9 +608,7 @@ def admin_lan_games() -> Union[str, Response]:
 
     proposals.sort(key=lambda p: p.game.name)
 
-    form_data = Setting.get(['lan_games_status'])
-
-    form = LanGamesSettingsForm(data=form_data)
+    form = LanGamesSettingsForm(data={'lan_games_status': g.lan_games_status})
 
     if form.validate_on_submit():
         Setting.set({
@@ -713,9 +711,7 @@ def admin_lan_accommodations() -> Union[str, Response]:
         .order_by(LanAccommodationProposal.title)
     ).scalars().all()
 
-    form_data = Setting.get(['lan_accommodations_status'])
-
-    form = LanAccommodationsSettingsForm(data=form_data)
+    form = LanAccommodationsSettingsForm(data={'lan_accommodations_status': g.lan_accommodations_status})
 
     if form.validate_on_submit():
         Setting.set({
