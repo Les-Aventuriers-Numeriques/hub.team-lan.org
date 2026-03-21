@@ -2,16 +2,6 @@
 
 set -e # Fait en sorte que les prochaines commandes en échec font sortir du script immédiatement
 
-echo "Chargement des variables d'environnement depuis les fichiers dotenv"
-
-if [ -f .env ]; then
-    export $(cat .env | xargs)
-fi
-
-if [ -f .flaskenv ]; then
-    export $(cat .flaskenv | xargs)
-fi
-
 echo "Récupération de la dernière version du code"
 
 git pull
