@@ -1,7 +1,5 @@
 {% extends 'layout.html' %}
 
-{% from 'macros.html' import bi_icon %}
-
 {% block title %}Admin : utilisateurs{% endblock %}
 
 {% block cssfiles %}
@@ -32,7 +30,10 @@
             <tbody>
                 {% for user in users %}
                     <tr>
-                        <td>{% if user.avatar_url %}<img src="{{ user.avatar_url }}?size=32" width="32" height="32" alt="Avatar de {{ user.display_name }}"> {% endif %}{{ user.display_name }}<br><code>{{ user.id }}</code></td>
+                        <td>
+                            {{ avatar(user) }}
+                            {{ user.display_name }}<br><code>{{ user.id }}</code>
+                        </td>
                         <td>{{ 'Oui' if user.is_member else 'Non' }}</td>
                         <td>{{ 'Oui' if user.is_lan_participant else 'Non' }}</td>
                         <td>{{ 'Oui' if user.is_lan_organizer else 'Non' }}</td>
@@ -42,13 +43,13 @@
                         <td class="actions">
                             {% if user.id != current_user.id %}
                                 <a href="{{ url_for('admin_user_delete', user_id=user.id) }}" onclick="return confirm('{{ user.display_name }} et tout ce qui lui est lié sera supprimé. Confirmer ?')">
-                                    {{ bi_icon('x-lg', width='1.2em', height='1.2em') }}
+                                    <i class="bi bi-x-lg"></i>
                                 </a>
                             {% endif %}
 
                             {% if not user.must_relogin %}
                                 <a href="{{ url_for('admin_user_force_relogin', user_id=user.id) }}" onclick="return confirm('{{ user.display_name }} va être forcé de se reconnecter afin de synchroniser ses rôles Discord. Confirmer ?')">
-                                    {{ bi_icon('box-arrow-in-right', width='1.2em', height='1.2em') }}
+                                    <i class="bi bi-box-arrow-in-right"></i>
                                 </a>
                             {% endif %}
                         </td>

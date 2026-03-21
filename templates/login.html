@@ -1,7 +1,5 @@
 {% extends 'layout.html' %}
 
-{% from 'macros.html' import bi_icon %}
-
 {% block title %}Connexion{% endblock %}
 
 {% block cssfiles %}
@@ -10,6 +8,6 @@
 
 {% block content %}
     <p class="text-center mb-0">
-        <a href="{{ login_discord_url }}" role="button">{{ bi_icon('discord', width='2em', height='2em') }} Se connecter avec Discord</a>
+        <a href="{{ login_discord_url }}" role="button"><i class="bi bi-discord"></i> Se connecter avec Discord</a>
     </p>
 {% endblock %}

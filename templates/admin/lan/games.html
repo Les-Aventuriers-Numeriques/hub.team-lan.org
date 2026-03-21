@@ -1,6 +1,6 @@
 {% extends 'layout.html' %}
 
-{% from 'macros.html' import bi_icon, field with context %}
+{% from 'macros.html' import field with context %}
 
 {% block title %}Admin : LAN party : jeux{% endblock %}
 
@@ -43,8 +43,8 @@
                         <td>{{ proposal.user.display_name }}</td>
                         <td>{{ proposal.created_at|datetimeformat }}</td>
                         <td class="actions">
-                            <a href="{{ url_for('admin_lan_game_proposal_delete', game_id=proposal.game_id) }}" onclick="return confirm('{{ proposal.game.name }} et les votes associés seront supprimés. Confirmer ?')">{{ bi_icon('x-lg', width='1.2em', height='1.2em') }}</a>
-                            <a href="{{ url_for('admin_lan_game_proposal_delete_votes', game_id=proposal.game_id) }}" onclick="return confirm('Les votes de {{ proposal.game.name }} seront supprimés. Confirmer ?')">{{ bi_icon('journal-x', width='1.2em', height='1.2em') }}</a>
+                            <a href="{{ url_for('admin_lan_game_proposal_delete', game_id=proposal.game_id) }}" onclick="return confirm('{{ proposal.game.name }} et les votes associés seront supprimés. Confirmer ?')"><i class="bi bi-x-lg"></i></a>
+                            <a href="{{ url_for('admin_lan_game_proposal_delete_votes', game_id=proposal.game_id) }}" onclick="return confirm('Les votes de {{ proposal.game.name }} seront supprimés. Confirmer ?')"><i class="bi bi-journal-x"></i></a>
                         </td>
                     </tr>
                 {% endfor %}

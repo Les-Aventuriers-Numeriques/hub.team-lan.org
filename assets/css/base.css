@@ -20,6 +20,10 @@ nav details.dropdown {
     display: inline-block;
 }
 
+i.bi {
+    vertical-align: middle;
+}
+
 /************************************************************************
  * En-tête */
 
@@ -54,22 +58,16 @@ body > header > div > div > div {
     font-size: 1rem;
 }
 
-body > header > nav > ul {
-    flex-direction: column;
-}
-
-body > header nav li {
-    padding: var(--pico-nav-element-spacing-horizontal);
-}
-
 @media (min-width: 768px) {
     body > header {
         flex-direction: row;
         justify-content: space-between;
     }
+}
 
-    body > header > nav > ul {
-        flex-direction: row;
+@media (max-width: 1024px) {
+    body > header nav summary span {
+        display: none;
     }
 }
 

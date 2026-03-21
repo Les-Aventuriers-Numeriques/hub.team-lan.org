@@ -1,6 +1,6 @@
 {% extends 'layout.html' %}
 
-{% from 'macros.html' import field, bi_icon, game_cover with context %}
+{% from 'macros.html' import field, game_cover with context %}
 
 {% block title %}LAN party : proposer un jeu{% endblock %}
 
@@ -23,9 +23,9 @@
                         {{ game_cover(game, game.name + (' [déjà proposé par ' + (game.proposal.user.display_name if game.proposal.user_id != current_user.id else 'toi') + ']' if game.proposal else '')) }}
 
                         {% if game.proposal %}
-                            {{ bi_icon('bag-check', width='1.5em', height='1.5em') }}
+                            <i class="bi bi-bag-check" style="font-size: 1.5em;"></i>
                         {% else %}
-                            <a href="{{ url_for('lan_games_proposal_submit', game_id=game.id, **request.args) }}">{{ bi_icon('bag-plus', width='1.5em', height='1.5em') }}</a>
+                            <a href="{{ url_for('lan_games_proposal_submit', game_id=game.id, **request.args) }}"><i class="bi bi-bag-plus" style="font-size: 1.5em;"></i></a>
                         {% endif %}
                     </article>
                 {% endfor %}

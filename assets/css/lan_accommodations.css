@@ -5,8 +5,8 @@
  * Liste des logements */
 
 body > main .accommodations {
-    display: grid;
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
     column-gap: var(--pico-grid-column-gap);
     row-gap: var(--pico-grid-row-gap);
 }
@@ -42,13 +42,11 @@ body > main .accommodations > article > .details > h4 {
     margin-bottom: 0;
 }
 
-body > main .accommodations img {
-    border: var(--pico-border-width) solid var(--pico-muted-border-color);
-    border-radius: var(--pico-border-radius);
+body > main .accommodations > article > a {
+    max-width: 30%;
 }
 
-@media (min-width: 768px) {
-    body > main .accommodations {
-        grid-template-columns: repeat(2, 1fr);
-    }
+body > main .accommodations > article > a > img {
+    border: var(--pico-border-width) solid var(--pico-muted-border-color);
+    border-radius: var(--pico-border-radius);
 }

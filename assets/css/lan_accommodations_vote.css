@@ -5,12 +5,12 @@
  * Liste des logements */
 
 body > main .accommodations > article .votes {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-auto-flow: column;
+    display: flex;
+    flex-direction: column;
     column-gap: var(--pico-grid-column-gap);
     row-gap: var(--pico-grid-row-gap);
     line-height: initial;
+    align-self: center;
 }
 
 body > main .accommodations > article .votes > div {
@@ -49,7 +49,7 @@ body > main .subheading > p {
     flex-shrink: 0;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1280px) {
     body > main .subheading {
         flex-direction: row;
     }

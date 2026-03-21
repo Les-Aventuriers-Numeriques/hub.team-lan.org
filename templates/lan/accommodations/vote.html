@@ -1,6 +1,6 @@
 {% extends 'layout.html' %}
 
-{% from 'macros.html' import vote_accommodation, bi_icon, field with context %}
+{% from 'macros.html' import vote_accommodation, field with context %}
 
 {% block title %}LAN party : voter pour des logements{% endblock %}
 
@@ -28,22 +28,23 @@
                 {% set my_vote = current_user.my_vote(proposal) %}
 
                 <article id="a={{ proposal.id }}">
-                    <img src="{{ proposal.photo_url }}">
+                    <a href="{{ proposal.photo_url }}" target="_blank">
+                        <img src="{{ proposal.photo_url }}" alt="Photo du logement {{ proposal.title }}">
+                    </a>
                     <div class="details">
                         <h4>
-                            {{ proposal.total_price|currencyformat('EUR') }} <a href="{{ proposal.listing_url }}">{{ proposal.title }}</a>
+                            {{ proposal.total_price|currencyformat('EUR') }} <a href="{{ proposal.listing_url }}" target="_blank">{{ proposal.title }}</a>
                         </h4>
 
-                        <div>{{ bi_icon('geo-alt-fill') }} <a href="{{ proposal.location_url }}">{{ proposal.location_name }}</a></div>
+                        <div><i class="bi bi-geo-alt-fill"></i> <a href="{{ proposal.location_url }}" target="_blank">{{ proposal.location_name }}</a></div>
 
                         <div>{{ proposal.bedrooms }} chambres / {{ proposal.single_beds }} lits simples / {{ proposal.twin_beds }} lits doubles / {{ proposal.large_tables }} grandes tables</div>
                         <div>{{ proposal.has_fiber }} fibre / {{ proposal.has_private_parking }} parking privé</div>
-
-                        <div class="votes">
-                            {% for vote_type in VoteType %}
-                                {{ vote_accommodation(vote_type, proposal, my_vote) }}
-                            {% endfor %}
-                        </div>
+                    </div>
+                    <div class="votes">
+                        {% for vote_type in VoteType %}
+                            {{ vote_accommodation(vote_type, proposal, my_vote) }}
+                        {% endfor %}
                     </div>
                 </article>
             {% endfor %}
