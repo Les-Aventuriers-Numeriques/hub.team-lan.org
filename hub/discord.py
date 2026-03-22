@@ -154,7 +154,7 @@ def _handle_vote_button(ctx: Context, game_id: int, vote_type: Literal['YES', 'N
     elif g.lan_games_status == 'disabled':
         message = 'On ne choisis pas encore les jeux pour la LAN, revient plus tard !'
     elif g.lan_games_status == 'read_only':
-        message = 'Trop tard, la date de la LAN approche, les propositions et votes sont figés !'
+        message = 'Trop tard, la date de la LAN approche, les jeux principaux ont été choisis !'
     else:
         try:
             LanGameProposalVote.vote(user, game_id, VoteType(vote_type))
@@ -197,7 +197,7 @@ def submit_game_proposal_command(ctx: Context, jeu: Autocomplete(int)) -> Messag
     elif g.lan_games_status == 'disabled':
         message = 'On ne choisis pas encore les jeux pour la LAN, revient plus tard !'
     elif g.lan_games_status == 'read_only':
-        message = 'Trop tard, la date de la LAN approche, les propositions et votes sont figés !'
+        message = 'Trop tard, la date de la LAN approche, les jeux principaux ont été choisis !'
     else:
         try:
             proposal = LanGameProposal()

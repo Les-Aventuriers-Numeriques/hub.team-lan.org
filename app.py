@@ -1,6 +1,6 @@
+from sqlalchemy_searchable import make_searchable, SearchOptions
 from flask import Flask, render_template, request, session, g
 from flask_discord_interactions import DiscordInteractions
-from sqlalchemy_searchable import make_searchable
 from werkzeug.exceptions import HTTPException
 from flask_assets import Environment, Bundle
 from sqlalchemy.orm import DeclarativeBase
@@ -19,7 +19,7 @@ from environs import Env
 env = Env()
 env.read_env()
 
-app =Flask(__name__)
+app = Flask(__name__)
 
 app.config.update(
     # -----------------------------------------------------------
@@ -72,6 +72,7 @@ app.config.update(
     DISCORD_GUILD_ID=env.int('DISCORD_GUILD_ID'),
     DISCORD_MEMBER_ROLE_ID=env.int('DISCORD_MEMBER_ROLE_ID'),
     DISCORD_LAN_PARTICIPANT_ROLE_ID=env.int('DISCORD_LAN_PARTICIPANT_ROLE_ID'),
+    DISCORD_LAN_ORGANIZER_ROLE_ID=env.int('DISCORD_LAN_ORGANIZER_ROLE_ID'),
     DISCORD_ADMIN_ROLE_ID=env.int('DISCORD_ADMIN_ROLE_ID'),
     DISCORD_LAN_CHANNEL_ID=env.int('DISCORD_LAN_CHANNEL_ID', None),
 
@@ -142,10 +143,11 @@ except ImportError:
 assets = Environment(app)
 assets.append_path('assets')
 
-assets.register('css_base', Bundle('css/base.css', filters='rcssmin', output='css/base.css'))
-assets.register('css_lan_games', Bundle('css/base.css', 'css/lan_games.css', filters='rcssmin', output='css/lan_games.css'))
-assets.register('css_lan_games_vote', Bundle('css/base.css', 'css/lan_games.css', 'css/lan_games_vote.css', filters='rcssmin', output='css/lan_games_vote.css'))
-assets.register('css_lan_games_proposal', Bundle('css/base.css', 'css/lan_games.css', 'css/lan_games_proposal.css', filters='rcssmin', output='css/lan_games_proposal.css'))
+assets.register('css_base', Bundle('css/base.css', filters='rcssmin', output='css/base.min.css'))
+assets.register('css_lan_games_vote', Bundle('css/base.css', 'css/lan_games.css', 'css/lan_games_vote.css', filters='rcssmin', output='css/lan_games_vote.min.css'))
+assets.register('css_lan_games_proposal', Bundle('css/base.css', 'css/lan_games.css', 'css/lan_games_proposal.css', filters='rcssmin', output='css/lan_games_proposal.min.css'))
+assets.register('css_lan_accommodations_vote', Bundle('css/base.css', 'css/lan_accommodations_vote.css', filters='rcssmin', output='css/lan_accommodations_vote.min.css'))
+assets.register('css_lan_accommodations_proposal', Bundle('css/base.css', 'css/lan_accommodations_proposal.css', filters='rcssmin', output='css/lan_accommodations_proposal.min.css'))
 
 # Flask-Babel
 babel = Babel(app)
@@ -157,6 +159,7 @@ discord_interactions.set_route(app.config['DISCORD_INTERACTIONS_PATH'])
 # Flask-Caching
 cache = Cache(app)
 
+
 # Flask-SQLAlchemy
 class AppDeclarativeBase(DeclarativeBase):
     pass
@@ -164,7 +167,12 @@ class AppDeclarativeBase(DeclarativeBase):
 
 db = SQLAlchemy(app, model_class=AppDeclarativeBase)
 
-make_searchable(db.metadata, options={'regconfig': app.config['SQLALCHEMY_SCHEMA_NAME'] + '.english_nostop'})
+make_searchable(
+    db.metadata,
+    options=SearchOptions(
+        regconfig=app.config['SQLALCHEMY_SCHEMA_NAME'] + '.english_nostop'
+    )
+)
 
 # Flask-Migrate
 migrate = Migrate(app, db)
@@ -193,7 +201,10 @@ def before_request():
     if request.endpoint and request.endpoint.startswith(('static', 'debugtoolbar', '_debug_toolbar')):
         return
 
-    g.lan_games_status =  Setting.get('lan_games_status', 'disabled')
+    statuses = Setting.get(['lan_games_status', 'lan_accommodations_status'])
+
+    g.lan_games_status =  statuses.get('lan_games_status', 'disabled')
+    g.lan_accommodations_status = statuses.get('lan_accommodations_status', 'disabled')
 
     if request.path == app.config['DISCORD_INTERACTIONS_PATH']:
         return

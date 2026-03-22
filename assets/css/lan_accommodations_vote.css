@@ -1,0 +1,134 @@
+/************************************************************************
+ * Votes pour les logements de la LAN */
+
+/************************************************************************
+ * Liste des logements */
+
+body > main .accommodations {
+    display: flex;
+    flex-direction: column;
+    column-gap: var(--pico-grid-column-gap);
+    row-gap: var(--pico-grid-row-gap);
+}
+
+body > main .accommodations > article {
+    --pico-grid-row-gap: 0.5rem;
+
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    column-gap: var(--pico-grid-column-gap);
+    row-gap: var(--pico-grid-row-gap);
+    margin-bottom: 0;
+}
+
+body > main .accommodations > article:target {
+    border-width: var(--pico-border-width);
+    border-style: solid;
+    border-color: var(--pico-primary-border);
+    scroll-margin-top: var(--pico-spacing);
+}
+
+body > main .accommodations > article > .details {
+    flex-grow: 1;
+
+    display: flex;
+    flex-direction: column;
+    column-gap: var(--pico-grid-column-gap);
+    row-gap: var(--pico-grid-row-gap);
+}
+
+body > main .accommodations > article > .details > .features {
+    display: flex;
+    flex-direction: row;
+    column-gap: 0.5rem;
+    row-gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+body > main .accommodations > article > .details > h4 {
+    margin-bottom: 0;
+}
+
+body > main .accommodations > article > .photo {
+    flex-shrink: 0;
+    align-self: center;
+}
+
+body > main .accommodations > article > .photo a {
+    display: flex;
+    justify-content: center;
+}
+
+body > main .accommodations > article > .photo a > img {
+    border: var(--pico-border-width) solid var(--pico-muted-border-color);
+    border-radius: var(--pico-border-radius);
+}
+
+body > main .accommodations > article .votes {
+    display: flex;
+    flex-direction: row;
+    column-gap: var(--pico-grid-column-gap);
+    row-gap: var(--pico-grid-row-gap);
+    line-height: initial;
+    align-items: center;
+    justify-content: center;
+}
+
+body > main .accommodations > article .votes > div {
+    display: flex;
+    flex-direction: column;
+    column-gap: var(--pico-grid-column-gap);
+    row-gap: var(--pico-grid-row-gap);
+    justify-content: space-between;
+    align-items: center;
+}
+
+body > main .accommodations > article .votes > div .my-vote {
+    color: var(--pico-primary);
+}
+
+body > main .accommodations > article .votes > div > span {
+    color: var(--pico-muted-color);
+    font-size: 0.7em;
+    white-space: nowrap;
+}
+
+/************************************************************************
+ * Sous-en-tête */
+
+body > main .subheading {
+    display: flex;
+    flex-direction: column;
+    column-gap: var(--pico-grid-column-gap);
+    row-gap: var(--pico-grid-row-gap);
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--pico-spacing);
+}
+
+body > main .subheading > p {
+    flex-shrink: 0;
+}
+
+@media (min-width: 1280px) {
+    body > main .subheading {
+        flex-direction: row;
+    }
+
+    body > main .accommodations > article {
+        flex-direction: row;
+    }
+
+    body > main .accommodations > article > .photo {
+        width: 30%;
+    }
+
+    body > main .accommodations > article .votes {
+        flex-direction: column;
+    }
+
+    body > main .accommodations > article .votes > a {
+        margin-top: auto;
+    }
+}

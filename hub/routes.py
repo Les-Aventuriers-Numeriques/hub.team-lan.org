@@ -1,5 +1,5 @@
-from hub.forms import LanGamesProposalSearchForm, LanGamesSettingsForm, LanGamesVoteFilterForm
-from hub.models import User, Game, LanGameProposal, LanGameProposalVote, VoteType, Setting
+from hub.models import User, Game, LanGameProposal, LanGameProposalVote, VoteType, Setting, LanAccommodationProposal, LanAccommodationProposalVote
+from hub.forms import LanGamesProposalSearchForm, LanGamesSettingsForm, LanGamesVoteFilterForm, LanAccommodationsSettingsForm, LanAccommodationsVoteFilterForm, LanGamesProposalForm
 from flask import render_template, redirect, url_for, flash, session, request, g
 from flask_login import login_required, current_user, logout_user, login_user
 from sqlalchemy_searchable import search, inspect_search_vectors
@@ -26,7 +26,7 @@ def to_home_if_authenticated(f):
     return decorated
 
 
-def to_home_if_cannot_access_lan_section(f):
+def to_home_if_not_lan_participant(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         if not current_user.is_lan_participant:
@@ -44,13 +44,44 @@ def to_home_if_cannot_access_lan_section(f):
     return decorated
 
 
-def to_lan_games_vote_if_lan_section_read_only(f):
+def to_lan_games_vote_if_lan_games_read_only(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         if g.lan_games_status == 'read_only':
-            flash('Trop tard, la date de la LAN approche, les propositions et votes sont figés !', 'error')
+            flash('Trop tard, la date de la LAN approche, les jeux principaux ont été choisis !', 'error')
 
             return redirect(url_for('lan_games_vote'))
+
+        return f(*args, **kwargs)
+
+    return decorated
+
+
+def to_home_if_not_lan_organizer(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if not current_user.is_lan_organizer:
+            flash('Désolé, tu ne fais pas partie des organisateurs de la LAN.', 'error')
+
+            return redirect(url_for('home'))
+
+        if g.lan_accommodations_status == 'disabled':
+            flash('On ne choisis pas encore les logements pour la LAN, revient plus tard !', 'error')
+
+            return redirect(url_for('home'))
+
+        return f(*args, **kwargs)
+
+    return decorated
+
+
+def to_lan_accommodations_vote_if_lan_accommodations_read_only(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if g.lan_accommodations_status == 'read_only':
+            flash('Trop tard, le logement a déjà été choisi !', 'error')
+
+            return redirect(url_for('accommodations'))
 
         return f(*args, **kwargs)
 
@@ -136,8 +167,9 @@ def login_callback() -> Union[str, Response]:
 
     is_member = str(app.config['DISCORD_MEMBER_ROLE_ID']) in user_roles
     is_lan_participant = str(app.config['DISCORD_LAN_PARTICIPANT_ROLE_ID']) in user_roles
+    is_lan_organizer = str(app.config['DISCORD_LAN_ORGANIZER_ROLE_ID']) in user_roles
     is_admin = str(app.config['DISCORD_ADMIN_ROLE_ID']) in user_roles
-    has_any_role = is_member or is_lan_participant or is_admin
+    has_any_role = is_member or is_lan_participant or is_lan_organizer or is_admin
 
     user_info = membership_info.get('user', {})
 
@@ -169,6 +201,7 @@ def login_callback() -> Union[str, Response]:
 
     user.is_member = is_member
     user.is_lan_participant = is_lan_participant
+    user.is_lan_organizer = is_lan_organizer
     user.is_admin = is_admin
     user.must_relogin = False
 
@@ -209,7 +242,7 @@ def home() -> str:
 @app.route('/lan/jeux/voter')
 @login_required
 @logout_if_must_relogin
-@to_home_if_cannot_access_lan_section
+@to_home_if_not_lan_participant
 def lan_games_vote() -> Union[str, Response]:
     form = LanGamesVoteFilterForm(request.args, meta={'csrf': False})
     validated = len(request.args) > 0 and form.validate()
@@ -265,7 +298,7 @@ def lan_games_vote() -> Union[str, Response]:
     proposals.sort(key=lambda p: p.score, reverse=True)
 
     return render_template(
-        'lan/games.html',
+        'lan/games/vote.html',
         form=form,
         validated=validated,
         proposals=proposals,
@@ -276,8 +309,8 @@ def lan_games_vote() -> Union[str, Response]:
 @app.route('/lan/jeux/voter/<int(signed=True):game_id>/<any({}):vote_type>'.format(VoteType.cslist()))
 @login_required
 @logout_if_must_relogin
-@to_home_if_cannot_access_lan_section
-@to_lan_games_vote_if_lan_section_read_only
+@to_home_if_not_lan_participant
+@to_lan_games_vote_if_lan_games_read_only
 def lan_games_proposal_vote(game_id: int, vote_type: str) -> Response:
     anchor = None
 
@@ -296,8 +329,8 @@ def lan_games_proposal_vote(game_id: int, vote_type: str) -> Response:
 @app.route('/lan/jeux/proposer')
 @login_required
 @logout_if_must_relogin
-@to_home_if_cannot_access_lan_section
-@to_lan_games_vote_if_lan_section_read_only
+@to_home_if_not_lan_participant
+@to_lan_games_vote_if_lan_games_read_only
 def lan_games_proposal() -> Union[str, Response]:
     form = LanGamesProposalSearchForm(request.args, meta={'csrf': False})
     validated = len(request.args) > 0 and form.validate()
@@ -323,7 +356,7 @@ def lan_games_proposal() -> Union[str, Response]:
         ).scalars().all()
 
     return render_template(
-        'lan/games_proposal.html',
+        'lan/games/propose.html',
         form=form,
         validated=validated,
         games=games
@@ -333,8 +366,8 @@ def lan_games_proposal() -> Union[str, Response]:
 @app.route('/lan/jeux/proposer/<int(signed=True):game_id>')
 @login_required
 @logout_if_must_relogin
-@to_home_if_cannot_access_lan_section
-@to_lan_games_vote_if_lan_section_read_only
+@to_home_if_not_lan_participant
+@to_lan_games_vote_if_lan_games_read_only
 def lan_games_proposal_submit(game_id: int) -> Response:
     anchor = None
 
@@ -362,6 +395,143 @@ def lan_games_proposal_submit(game_id: int) -> Response:
         flash('Ce jeu a déjà été proposé (ou identifiant de jeu invalide).', 'error')
 
     return redirect(url_for('lan_games_proposal', **request.args, _anchor=anchor))
+
+
+@app.route('/lan/logements/voter')
+@login_required
+@logout_if_must_relogin
+@to_home_if_not_lan_organizer
+def lan_accommodations_vote() -> Union[str, Response]:
+    form = LanAccommodationsVoteFilterForm(request.args, meta={'csrf': False})
+    validated = len(request.args) > 0 and form.validate()
+
+    proposals = db.session.execute(
+        sa.select(LanAccommodationProposal)
+        .options(
+            sa_orm.selectinload(LanAccommodationProposal.user),
+            sa_orm.selectinload(LanAccommodationProposal.votes)
+        )
+    ).scalars().all()
+
+    lan_organizers_count = db.session.execute(
+        sa.select(sa_func.count('*')).select_from(User)
+        .where(User.is_lan_organizer == True)
+    ).scalar()
+
+    if validated and form.filter.data:
+        def _voted(proposal: LanAccommodationProposal) -> bool:
+            return current_user.id in [
+                vote.user_id for vote in proposal.votes
+            ]
+
+        def _not_voted(proposal: LanAccommodationProposal) -> bool:
+            return not _voted(proposal)
+
+        def _all_voted(proposal: LanAccommodationProposal) -> bool:
+            return len(proposal.votes) == lan_organizers_count
+
+        def _not_all_voted(proposal: LanAccommodationProposal) -> bool:
+            return not _all_voted(proposal)
+
+        filter_func = None
+
+        if form.filter.data == 'voted':
+            filter_func = _voted
+        elif form.filter.data == 'not-voted':
+            filter_func = _not_voted
+        elif form.filter.data == 'all-voted':
+            filter_func = _all_voted
+        elif form.filter.data == 'not-all-voted':
+            filter_func = _not_all_voted
+
+        if filter_func:
+            proposals = [
+                proposal for proposal in proposals if filter_func(proposal)
+            ]
+
+    proposals.sort(key=lambda p: p.score, reverse=True)
+
+    return render_template(
+        'lan/accommodations/vote.html',
+        form=form,
+        validated=validated,
+        proposals=proposals,
+        VoteType=VoteType
+    )
+
+
+@app.route('/lan/logements/voter/<int(signed=True):accommodation_proposal_id>/<any({}):vote_type>'.format(VoteType.cslist()))
+@login_required
+@logout_if_must_relogin
+@to_home_if_not_lan_organizer
+@to_lan_accommodations_vote_if_lan_accommodations_read_only
+def lan_accommodations_proposal_vote(accommodation_proposal_id: int, vote_type: str) -> Response:
+    anchor = None
+
+    try:
+        LanAccommodationProposalVote.vote(current_user, accommodation_proposal_id, VoteType(vote_type))
+
+        db.session.commit()
+
+        anchor = f'a={accommodation_proposal_id}'
+    except IntegrityError:
+        flash('Identifiant de logement invalide.', 'error')
+
+    return redirect(url_for('lan_accommodations_vote', filter=request.args.get('filter'), _anchor=anchor))
+
+
+@app.route('/lan/logements/proposer', methods=['GET', 'POST'])
+@login_required
+@logout_if_must_relogin
+@to_home_if_not_lan_organizer
+@to_lan_accommodations_vote_if_lan_accommodations_read_only
+def lan_accommodations_proposal() -> Union[str, Response]:
+    form = LanGamesProposalForm()
+
+    if form.validate_on_submit():
+        lan_accommodation_proposal = LanAccommodationProposal()
+        lan_accommodation_proposal.user_id = current_user.id
+
+        form.populate_obj(lan_accommodation_proposal)
+
+        db.session.add(lan_accommodation_proposal)
+        db.session.commit()
+
+        flash('Merci pour ta proposition !', 'success')
+
+        return redirect(url_for('lan_accommodations_vote', _anchor=f'a={lan_accommodation_proposal.id}'))
+
+    return render_template(
+        'lan/accommodations/propose.html',
+        form=form
+    )
+
+
+@app.route('/lan/logements/editer/<int(signed=True):accommodation_proposal_id>', methods=['GET', 'POST'])
+@login_required
+@logout_if_must_relogin
+@to_home_if_not_lan_organizer
+@to_lan_accommodations_vote_if_lan_accommodations_read_only
+def lan_accommodations_proposal_edit(accommodation_proposal_id: int) -> Union[str, Response]:
+    lan_accommodation_proposal = db.get_or_404(LanAccommodationProposal, accommodation_proposal_id)
+
+    form = LanGamesProposalForm(obj=lan_accommodation_proposal)
+
+    if form.validate_on_submit():
+        form.populate_obj(lan_accommodation_proposal)
+
+        db.session.add(lan_accommodation_proposal)
+        db.session.commit()
+
+        flash('Proposition mise à jour.', 'success')
+
+        return redirect(url_for('lan_accommodations_vote', _anchor=f'a={lan_accommodation_proposal.id}'))
+
+    return render_template(
+        'lan/accommodations/edit.html',
+        proposal=lan_accommodation_proposal,
+        form=form
+    )
 
 
 @app.route('/admin/utilisateurs')
@@ -439,6 +609,44 @@ def admin_users_lan_participants_force_relogin() -> Response:
     return redirect(url_for('admin_users'))
 
 
+@app.route('/admin/utilisateurs/utilisateurs-forcer-reconnexion')
+@login_required
+@logout_if_must_relogin
+@to_home_if_not_admin
+def admin_users_force_relogin() -> Response:
+    result = db.session.execute(
+        sa.update(User).values(must_relogin=True, is_lan_organizer=False, is_lan_participant=False)
+    )
+
+    db.session.commit()
+
+    if result.rowcount >= 1:
+        flash('Tous les utilisateurs ont forcés à se reconnecter.', 'success')
+    else:
+        flash('Aucun utilisateur à forcer à se reconnecter.', 'error')
+
+    return redirect(url_for('admin_users'))
+
+
+@app.route('/admin/utilisateurs/orga-lan-forcer-reconnexion')
+@login_required
+@logout_if_must_relogin
+@to_home_if_not_admin
+def admin_users_lan_organizers_force_relogin() -> Response:
+    result = db.session.execute(
+        sa.update(User).where(User.is_lan_organizer == True).values(must_relogin=True, is_lan_organizer=False)
+    )
+
+    db.session.commit()
+
+    if result.rowcount >= 1:
+        flash('Organisateurs de la LAN forcés à se reconnecter.', 'success')
+    else:
+        flash('Aucun organisateur de la LAN à forcer à se reconnecter.', 'error')
+
+    return redirect(url_for('admin_users'))
+
+
 @app.route('/admin/lan/jeux', methods=['GET', 'POST'])
 @login_required
 @logout_if_must_relogin
@@ -454,9 +662,7 @@ def admin_lan_games() -> Union[str, Response]:
 
     proposals.sort(key=lambda p: p.game.name)
 
-    form_data = Setting.get(['lan_games_status'])
-
-    form = LanGamesSettingsForm(data=form_data)
+    form = LanGamesSettingsForm(data={'lan_games_status': g.lan_games_status})
 
     if form.validate_on_submit():
         Setting.set({
@@ -470,7 +676,7 @@ def admin_lan_games() -> Union[str, Response]:
         return redirect(url_for('admin_lan_games'))
 
     return render_template(
-        'admin/lan_games.html',
+        'admin/lan/games.html',
         proposals=proposals,
         form=form
     )
@@ -544,3 +750,105 @@ def admin_lan_game_proposals_reset_votes() -> Response:
     flash('Votes réinitialisés.', 'success')
 
     return redirect(url_for('admin_lan_games'))
+
+
+@app.route('/admin/lan/logements', methods=['GET', 'POST'])
+@login_required
+@logout_if_must_relogin
+@to_home_if_not_admin
+def admin_lan_accommodations() -> Union[str, Response]:
+    proposals = db.session.execute(
+        sa.select(LanAccommodationProposal)
+        .options(
+            sa_orm.selectinload(LanAccommodationProposal.user)
+        )
+        .order_by(LanAccommodationProposal.title)
+    ).scalars().all()
+
+    form = LanAccommodationsSettingsForm(data={'lan_accommodations_status': g.lan_accommodations_status})
+
+    if form.validate_on_submit():
+        Setting.set({
+            'lan_accommodations_status': form.lan_accommodations_status.data,
+        })
+
+        db.session.commit()
+
+        flash('Paramètres enregistrés.', 'success')
+
+        return redirect(url_for('admin_lan_accommodations'))
+
+    return render_template(
+        'admin/lan/accommodations.html',
+        proposals=proposals,
+        form=form
+    )
+
+@app.route('/admin/lan/logements/proposition/<int(signed=True):accommodation_proposal_id>/supprimer')
+@login_required
+@logout_if_must_relogin
+@to_home_if_not_admin
+def admin_lan_accommodation_proposal_delete(accommodation_proposal_id: int) -> Response:
+    result = db.session.execute(
+        sa.delete(LanAccommodationProposal).where(LanAccommodationProposal.id == accommodation_proposal_id)
+    )
+
+    db.session.commit()
+
+    if result.rowcount == 1:
+        flash('Proposition supprimée.', 'success')
+    else:
+        flash('Aucune proposition à supprimer.', 'error')
+
+    return redirect(url_for('admin_lan_accommodations'))
+
+
+@app.route('/admin/lan/logements/proposition/<int(signed=True):accommodation_proposal_id>/supprimer-votes')
+@login_required
+@logout_if_must_relogin
+@to_home_if_not_admin
+def admin_lan_accommodation_proposal_delete_votes(accommodation_proposal_id: int) -> Response:
+    result = db.session.execute(
+        sa.delete(LanAccommodationProposalVote).where(LanAccommodationProposalVote.accommodation_proposal_id == accommodation_proposal_id)
+    )
+
+    db.session.commit()
+
+    if result.rowcount >= 1:
+        flash('Votes supprimés.', 'success')
+    else:
+        flash('Aucun vote à supprimer.', 'error')
+
+    return redirect(url_for('admin_lan_accommodations'))
+
+
+@app.route('/admin/lan/logements/propositions/reinitialiser-tout')
+@login_required
+@logout_if_must_relogin
+@to_home_if_not_admin
+def admin_lan_accommodation_proposals_reset_all() -> Response:
+    db.session.execute(
+        sa.delete(LanAccommodationProposal)
+    )
+
+    db.session.commit()
+
+    flash('Propositions et votes réinitialisés.', 'success')
+
+    return redirect(url_for('admin_lan_accommodations'))
+
+
+@app.route('/admin/lan/logements/propositions/reinitialiser-votes')
+@login_required
+@logout_if_must_relogin
+@to_home_if_not_admin
+def admin_lan_accommodation_proposals_reset_votes() -> Response:
+    db.session.execute(
+        sa.delete(LanAccommodationProposalVote)
+    )
+
+    db.session.commit()
+
+    flash('Votes réinitialisés.', 'success')
+
+    return redirect(url_for('admin_lan_accommodations'))
