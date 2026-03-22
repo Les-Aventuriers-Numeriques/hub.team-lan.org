@@ -86,3 +86,23 @@
         <img src="{{ user.avatar_url }}?size=24" alt="Avatar de {{ user.display_name }}" class="avatar">
     {%- endif %}
 {%- endmacro %}
+
+{% macro accommodation_feature_count(count, icon, bi=False, highlight=False) -%}
+    <span class="{{ 'text-error' if count == 0 and highlight }}">
+        {% if bi -%}
+            <i class="bi bi-{{ icon }}"></i>
+        {%- else -%}
+            <svg style="width: 1.2em; height: 1.2em"><use href="{{ url_for('static', filename='images/extra-icons.svg', _anchor=icon) }}"></use></svg>
+        {%- endif %} {{ count }}
+    </span>
+{%- endmacro %}
+
+{% macro accommodation_feature_boolean(value, icon, bi=False) -%}
+    <span class="{% if value is true %}text-success{% elif value is false %}text-error{% endif %}">
+        {% if bi -%}
+            <i class="bi bi-{{ icon }}"></i>
+        {%- else -%}
+            <svg style="width: 1.2em; height: 1.2em"><use href="{{ url_for('static', filename='images/extra-icons.svg', _anchor=icon) }}"></use></svg>
+        {%- endif %} {% if value is true %}Oui{% elif value is false %}Non{% else %}?{% endif %}
+    </span>
+{%- endmacro %}

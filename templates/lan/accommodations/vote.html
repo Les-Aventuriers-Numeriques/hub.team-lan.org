@@ -1,6 +1,6 @@
 {% extends 'layout.html' %}
 
-{% from 'macros.html' import vote_accommodation, field with context %}
+{% from 'macros.html' import vote_accommodation, accommodation_feature_count, accommodation_feature_boolean, field with context %}
 
 {% block title %}LAN party : voter pour des logements{% endblock %}
 
@@ -38,10 +38,19 @@
                             {{ proposal.total_price|currencyformat('EUR') }} <a href="{{ proposal.listing_url }}" target="_blank">{{ proposal.title }}</a>
                         </h4>
 
-                        <div><i class="bi bi-geo-alt-fill"></i> <a href="{{ proposal.location_url }}" target="_blank">{{ proposal.location_name }}</a></div>
+                        <div class="features">
+                            <span>
+                                <i class="bi bi-geo-alt-fill"></i> <a href="{{ proposal.location_url }}" target="_blank">{{ proposal.location_name }}</a>
+                            </span>
 
-                        <div>{{ proposal.bedrooms }} chambres / {{ proposal.single_beds }} lits simples / {{ proposal.twin_beds }} lits doubles / {{ proposal.large_tables }} grandes tables</div>
-                        <div>{{ proposal.has_fiber }} fibre / {{ proposal.has_private_parking }} parking privé</div>
+                            {{ accommodation_feature_count(proposal.max_guests, 'people-fill', bi=True) }}
+                            {{ accommodation_feature_count(proposal.bedrooms, 'bedroom') }}
+                            {{ accommodation_feature_count(proposal.single_beds, 'bed-single') }}
+                            {{ accommodation_feature_count(proposal.twin_beds, 'bed-double') }}
+                            {{ accommodation_feature_count(proposal.large_tables, 'table', highlight=True) }}
+                            {{ accommodation_feature_boolean(proposal.has_fiber, 'speedometer', bi=True) }}
+                            {{ accommodation_feature_boolean(proposal.has_private_parking, 'p-square-fill', bi=True) }}
+                        </div>
 
                         {% if proposal.notes %}
                             <div>{{ proposal.notes }}</div>

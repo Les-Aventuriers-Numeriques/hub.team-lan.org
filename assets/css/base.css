@@ -20,6 +20,13 @@ nav details.dropdown {
     display: inline-block;
 }
 
+details.dropdown > summary + ul li.separator {
+    background-color: var(--pico-muted-border-color);
+    height: 1px;
+    padding: 0;
+    margin: 0.5rem 0;
+}
+
 i.bi {
     vertical-align: middle;
 }
@@ -27,6 +34,14 @@ i.bi {
 img.avatar {
     max-height: 24px;
     max-width: 24px;
+}
+
+.text-success {
+    color: var(--pico-form-element-valid-active-border-color);
+}
+
+.text-error {
+    color: var(--pico-form-element-invalid-active-border-color);
 }
 
 /************************************************************************
