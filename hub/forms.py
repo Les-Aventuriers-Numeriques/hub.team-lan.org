@@ -111,7 +111,8 @@ class LanGamesProposalForm(FlaskForm):
             ('', 'Sait pas'),
             ('yes', 'Oui'),
             ('no', 'Non'),
-        ]
+        ],
+        # coerce=lambda value: True if value == 'yes' else False if value == 'no' else None
     )
 
     has_private_parking = SelectField(
@@ -121,7 +122,8 @@ class LanGamesProposalForm(FlaskForm):
             ('', 'Sait pas'),
             ('yes', 'Oui'),
             ('no', 'Non'),
-        ]
+        ],
+        # coerce=lambda value: True if value == 'yes' else False if value == 'no' else None
     )
 
     total_price = DecimalField(
@@ -138,20 +140,16 @@ class LanGamesProposalForm(FlaskForm):
         }
     )
 
-    def populate_proposal(self, proposal: LanAccommodationProposal):
-        proposal.title = self.title.data
-        proposal.photo_url = self.photo_url.data
-        proposal.listing_url = self.listing_url.data
-        proposal.location_name = self.location_name.data
-        proposal.location_url = self.location_url.data
-        proposal.bedrooms = self.bedrooms.data
-        proposal.single_beds = self.single_beds.data
-        proposal.twin_beds = self.twin_beds.data
-        proposal.large_tables = self.large_tables.data
-        proposal.has_fiber = True if self.has_fiber.data == 'yes' else False if self.has_fiber.data == 'no' else None
-        proposal.has_private_parking = True if self.has_private_parking.data == 'yes' else False if self.has_private_parking.data == 'no' else None
-        proposal.total_price = self.total_price.data
-        proposal.notes = self.notes.data
+    # def filter_has_fiber(self, value):
+    #     print(value)
+    #
+    #     if not isinstance(value, str):
+    #         return 'yes' if value is True else 'no' if value is False else ''
+    #
+    #     return value
+
+    # def filter_has_private_parking(self, value: str) -> str:
+    #     return 'yes' if value is True else 'no' if value is False else ''
 
 
 class LanGamesSettingsForm(FlaskForm):

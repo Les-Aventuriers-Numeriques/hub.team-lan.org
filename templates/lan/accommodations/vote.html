@@ -61,7 +61,7 @@
                             {{ vote_accommodation(vote_type, proposal, my_vote) }}
                         {% endfor %}
 
-                        <a href="" style="font-size: 0.8em">
+                        <a href="{{ url_for('lan_accommodations_proposal_edit', accommodation_proposal_id=proposal.id) }}" style="font-size: 0.8em">
                             <i class="bi bi-pencil"></i>
                         </a>
                     </div>

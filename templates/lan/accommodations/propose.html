@@ -14,55 +14,10 @@
     <form method="post" action="{{ url_for('lan_accommodations_proposal') }}">
         {{ form.csrf_token }}
 
-        {{ field(form.title) }}
-        {{ field(form.total_price) }}
+        {% include 'lan/accommodations/partials/form.html' %}
 
-        <div class="row">
-            <div>
-                {{ field(form.photo_url) }}
-            </div>
-            <div>
-                {{ field(form.listing_url) }}
-            </div>
-        </div>
-
-        <div class="row">
-            <div>
-                {{ field(form.location_name) }}
-            </div>
-            <div>
-                {{ field(form.location_url) }}
-            </div>
-        </div>
-
-        <div class="row">
-            <div>
-                {{ field(form.bedrooms) }}
-            </div>
-            <div>
-                {{ field(form.single_beds) }}
-            </div>
-            <div>
-                {{ field(form.twin_beds) }}
-            </div>
-        </div>
-
-        <div class="row">
-            <div>
-                {{ field(form.large_tables) }}
-            </div>
-            <div>
-                {{ field(form.has_fiber) }}
-            </div>
-            <div>
-                {{ field(form.has_private_parking) }}
-            </div>
-        </div>
-
-        {{ field(form.notes) }}
-
-        <p class="mb-0">
+        <div>
             <button type="submit" class="mb-0">Soumettre</button>
-        </p>
+        </div>
     </form>
 {% endblock %}

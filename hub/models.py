@@ -213,7 +213,7 @@ class LanAccommodationProposalVote(CreatedAtMixin, UpdatedAtMixin, db.Model):
     user = relationship('User', uselist=False, back_populates='accommodation_votes')
 
     @classmethod
-    def vote(cls, user: User, proposal_id: int, vote_type: VoteType):
+    def vote(cls, user: User, proposal_id: int, vote_type: VoteType) -> None:
         query = postgresql.insert(cls).values(
             accommodation_proposal_id=proposal_id,
             user_id=user.id,
