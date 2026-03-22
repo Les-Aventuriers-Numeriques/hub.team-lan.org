@@ -143,11 +143,11 @@ except ImportError:
 assets = Environment(app)
 assets.append_path('assets')
 
-assets.register('css_base', Bundle('css/base.css', filters='rcssmin', output='css/base.css'))
-assets.register('css_lan_games', Bundle('css/base.css', 'css/lan_games.css', filters='rcssmin', output='css/lan_games.css'))
-assets.register('css_lan_games_vote', Bundle('css/base.css', 'css/lan_games.css', 'css/lan_games_vote.css', filters='rcssmin', output='css/lan_games_vote.css'))
-assets.register('css_lan_games_proposal', Bundle('css/base.css', 'css/lan_games.css', 'css/lan_games_proposal.css', filters='rcssmin', output='css/lan_games_proposal.css'))
-assets.register('css_lan_accommodations_vote', Bundle('css/base.css', 'css/lan_accommodations_vote.css', filters='rcssmin', output='css/lan_accommodations_vote.css'))
+assets.register('css_base', Bundle('css/base.css', filters='rcssmin', output='css/base.min.css'))
+assets.register('css_lan_games_vote', Bundle('css/base.css', 'css/lan_games.css', 'css/lan_games_vote.css', filters='rcssmin', output='css/lan_games_vote.min.css'))
+assets.register('css_lan_games_proposal', Bundle('css/base.css', 'css/lan_games.css', 'css/lan_games_proposal.css', filters='rcssmin', output='css/lan_games_proposal.min.css'))
+assets.register('css_lan_accommodations_vote', Bundle('css/base.css', 'css/lan_accommodations_vote.css', filters='rcssmin', output='css/lan_accommodations_vote.min.css'))
+assets.register('css_lan_accommodations_proposal', Bundle('css/base.css', 'css/lan_accommodations_proposal.css', filters='rcssmin', output='css/lan_accommodations_proposal.min.css'))
 
 # Flask-Babel
 babel = Babel(app)
@@ -204,7 +204,7 @@ def before_request():
     statuses = Setting.get(['lan_games_status', 'lan_accommodations_status'])
 
     g.lan_games_status =  statuses.get('lan_games_status', 'disabled')
-    g.lan_accommodations_status =  statuses.get('lan_accommodations_status', 'disabled')
+    g.lan_accommodations_status = statuses.get('lan_accommodations_status', 'disabled')
 
     if request.path == app.config['DISCORD_INTERACTIONS_PATH']:
         return

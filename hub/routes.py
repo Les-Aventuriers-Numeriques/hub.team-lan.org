@@ -480,6 +480,17 @@ def lan_accommodations_proposal_vote(accommodation_proposal_id: int, vote_type: 
     return redirect(url_for('lan_accommodations_vote', filter=request.args.get('filter'), _anchor=anchor))
 
 
+@app.route('/lan/logements/proposer')
+@login_required
+@logout_if_must_relogin
+@to_home_if_not_lan_organizer
+@to_lan_accommodations_vote_if_lan_accommodations_read_only
+def lan_accommodations_proposal() -> Union[str, Response]:
+    return render_template(
+        'lan/accommodations/propose.html'
+    )
+
+
 @app.route('/admin/utilisateurs')
 @login_required
 @logout_if_must_relogin

@@ -1,0 +1,11 @@
+{% extends 'layout.html' %}
+
+{% block title %}LAN party : proposer un logement{% endblock %}
+
+{% block cssfiles %}
+    {% assets 'css_lan_accommodations_proposal' %}<link rel="stylesheet" href="{{ ASSET_URL }}">{% endassets %}
+{% endblock %}
+
+{% block content %}
+    <p>Soumets ici un logement pour la prochaine LAN. <a href="{{ url_for('lan_accommodations_vote') }}">Pour voter pour des logements, c'est par là</a>.</p>
+{% endblock %}

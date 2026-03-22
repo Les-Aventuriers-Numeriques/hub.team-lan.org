@@ -16,7 +16,7 @@ body > main .accommodations > article {
 
     min-width: 0;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     column-gap: var(--pico-grid-column-gap);
     row-gap: var(--pico-grid-row-gap);
     margin-bottom: 0;
@@ -43,6 +43,7 @@ body > main .accommodations > article > .details > .features {
     flex-direction: row;
     column-gap: 0.5rem;
     row-gap: 0.5rem;
+    flex-wrap: wrap;
 }
 
 body > main .accommodations > article > .details > h4 {
@@ -50,7 +51,6 @@ body > main .accommodations > article > .details > h4 {
 }
 
 body > main .accommodations > article > .photo {
-    width: 30%;
     flex-shrink: 0;
     align-self: center;
 }
@@ -67,10 +67,12 @@ body > main .accommodations > article > .photo a > img {
 
 body > main .accommodations > article .votes {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     column-gap: var(--pico-grid-column-gap);
     row-gap: var(--pico-grid-row-gap);
     line-height: initial;
+    align-items: center;
+    justify-content: center;
 }
 
 body > main .accommodations > article .votes > div {
@@ -80,11 +82,6 @@ body > main .accommodations > article .votes > div {
     row-gap: var(--pico-grid-row-gap);
     justify-content: space-between;
     align-items: center;
-}
-
-body > main .accommodations > article .votes > a {
-    align-self: center;
-    margin-top: auto;
 }
 
 body > main .accommodations > article .votes > div .my-vote {
@@ -117,5 +114,21 @@ body > main .subheading > p {
 @media (min-width: 1280px) {
     body > main .subheading {
         flex-direction: row;
+    }
+
+    body > main .accommodations > article {
+        flex-direction: row;
+    }
+
+    body > main .accommodations > article > .photo {
+        width: 30%;
+    }
+
+    body > main .accommodations > article .votes {
+        flex-direction: column;
+    }
+
+    body > main .accommodations > article .votes > a {
+        margin-top: auto;
     }
 }

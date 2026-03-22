@@ -8,7 +8,7 @@ class LanGamesProposalSearchForm(FlaskForm):
         'Nom du jeu',
         [validators.DataRequired(), validators.Length(min=2)],
         render_kw={
-            'placeholder': 'Tape le nom d\'un jeu...',
+            'placeholder': 'Tapes le nom d\'un jeu...',
         }
     )
 
