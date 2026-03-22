@@ -480,13 +480,26 @@ def lan_accommodations_proposal_vote(accommodation_proposal_id: int, vote_type: 
     return redirect(url_for('lan_accommodations_vote', filter=request.args.get('filter'), _anchor=anchor))
 
 
-@app.route('/lan/logements/proposer')
+@app.route('/lan/logements/proposer', methods=['GET', 'POST'])
 @login_required
 @logout_if_must_relogin
 @to_home_if_not_lan_organizer
 @to_lan_accommodations_vote_if_lan_accommodations_read_only
 def lan_accommodations_proposal() -> Union[str, Response]:
     form = LanGamesProposalForm()
+
+    if form.validate_on_submit():
+        lan_accommodation_proposal = LanAccommodationProposal()
+        lan_accommodation_proposal.user_id = current_user.id
+
+        form.populate_proposal(lan_accommodation_proposal)
+
+        db.session.add(lan_accommodation_proposal)
+        db.session.commit()
+
+        flash('Merci pour ta proposition !', 'success')
+
+        return redirect(url_for('lan_accommodations_vote', _anchor=f'a={lan_accommodation_proposal.id}'))
 
     return render_template(
         'lan/accommodations/propose.html',

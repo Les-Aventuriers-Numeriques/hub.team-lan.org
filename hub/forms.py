@@ -1,4 +1,5 @@
-from wtforms import SearchField, SelectField, StringField, URLField, IntegerField, BooleanField, DecimalField, TextAreaField
+from wtforms import SearchField, SelectField, StringField, URLField, IntegerField, DecimalField, TextAreaField
+from hub.models import LanAccommodationProposal
 from flask_wtf import FlaskForm
 import wtforms.validators as validators
 
@@ -97,7 +98,7 @@ class LanGamesProposalForm(FlaskForm):
 
     large_tables = IntegerField(
         'Nombre de grandes tables',
-        [validators.NumberRange(min=0)],
+        [validators.Optional(), validators.NumberRange(min=0)],
         render_kw={
             'placeholder': 'Laisse vide si tu sait pas',
         }
@@ -105,6 +106,7 @@ class LanGamesProposalForm(FlaskForm):
 
     has_fiber = SelectField(
         'Fibre optique ?',
+        [validators.Optional()],
         choices=[
             ('', 'Sait pas'),
             ('yes', 'Oui'),
@@ -114,6 +116,7 @@ class LanGamesProposalForm(FlaskForm):
 
     has_private_parking = SelectField(
         'Parking privé ?',
+        [validators.Optional()],
         choices=[
             ('', 'Sait pas'),
             ('yes', 'Oui'),
@@ -123,16 +126,32 @@ class LanGamesProposalForm(FlaskForm):
 
     total_price = DecimalField(
         'Prix total',
-        [validators.DataRequired(), validators.NumberRange(min=1.0)],
+        [validators.DataRequired(), validators.NumberRange(min=1.0, max=9999.99)],
         places=2
     )
 
     notes = TextAreaField(
         'Notes',
+        [validators.Optional()],
         render_kw={
             'placeholder': 'Par exemple "Le canapé est assez grand pour Pepsy et sa fratrie"',
         }
     )
+
+    def populate_proposal(self, proposal: LanAccommodationProposal):
+        proposal.title = self.title.data
+        proposal.photo_url = self.photo_url.data
+        proposal.listing_url = self.listing_url.data
+        proposal.location_name = self.location_name.data
+        proposal.location_url = self.location_url.data
+        proposal.bedrooms = self.bedrooms.data
+        proposal.single_beds = self.single_beds.data
+        proposal.twin_beds = self.twin_beds.data
+        proposal.large_tables = self.large_tables.data
+        proposal.has_fiber = True if self.has_fiber.data == 'yes' else False if self.has_fiber.data == 'no' else None
+        proposal.has_private_parking = True if self.has_private_parking.data == 'yes' else False if self.has_private_parking.data == 'no' else None
+        proposal.total_price = self.total_price.data
+        proposal.notes = self.notes.data
 
 
 class LanGamesSettingsForm(FlaskForm):
