@@ -108,7 +108,7 @@ body > main details > summary {
 /************************************************************************
  * Formulaires */
 
-label.required::after {
+label span.required::after {
     content: " *";
     color: var(--pico-primary);
 }

@@ -1,4 +1,4 @@
-from wtforms import SearchField, SelectField
+from wtforms import SearchField, SelectField, StringField, URLField, IntegerField, BooleanField, DecimalField, TextAreaField
 from flask_wtf import FlaskForm
 import wtforms.validators as validators
 
@@ -36,6 +36,102 @@ class LanAccommodationsVoteFilterForm(FlaskForm):
             ('all-voted', '...pour lesquels tout le monde a voté'),
             ('not-all-voted', '...pour lesquels tout le monde n\'a PAS voté'),
         ]
+    )
+
+
+class LanGamesProposalForm(FlaskForm):
+    title = StringField(
+        'Titre',
+        [validators.DataRequired(), validators.Length(max=255)],
+        render_kw={
+            'placeholder': 'Par exemple "Maison avec grande pièce de vie, billard, piscine, baby-foot, tireuse à bière"',
+        }
+    )
+
+    photo_url = URLField(
+        'Photo représentative',
+        [validators.DataRequired(), validators.Length(max=500)],
+        render_kw={
+            'placeholder': 'URL vers une image aux dimensions respectables',
+        }
+    )
+
+    listing_url = URLField(
+        'Annonce',
+        [validators.DataRequired(), validators.Length(max=500)],
+        render_kw={
+            'placeholder': 'URL vers l\'annonce (Booking, Airbnb, etc)',
+        }
+    )
+
+    location_name = StringField(
+        'Localisation (nom)',
+        [validators.DataRequired(), validators.Length(max=255)],
+        render_kw={
+            'placeholder': 'Par exemple "Montcuq (vers Montauban)"',
+        }
+    )
+
+    location_url = URLField(
+        'Localisation (URL)',
+        [validators.DataRequired(), validators.Length(max=500)],
+        render_kw={
+            'placeholder': 'URL vers Google Maps, Bing Maps, etc',
+        }
+    )
+
+    bedrooms = IntegerField(
+        'Nombre de chambres',
+        [validators.DataRequired(), validators.NumberRange(min=1)]
+    )
+
+    single_beds = IntegerField(
+        'Nombre de lits simples',
+        [validators.DataRequired(), validators.NumberRange(min=0)]
+    )
+
+    twin_beds = IntegerField(
+        'Nombre de lits doubles',
+        [validators.DataRequired(), validators.NumberRange(min=0)]
+    )
+
+    large_tables = IntegerField(
+        'Nombre de grandes tables',
+        [validators.NumberRange(min=0)],
+        render_kw={
+            'placeholder': 'Laisse vide si tu sait pas',
+        }
+    )
+
+    has_fiber = SelectField(
+        'Fibre optique ?',
+        choices=[
+            ('', 'Sait pas'),
+            ('yes', 'Oui'),
+            ('no', 'Non'),
+        ]
+    )
+
+    has_private_parking = SelectField(
+        'Parking privé ?',
+        choices=[
+            ('', 'Sait pas'),
+            ('yes', 'Oui'),
+            ('no', 'Non'),
+        ]
+    )
+
+    total_price = DecimalField(
+        'Prix total',
+        [validators.DataRequired(), validators.NumberRange(min=1.0)],
+        places=2
+    )
+
+    notes = TextAreaField(
+        'Notes',
+        render_kw={
+            'placeholder': 'Par exemple "Le canapé est assez grand pour Pepsy et sa fratrie"',
+        }
     )
 
 

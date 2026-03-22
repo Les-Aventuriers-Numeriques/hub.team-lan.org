@@ -44,10 +44,18 @@
 
 {% macro field(field, with_label=True) -%}
     {% if with_label and field.label.text %}
-        {{ field.label(class='required' if field.flags.required else '') }}
+        <label for="{{ field.label.field_id }}">
+
+        {% if field.type == 'BooleanField' %}
+            {{ field(aria_invalid='true' if field.errors, **kwargs) }}
+        {% endif %}
+
+        <span class="{{ 'required' if field.flags.required }}">{{ field.label.text }}</span>
     {% endif %}
 
-    {{ field(aria_invalid='true' if field.errors else '', **kwargs) }}
+    {% if field.type != 'BooleanField' %}
+        {{ field(aria_invalid='true' if field.errors, **kwargs) }}
+    {% endif %}
 
     {% if field.errors or field.description %}
         <small>
@@ -63,6 +71,10 @@
                 {{ field.description|safe }}
             {% endif %}
         </small>
+    {% endif %}
+
+    {% if with_label and field.label.text %}
+        </label>
     {% endif %}
 {%- endmacro %}
 

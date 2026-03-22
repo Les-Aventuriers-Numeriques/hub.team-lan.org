@@ -1,0 +1,14 @@
+/************************************************************************
+ * Proposition de logements pour la LAN */
+
+body > main .row {
+    display: flex;
+    flex-direction: row;
+    column-gap: var(--pico-grid-column-gap);
+    row-gap: var(--pico-grid-row-gap);
+}
+
+body > main .row > * {
+    flex-grow: 1;
+    flex-basis: 0;
+}

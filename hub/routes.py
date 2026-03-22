@@ -1,5 +1,5 @@
-from hub.forms import LanGamesProposalSearchForm, LanGamesSettingsForm, LanGamesVoteFilterForm, LanAccommodationsSettingsForm, LanAccommodationsVoteFilterForm
 from hub.models import User, Game, LanGameProposal, LanGameProposalVote, VoteType, Setting, LanAccommodationProposal, LanAccommodationProposalVote
+from hub.forms import LanGamesProposalSearchForm, LanGamesSettingsForm, LanGamesVoteFilterForm, LanAccommodationsSettingsForm, LanAccommodationsVoteFilterForm, LanGamesProposalForm
 from flask import render_template, redirect, url_for, flash, session, request, g
 from flask_login import login_required, current_user, logout_user, login_user
 from sqlalchemy_searchable import search, inspect_search_vectors
@@ -486,8 +486,11 @@ def lan_accommodations_proposal_vote(accommodation_proposal_id: int, vote_type: 
 @to_home_if_not_lan_organizer
 @to_lan_accommodations_vote_if_lan_accommodations_read_only
 def lan_accommodations_proposal() -> Union[str, Response]:
+    form = LanGamesProposalForm()
+
     return render_template(
-        'lan/accommodations/propose.html'
+        'lan/accommodations/propose.html',
+        form=form
     )
 
 

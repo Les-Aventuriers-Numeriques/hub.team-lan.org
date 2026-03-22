@@ -1,5 +1,7 @@
 {% extends 'layout.html' %}
 
+{% from 'macros.html' import field with context %}
+
 {% block title %}LAN party : proposer un logement{% endblock %}
 
 {% block cssfiles %}
@@ -8,4 +10,59 @@
 
 {% block content %}
     <p>Soumets ici un logement pour la prochaine LAN. <a href="{{ url_for('lan_accommodations_vote') }}">Pour voter pour des logements, c'est par là</a>.</p>
+
+    <form method="post" action="{{ url_for('lan_accommodations_proposal') }}">
+        {{ form.csrf_token }}
+
+        {{ field(form.title) }}
+        {{ field(form.total_price) }}
+
+        <div class="row">
+            <div>
+                {{ field(form.photo_url) }}
+            </div>
+            <div>
+                {{ field(form.listing_url) }}
+            </div>
+        </div>
+
+        <div class="row">
+            <div>
+                {{ field(form.location_name) }}
+            </div>
+            <div>
+                {{ field(form.location_url) }}
+            </div>
+        </div>
+
+        <div class="row">
+            <div>
+                {{ field(form.bedrooms) }}
+            </div>
+            <div>
+                {{ field(form.single_beds) }}
+            </div>
+            <div>
+                {{ field(form.twin_beds) }}
+            </div>
+        </div>
+
+        <div class="row">
+            <div>
+                {{ field(form.large_tables) }}
+            </div>
+            <div>
+                {{ field(form.has_fiber) }}
+            </div>
+            <div>
+                {{ field(form.has_private_parking) }}
+            </div>
+        </div>
+
+        {{ field(form.notes) }}
+
+        <p class="mb-0">
+            <button type="submit" class="mb-0">Soumettre</button>
+        </p>
+    </form>
 {% endblock %}
