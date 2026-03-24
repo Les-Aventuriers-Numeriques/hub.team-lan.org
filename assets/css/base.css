@@ -20,6 +20,30 @@ nav details.dropdown {
     display: inline-block;
 }
 
+details.dropdown > summary + ul li.separator {
+    background-color: var(--pico-muted-border-color);
+    height: 1px;
+    padding: 0;
+    margin: 0.5rem 0;
+}
+
+i.bi {
+    vertical-align: middle;
+}
+
+img.avatar {
+    max-height: 24px;
+    max-width: 24px;
+}
+
+.text-success {
+    color: var(--pico-form-element-valid-active-border-color);
+}
+
+.text-error {
+    color: var(--pico-form-element-invalid-active-border-color);
+}
+
 /************************************************************************
  * En-tête */
 
@@ -54,22 +78,16 @@ body > header > div > div > div {
     font-size: 1rem;
 }
 
-body > header > nav > ul {
-    flex-direction: column;
-}
-
-body > header nav li {
-    padding: var(--pico-nav-element-spacing-horizontal);
-}
-
 @media (min-width: 768px) {
     body > header {
         flex-direction: row;
         justify-content: space-between;
     }
+}
 
-    body > header > nav > ul {
-        flex-direction: row;
+@media (max-width: 1024px) {
+    body > header nav summary span {
+        display: none;
     }
 }
 
@@ -87,15 +105,10 @@ body > main details > summary {
     font-weight: bolder;
 }
 
-body > main svg.bi {
-    width: 1.5em;
-    height: 1.5em;
-}
-
 /************************************************************************
  * Formulaires */
 
-label.required::after {
+label span.required::after {
     content: " *";
     color: var(--pico-primary);
 }

@@ -1,0 +1,20 @@
+{% extends 'layout.html' %}
+
+{% from 'macros.html' import field with context %}
+
+{% block title %}LAN party : édition d'un logement{% endblock %}
+
+{% block cssfiles %}
+    {% assets 'css_lan_accommodations_proposal' %}<link rel="stylesheet" href="{{ ASSET_URL }}">{% endassets %}
+{% endblock %}
+
+{% block content %}
+    <form method="post" action="{{ url_for('lan_accommodations_proposal_edit', accommodation_proposal_id=proposal.id) }}">
+        {% include 'lan/accommodations/partials/form.html' %}
+
+        <div class="row">
+            <a href="{{ url_for('lan_accommodations_vote') }}" role="button" class="secondary">Annuler</a>
+            <button type="submit" class="mb-0">Enregistrer</button>
+        </div>
+    </form>
+{% endblock %}

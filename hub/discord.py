@@ -1,5 +1,7 @@
+from flask_babel import format_currency
+
+from hub.models import User, Game, VoteType, LanGameProposal, LanGameProposalVote, LanAccommodationProposal, LanAccommodationProposalVote
 from flask_discord_interactions import Message, Embed, ActionRow, ButtonStyles, Button, Context, Autocomplete, Option
-from hub.models import User, Game, VoteType, LanGameProposal, LanGameProposalVote
 from flask_discord_interactions.models.embed import Media, Field, Footer
 from sqlalchemy_searchable import search, inspect_search_vectors
 from app import app, db, discord_interactions
@@ -66,11 +68,15 @@ def get_membership_info(token: Dict) -> Response:
     )
 
 
-def can_send_messages() -> bool:
-    return app.config['DISCORD_LAN_CHANNEL_ID'] and app.config['DISCORD_BOT_TOKEN']
+def can_send_lan_messages() -> bool:
+    return app.config['DISCORD_BOT_TOKEN'] and app.config['DISCORD_LAN_CHANNEL_ID']
 
 
-def _handle_top(ctx: Context) -> Message:
+def can_send_organizer_messages() -> bool:
+    return app.config['DISCORD_BOT_TOKEN'] and app.config['DISCORD_LAN_ORGANIZER_CHANNEL_ID']
+
+
+def _handle_top_games(ctx: Context) -> Message:
     if g.lan_games_status == 'disabled':
         return Message(
             'On ne choisis pas encore les jeux pour la LAN !',
@@ -132,12 +138,12 @@ def _handle_top(ctx: Context) -> Message:
 
 
 @discord_interactions.custom_handler('top')
-def _handle_top_button(ctx: Context) -> Message:
-    return _handle_top(ctx)
+def _handle_game_top_button(ctx: Context) -> Message:
+    return _handle_top_games(ctx)
 
 
-@discord_interactions.custom_handler('vote')
-def _handle_vote_button(ctx: Context, game_id: int, vote_type: Literal['YES', 'NEUTRAL', 'NO']) -> Message:
+@discord_interactions.custom_handler('vote-game')
+def _handle_game_vote_button(ctx: Context, game_id: int, vote_type: Literal['YES', 'NEUTRAL', 'NO']) -> Message:
     user = db.session.get(User, ctx.author.id)
 
     if not user:
@@ -154,7 +160,7 @@ def _handle_vote_button(ctx: Context, game_id: int, vote_type: Literal['YES', 'N
     elif g.lan_games_status == 'disabled':
         message = 'On ne choisis pas encore les jeux pour la LAN, revient plus tard !'
     elif g.lan_games_status == 'read_only':
-        message = 'Trop tard, la date de la LAN approche, les propositions et votes sont figés !'
+        message = 'Trop tard, la date de la LAN approche, les jeux principaux ont été choisis !'
     else:
         try:
             LanGameProposalVote.vote(user, game_id, VoteType(vote_type))
@@ -166,6 +172,43 @@ def _handle_vote_button(ctx: Context, game_id: int, vote_type: Literal['YES', 'N
             message = 'Type de vote invalide.'
         except IntegrityError:
             message = 'Identifiant de jeu invalide.'
+
+    return Message(
+        message,
+        ephemeral=True
+    )
+
+
+@discord_interactions.custom_handler('vote-accommodation')
+def _handle_accommodation_vote_button(ctx: Context, accommodation_proposal_id: int, vote_type: Literal['YES', 'NEUTRAL', 'NO']) -> Message:
+    user = db.session.get(User, ctx.author.id)
+
+    if not user:
+        message = 'Tu n\'a pas encore de compte sur l\'intranet. Crée-le ici {} et rééssaye. Tu peux également voter ici {}.'.format(
+            url_for('login', _external=True),
+            url_for('lan_accommodations_vote', _external=True),
+        )
+    elif user.must_relogin:
+        message = 'Merci de te reconnecter sur l\'intranet puis réessaye : {} (tu ne devras effectuer cette action qu\'une fois).'.format(
+            url_for('login', _external=True)
+        )
+    elif not user.is_lan_organizer:
+        message = 'Désolé, tu ne fais pas partie des organisateurs de la LAN.'
+    elif g.lan_accommodations_status == 'disabled':
+        message = 'On ne choisis pas encore le logement pour la LAN, revient plus tard !'
+    elif g.lan_accommodations_status == 'read_only':
+        message = 'Trop tard, le logement a été choisi !'
+    else:
+        try:
+            LanAccommodationProposalVote.vote(user, accommodation_proposal_id, VoteType(vote_type))
+
+            db.session.commit()
+
+            message = 'A voté !'
+        except ValueError:
+            message = 'Type de vote invalide.'
+        except IntegrityError:
+            message = 'Identifiant de logement invalide.'
 
     return Message(
         message,
@@ -197,7 +240,7 @@ def submit_game_proposal_command(ctx: Context, jeu: Autocomplete(int)) -> Messag
     elif g.lan_games_status == 'disabled':
         message = 'On ne choisis pas encore les jeux pour la LAN, revient plus tard !'
     elif g.lan_games_status == 'read_only':
-        message = 'Trop tard, la date de la LAN approche, les propositions et votes sont figés !'
+        message = 'Trop tard, la date de la LAN approche, les jeux principaux ont été choisis !'
     else:
         try:
             proposal = LanGameProposal()
@@ -210,8 +253,8 @@ def submit_game_proposal_command(ctx: Context, jeu: Autocomplete(int)) -> Messag
 
             db.session.commit()
 
-            if can_send_messages():
-                send_proposal_message(
+            if can_send_lan_messages():
+                send_game_proposal_message(
                     user,
                     db.session.get(Game, jeu)
                 )
@@ -259,15 +302,15 @@ def submit_game_proposal_command_autocomplete(ctx: Context, jeu: Option = None) 
     'top',
     'Affiche le top {TOP_LAN_GAME_PROPOSALS} actuel des jeux proposés.'.format(**app.config)
 )
-def top_command(ctx: Context) -> Message:
-    return _handle_top(ctx)
+def top_games_command(ctx: Context) -> Message:
+    return _handle_top_games(ctx)
 
 
-def send_proposal_message(user: User, game: Game) -> None:
+def send_game_proposal_message(user: User, game: Game) -> None:
     components = [
         Button(
             style=ButtonStyles.PRIMARY,
-            custom_id=[_handle_vote_button, game.id, vote_type.value],
+            custom_id=[_handle_game_vote_button, game.id, vote_type.value],
             emoji={
                 'name': _vote_type_emoji(vote_type),
             }
@@ -277,7 +320,7 @@ def send_proposal_message(user: User, game: Game) -> None:
     components.extend([
         Button(
             style=ButtonStyles.SECONDARY,
-            custom_id=_handle_top_button,
+            custom_id=_handle_game_top_button,
             label='Voir le top {TOP_LAN_GAME_PROPOSALS}'.format(**app.config),
         ),
         Button(
@@ -311,6 +354,108 @@ def send_proposal_message(user: User, game: Game) -> None:
         app.config['DISCORD_LAN_CHANNEL_ID'],
         json.get('id'),
         game.name
+    )
+
+
+def send_accommodation_proposal_message(user: User, accommodation_proposal: LanAccommodationProposal) -> None:
+    components = [
+        Button(
+            style=ButtonStyles.PRIMARY,
+            custom_id=[_handle_accommodation_vote_button, accommodation_proposal.id, vote_type.value],
+            emoji={
+                'name': _vote_type_emoji(vote_type),
+            }
+        ) for vote_type in VoteType
+    ]
+
+    components.extend([
+        Button(
+            style=ButtonStyles.LINK,
+            label=accommodation_proposal.location_name,
+            url=accommodation_proposal.location_url,
+        ),
+        Button(
+            style=ButtonStyles.LINK,
+            label='Voir tous les logements',
+            url=url_for('lan_accommodations_vote', _external=True),
+        ),
+    ])
+
+    fields = [
+        Field(
+            name='Prix total',
+            value=format_currency(accommodation_proposal.total_price, 'EUR'),
+            inline=True
+        ),
+        Field(
+            name='Chambres',
+            value=str(accommodation_proposal.bedrooms),
+            inline=True
+        ),
+        Field(
+            name='Lits simples',
+            value=str(accommodation_proposal.single_beds),
+            inline=True
+        ),
+        Field(
+            name='Lits doubles',
+            value=str(accommodation_proposal.twin_beds),
+            inline=True
+        ),
+    ]
+
+    if accommodation_proposal.large_tables is not None:
+        fields.append(
+            Field(
+                name='Grandes tables',
+                value=str(accommodation_proposal.large_tables),
+                inline=True
+            )
+        )
+
+    if accommodation_proposal.has_fiber is not None:
+        fields.append(
+            Field(
+                name='Fibre optique ?',
+                value=':white_check_mark:' if accommodation_proposal.has_fiber else ':x:',
+                inline=True
+            )
+        )
+
+    if accommodation_proposal.has_fiber is not None:
+        fields.append(
+            Field(
+                name='Parking privé ?',
+                value=':white_check_mark:' if accommodation_proposal.has_private_parking else ':x:',
+                inline=True
+            )
+        )
+
+    data, content_type = Message(
+        f'**{user.display_name}** a proposé un nouveau logement :',
+        embed=Embed(
+            title=accommodation_proposal.title,
+            description=accommodation_proposal.notes,
+            color=EMBEDS_COLOR,
+            url=accommodation_proposal.listing_url,
+            image=Media(accommodation_proposal.photo_url),
+            fields=fields
+        ),
+        components=[
+            ActionRow(
+                components=components
+            )
+        ]
+    ).encode(True)
+
+    response = _send_message(app.config['DISCORD_LAN_ORGANIZER_CHANNEL_ID'], data, content_type)
+
+    json = response.json()
+
+    _start_thread(
+        app.config['DISCORD_LAN_ORGANIZER_CHANNEL_ID'],
+        json.get('id'),
+        accommodation_proposal.title
     )
 
 

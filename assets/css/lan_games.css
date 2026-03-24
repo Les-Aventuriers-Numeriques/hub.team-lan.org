@@ -35,16 +35,16 @@ body > main .games > article > .cover > a {
 body > main .games > article > .cover > span {
     position: absolute;
     right: 0.3rem;
-    bottom: 0.3rem;
+    bottom: 0.05rem;
     z-index: 2;
     color: rgb(51, 210, 163);
     border-bottom: none;
 }
 
-body > main .games > article > .cover > svg {
+body > main .games > article > .cover > i {
     position: absolute;
     right: 0.35rem;
-    bottom: 0.25rem;
+    bottom: 0;
     z-index: 1;
     color: rgb(0, 0, 0);
 }
@@ -56,12 +56,18 @@ body > main .games > article:target {
     scroll-margin-top: var(--pico-spacing);
 }
 
-body > main .games img {
+body > main .games > article > .cover > a > img {
     border: var(--pico-border-width) solid var(--pico-muted-border-color);
     border-radius: var(--pico-border-radius);
 }
 
 @media (min-width: 768px) {
+    body > main .games {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
     body > main .games {
         grid-template-columns: repeat(4, 1fr);
     }

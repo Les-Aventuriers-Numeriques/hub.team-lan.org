@@ -1,0 +1,84 @@
+{% extends 'layout.html' %}
+
+{% from 'macros.html' import vote_accommodation, accommodation_feature_count, accommodation_feature_boolean, field with context %}
+
+{% block title %}LAN party : voter pour des logements{% endblock %}
+
+{% block cssfiles %}
+    {% assets 'css_lan_accommodations_vote' %}<link rel="stylesheet" href="{{ ASSET_URL }}">{% endassets %}
+{% endblock %}
+
+{% block content %}
+    <div class="subheading">
+        <p class="mb-0">
+            {% if g.lan_accommodations_status == 'enabled' %}
+                Choisissons le meilleur logement pour la prochaine LAN. <a href="{{ url_for('lan_accommodations_proposal') }}">Pour proposer des logements, c'est par ici</a>.
+            {% else %}
+                Voici les meilleurs logements pour la prochaine LAN !
+            {% endif %}
+        </p>
+        <form method="get" action="{{ url_for('lan_accommodations_vote') }}">
+            {{ field(form.filter, with_label=False, class='mb-0', onchange='this.form.submit()') }}
+        </form>
+    </div>
+
+    {% if proposals %}
+        <div class="accommodations">
+            {% for proposal in proposals %}
+                {% set my_vote = current_user.my_vote(proposal) %}
+
+                <article id="a={{ proposal.id }}">
+                    <div class="photo">
+                        <a href="{{ proposal.photo_url }}" target="_blank" data-tooltip="Proposé par {{ proposal.user.display_name if proposal.user_id != current_user.id else 'toi' }}">
+                            <img src="{{ proposal.photo_url }}" alt="Photo du logement {{ proposal.title }}">
+                        </a>
+                    </div>
+                    <div class="details">
+                        <h4>
+                            {{ proposal.total_price|currencyformat('EUR') }} <a href="{{ proposal.listing_url }}" target="_blank">{{ proposal.title }}</a>
+                        </h4>
+
+                        <small class="features">
+                            <span>
+                                <i class="bi bi-geo-alt-fill"></i> <a href="{{ proposal.location_url }}" target="_blank">{{ proposal.location_name }}</a>
+                            </span>
+
+                            {{ accommodation_feature_count(proposal.max_guests, 'people-fill', bi=True) }}
+                            {{ accommodation_feature_count(proposal.bedrooms, 'bedroom') }}
+                            {{ accommodation_feature_count(proposal.single_beds, 'bed-single') }}
+                            {{ accommodation_feature_count(proposal.twin_beds, 'bed-double') }}
+                            {{ accommodation_feature_count(proposal.large_tables, 'table', highlight=True) }}
+                            {{ accommodation_feature_boolean(proposal.has_fiber, 'speedometer', bi=True) }}
+                            {{ accommodation_feature_boolean(proposal.has_private_parking, 'p-square-fill', bi=True) }}
+                        </small>
+
+                        {% if proposal.notes %}
+                            <div>{{ proposal.notes|nl2br }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="votes">
+                        {% for vote_type in VoteType %}
+                            {{ vote_accommodation(vote_type, proposal, my_vote) }}
+                        {% endfor %}
+
+                        {% if g.lan_accommodations_status == 'enabled' %}
+                            <a href="{{ url_for('lan_accommodations_proposal_edit', accommodation_proposal_id=proposal.id) }}" style="font-size: 0.8em">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="mb-0">
+            <strong>
+                {% if validated %}
+                    Aucun logement à afficher.
+                {% else %}
+                    Aucun logement pour l'instant. Proposes-en !
+                {% endif %}
+            </strong>
+        </p>
+    {% endif %}
+{% endblock %}
