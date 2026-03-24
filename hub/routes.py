@@ -66,7 +66,7 @@ def to_home_if_not_lan_organizer(f):
             return redirect(url_for('home'))
 
         if g.lan_accommodations_status == 'disabled':
-            flash('On ne choisis pas encore les logements pour la LAN, revient plus tard !', 'error')
+            flash('On ne choisis pas encore le logement pour la LAN, revient plus tard !', 'error')
 
             return redirect(url_for('home'))
 
@@ -79,7 +79,7 @@ def to_lan_accommodations_vote_if_lan_accommodations_read_only(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         if g.lan_accommodations_status == 'read_only':
-            flash('Trop tard, le logement a déjà été choisi !', 'error')
+            flash('Trop tard, le logement a été choisi !', 'error')
 
             return redirect(url_for('lan_accommodations_vote'))
 
@@ -382,8 +382,8 @@ def lan_games_proposal_submit(game_id: int) -> Response:
 
         db.session.commit()
 
-        if discord.can_send_messages():
-            discord.send_proposal_message(
+        if discord.can_send_lan_messages():
+            discord.send_game_proposal_message(
                 current_user,
                 db.session.get(Game, game_id)
             )
@@ -496,6 +496,12 @@ def lan_accommodations_proposal() -> Union[str, Response]:
 
         db.session.add(lan_accommodation_proposal)
         db.session.commit()
+
+        if discord.can_send_organizer_messages():
+            discord.send_accommodation_proposal_message(
+                current_user,
+                lan_accommodation_proposal
+            )
 
         flash('Merci pour ta proposition !', 'success')
 
