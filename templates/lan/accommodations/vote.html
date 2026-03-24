@@ -29,7 +29,7 @@
 
                 <article id="a={{ proposal.id }}">
                     <div class="photo">
-                        <a href="{{ proposal.photo_url }}" target="_blank">
+                        <a href="{{ proposal.photo_url }}" target="_blank" data-tooltip="Proposé par {{ proposal.user.display_name if proposal.user_id != current_user.id else 'toi' }}">
                             <img src="{{ proposal.photo_url }}" alt="Photo du logement {{ proposal.title }}">
                         </a>
                     </div>
@@ -38,7 +38,7 @@
                             {{ proposal.total_price|currencyformat('EUR') }} <a href="{{ proposal.listing_url }}" target="_blank">{{ proposal.title }}</a>
                         </h4>
 
-                        <div class="features">
+                        <small class="features">
                             <span>
                                 <i class="bi bi-geo-alt-fill"></i> <a href="{{ proposal.location_url }}" target="_blank">{{ proposal.location_name }}</a>
                             </span>
@@ -50,7 +50,7 @@
                             {{ accommodation_feature_count(proposal.large_tables, 'table', highlight=True) }}
                             {{ accommodation_feature_boolean(proposal.has_fiber, 'speedometer', bi=True) }}
                             {{ accommodation_feature_boolean(proposal.has_private_parking, 'p-square-fill', bi=True) }}
-                        </div>
+                        </small>
 
                         {% if proposal.notes %}
                             <div>{{ proposal.notes }}</div>

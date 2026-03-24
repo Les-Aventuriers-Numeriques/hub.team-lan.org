@@ -16,7 +16,8 @@
 
         {% include 'lan/accommodations/partials/form.html' %}
 
-        <div>
+        <div class="row">
+            <a href="{{ url_for('lan_accommodations_vote') }}" role="button" class="secondary">Retour</a>
             <button type="submit" class="mb-0">Soumettre</button>
         </div>
     </form>

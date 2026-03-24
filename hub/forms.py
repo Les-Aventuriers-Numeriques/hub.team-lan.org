@@ -145,6 +145,7 @@ class LanGamesProposalForm(FlaskForm):
         [validators.Optional()],
         render_kw={
             'placeholder': 'Par exemple "Le canapé est assez grand pour Pepsy et sa fratrie"',
+            'rows': 10
         }
     )
 

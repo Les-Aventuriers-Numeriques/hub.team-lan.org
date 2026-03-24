@@ -81,7 +81,7 @@ def to_lan_accommodations_vote_if_lan_accommodations_read_only(f):
         if g.lan_accommodations_status == 'read_only':
             flash('Trop tard, le logement a déjà été choisi !', 'error')
 
-            return redirect(url_for('accommodations'))
+            return redirect(url_for('lan_accommodations_vote'))
 
         return f(*args, **kwargs)
 
