@@ -205,8 +205,8 @@ def before_request():
 
     statuses = Setting.get(['lan_games_status', 'lan_accommodations_status'])
 
-    g.lan_games_status =  statuses.get('lan_games_status', 'disabled')
-    g.lan_accommodations_status = statuses.get('lan_accommodations_status', 'disabled')
+    g.lan_games_status = statuses.get('lan_games_status') or 'disabled'
+    g.lan_accommodations_status = statuses.get('lan_accommodations_status') or 'disabled'
 
     if request.path == app.config['DISCORD_INTERACTIONS_PATH']:
         return
