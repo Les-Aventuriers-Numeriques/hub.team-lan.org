@@ -6,6 +6,7 @@ from flask_assets import Environment, Bundle
 from sqlalchemy.orm import DeclarativeBase
 from flask_babel import Babel, get_locale
 from flask_sqlalchemy import SQLAlchemy
+from markupsafe import Markup, escape
 from datetime import timedelta, date
 from flask_login import LoginManager
 from flask_migrate import Migrate
@@ -233,6 +234,14 @@ def http_error_handler(e: HTTPException) -> Tuple[str, int]:
         name=e.name,
         description=e.description,
     ), e.code
+
+
+@app.template_filter('nl2br')
+def nl2br(value: str) -> Markup:
+    br = Markup("<br>\n")
+    value = escape(value)
+
+    return Markup(br.join(value.splitlines()))
 
 
 # -----------------------------------------------------------
