@@ -1,13 +1,21 @@
 from wtforms import SearchField, SelectField, StringField, URLField, IntegerField, DecimalField, TextAreaField
-from hub.models import LanAccommodationProposal
 from flask_wtf import FlaskForm
 import wtforms.validators as validators
+
+
+def coerce_nullable_boolean(value):
+    if isinstance(value, str):
+        return value == 'True' if value != 'None' else None
+    elif isinstance(value, bool):
+        return value
+
+    return None
 
 
 class LanGamesProposalSearchForm(FlaskForm):
     terms = SearchField(
         'Nom du jeu',
-        [validators.DataRequired(), validators.Length(min=2)],
+        [validators.InputRequired(), validators.Length(min=2)],
         render_kw={
             'placeholder': 'Tapes le nom d\'un jeu...',
         }
@@ -43,7 +51,7 @@ class LanAccommodationsVoteFilterForm(FlaskForm):
 class LanGamesProposalForm(FlaskForm):
     title = StringField(
         'Titre',
-        [validators.DataRequired(), validators.Length(max=255)],
+        [validators.InputRequired(), validators.Length(max=255)],
         render_kw={
             'placeholder': 'Par exemple "Maison avec grande pièce de vie, billard, piscine, baby-foot, tireuse à bière"',
         }
@@ -51,7 +59,7 @@ class LanGamesProposalForm(FlaskForm):
 
     photo_url = URLField(
         'Photo représentative',
-        [validators.DataRequired(), validators.Length(max=500)],
+        [validators.InputRequired(), validators.Length(max=500)],
         render_kw={
             'placeholder': 'URL vers une image aux dimensions respectables',
         }
@@ -59,7 +67,7 @@ class LanGamesProposalForm(FlaskForm):
 
     listing_url = URLField(
         'Annonce',
-        [validators.DataRequired(), validators.Length(max=500)],
+        [validators.InputRequired(), validators.Length(max=500)],
         render_kw={
             'placeholder': 'URL vers l\'annonce (Booking, Airbnb, etc)',
         }
@@ -67,7 +75,7 @@ class LanGamesProposalForm(FlaskForm):
 
     location_name = StringField(
         'Localisation (nom)',
-        [validators.DataRequired(), validators.Length(max=255)],
+        [validators.InputRequired(), validators.Length(max=255)],
         render_kw={
             'placeholder': 'Par exemple "Montcuq (vers Montauban)"',
         }
@@ -75,7 +83,7 @@ class LanGamesProposalForm(FlaskForm):
 
     location_url = URLField(
         'Localisation (URL)',
-        [validators.DataRequired(), validators.Length(max=500)],
+        [validators.InputRequired(), validators.Length(max=500)],
         render_kw={
             'placeholder': 'URL vers Google Maps, Bing Maps, etc',
         }
@@ -83,17 +91,17 @@ class LanGamesProposalForm(FlaskForm):
 
     bedrooms = IntegerField(
         'Nombre de chambres',
-        [validators.DataRequired(), validators.NumberRange(min=1)]
+        [validators.InputRequired(), validators.NumberRange(min=1)]
     )
 
     single_beds = IntegerField(
         'Nombre de lits simples',
-        [validators.DataRequired(), validators.NumberRange(min=0)]
+        [validators.InputRequired(), validators.NumberRange(min=0)]
     )
 
     twin_beds = IntegerField(
         'Nombre de lits doubles',
-        [validators.DataRequired(), validators.NumberRange(min=0)]
+        [validators.InputRequired(), validators.NumberRange(min=0)]
     )
 
     large_tables = IntegerField(
@@ -108,27 +116,27 @@ class LanGamesProposalForm(FlaskForm):
         'Fibre optique ?',
         [validators.Optional()],
         choices=[
-            ('', 'Sait pas'),
-            ('yes', 'Oui'),
-            ('no', 'Non'),
+            (None, 'Sait pas'),
+            (True, 'Oui'),
+            (False, 'Non'),
         ],
-        # coerce=lambda value: True if value == 'yes' else False if value == 'no' else None
+        coerce=coerce_nullable_boolean
     )
 
     has_private_parking = SelectField(
         'Parking privé ?',
         [validators.Optional()],
         choices=[
-            ('', 'Sait pas'),
-            ('yes', 'Oui'),
-            ('no', 'Non'),
+            (None, 'Sait pas'),
+            (True, 'Oui'),
+            (False, 'Non'),
         ],
-        # coerce=lambda value: True if value == 'yes' else False if value == 'no' else None
+        coerce=coerce_nullable_boolean
     )
 
     total_price = DecimalField(
         'Prix total',
-        [validators.DataRequired(), validators.NumberRange(min=1.0, max=9999.99)],
+        [validators.InputRequired(), validators.NumberRange(min=1.0, max=9999.99)],
         places=2
     )
 
@@ -140,22 +148,11 @@ class LanGamesProposalForm(FlaskForm):
         }
     )
 
-    # def filter_has_fiber(self, value):
-    #     print(value)
-    #
-    #     if not isinstance(value, str):
-    #         return 'yes' if value is True else 'no' if value is False else ''
-    #
-    #     return value
-
-    # def filter_has_private_parking(self, value: str) -> str:
-    #     return 'yes' if value is True else 'no' if value is False else ''
-
 
 class LanGamesSettingsForm(FlaskForm):
     lan_games_status = SelectField(
         'Statut de la section',
-        [validators.DataRequired()],
+        [validators.InputRequired()],
         choices=[
             ('disabled', 'Désactivée'),
             ('enabled', 'Activée'),
@@ -169,7 +166,7 @@ class LanGamesSettingsForm(FlaskForm):
 class LanAccommodationsSettingsForm(FlaskForm):
     lan_accommodations_status = SelectField(
         'Statut de la section',
-        [validators.DataRequired()],
+        [validators.InputRequired()],
         choices=[
             ('disabled', 'Désactivée'),
             ('enabled', 'Activée'),
