@@ -237,6 +237,9 @@ def http_error_handler(e: HTTPException) -> Tuple[str, int]:
     ), e.code
 
 
+# -----------------------------------------------------------
+# Filtres Jinja
+
 @app.template_filter('nl2br')
 def nl2br(value: str) -> Markup:
     br = Markup("<br>\n")
