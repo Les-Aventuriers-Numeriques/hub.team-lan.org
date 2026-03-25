@@ -688,6 +688,26 @@ def admin_lan_games() -> Union[str, Response]:
     )
 
 
+@app.route('/lan/jeux/proposer/<int(signed=True):game_id>/renvoyer')
+@login_required
+@logout_if_must_relogin
+@to_home_if_not_admin
+def admin_lan_games_proposal_resend(game_id: int) -> Response:
+    game = db.get_or_404(Game, game_id)
+
+    if discord.can_send_lan_messages():
+        discord.send_game_proposal_message(
+            current_user,
+            game
+        )
+
+        flash('C\'est renvoyé.', 'success')
+    else:
+        flash('Impossible d\'envoyer des messages sur Discord.', 'error')
+
+    return redirect(url_for('admin_lan_games'))
+
+
 @app.route('/admin/lan/jeux/proposition/<int(signed=True):game_id>/supprimer')
 @login_required
 @logout_if_must_relogin
@@ -789,6 +809,27 @@ def admin_lan_accommodations() -> Union[str, Response]:
         proposals=proposals,
         form=form
     )
+
+
+@app.route('/lan/logements/proposer/<int(signed=True):accommodation_proposal_id>/renvoyer')
+@login_required
+@logout_if_must_relogin
+@to_home_if_not_admin
+def admin_lan_accommodation_proposal_resend(accommodation_proposal_id: int) -> Response:
+    accommodation_proposal = db.get_or_404(LanAccommodationProposal, accommodation_proposal_id)
+
+    if discord.can_send_organizer_messages():
+        discord.send_accommodation_proposal_message(
+            current_user,
+            accommodation_proposal
+        )
+
+        flash('C\'est renvoyé.', 'success')
+    else:
+        flash('Impossible d\'envoyer des messages sur Discord.', 'error')
+
+    return redirect(url_for('admin_lan_accommodations'))
+
 
 @app.route('/admin/lan/logements/proposition/<int(signed=True):accommodation_proposal_id>/supprimer')
 @login_required
