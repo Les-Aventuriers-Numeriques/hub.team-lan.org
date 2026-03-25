@@ -43,15 +43,11 @@
                             <td>{{ user.updated_at|datetimeformat }}</td>
                             <td class="actions">
                                 {% if user.id != current_user.id %}
-                                    <a href="{{ url_for('admin_user_delete', user_id=user.id) }}" onclick="return confirm('{{ user.display_name }} et tout ce qui lui est lié sera supprimé. Confirmer ?')" data-tooltip="Supprimer">
-                                        <i class="bi bi-x-lg"></i>
-                                    </a>
+                                    <a href="{{ url_for('admin_user_delete', user_id=user.id) }}" onclick="return confirm('{{ user.display_name }} et tout ce qui lui est lié sera supprimé. Confirmer ?')" data-tooltip="Supprimer"><i class="bi bi-x-lg"></i></a>
                                 {% endif %}
 
                                 {% if not user.must_relogin %}
-                                    <a href="{{ url_for('admin_user_force_relogin', user_id=user.id) }}" onclick="return confirm('{{ user.display_name }} va être forcé de se reconnecter afin de synchroniser ses rôles Discord. Confirmer ?')" data-tooltip="Forcer la reconnexion">
-                                        <i class="bi bi-box-arrow-in-right"></i>
-                                    </a>
+                                    <a href="{{ url_for('admin_user_force_relogin', user_id=user.id) }}" onclick="return confirm('{{ user.display_name }} va être forcé de se reconnecter afin de synchroniser ses rôles Discord. Confirmer ?')" data-tooltip="Forcer la reconnexion"><i class="bi bi-box-arrow-in-right"></i></a>
                                 {% endif %}
                             </td>
                         </tr>

@@ -87,9 +87,7 @@
             <i class="bi bi-person-check" style="font-size: 1.5em"></i>
         {% endif %}
 
-        <a {% if game.url %}href="{{ game.url }}"{% endif %} target="_blank" data-tooltip="{{ tooltip }}">
-            <img src="{{ game.image_url }}" alt="Illustration {{ game.name }}">
-        </a>
+        <a {% if game.url %}href="{{ game.url }}"{% endif %} target="_blank" data-tooltip="{{ tooltip }}"><img src="{{ game.image_url }}" alt="Illustration {{ game.name }}"></a>
     </div>
 {%- endmacro %}
 

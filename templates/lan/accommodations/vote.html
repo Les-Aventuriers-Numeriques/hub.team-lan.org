@@ -62,9 +62,7 @@
                         {% endfor %}
 
                         {% if g.lan_accommodations_status == 'enabled' %}
-                            <a href="{{ url_for('lan_accommodations_proposal_edit', accommodation_proposal_id=proposal.id) }}" style="font-size: 0.8em">
-                                <i class="bi bi-pencil"></i>
-                            </a>
+                            <a href="{{ url_for('lan_accommodations_proposal_edit', accommodation_proposal_id=proposal.id) }}" style="font-size: 0.8em"><i class="bi bi-pencil"></i></a>
                         {% endif %}
                     </div>
                 </article>
