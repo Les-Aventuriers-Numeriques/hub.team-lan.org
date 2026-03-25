@@ -1,5 +1,5 @@
-from hub.models import User, Game, LanGameProposal, LanGameProposalVote, VoteType, Setting, LanAccommodationProposal, LanAccommodationProposalVote
 from hub.forms import LanGamesProposalSearchForm, LanGamesSettingsForm, LanGamesVoteFilterForm, LanAccommodationsSettingsForm, LanAccommodationsVoteFilterForm, LanGamesProposalForm
+from hub.models import User, Game, LanGameProposal, LanGameProposalVote, VoteType, Setting, LanAccommodationProposal, LanAccommodationProposalVote
 from flask import render_template, redirect, url_for, flash, session, request, g
 from flask_login import login_required, current_user, logout_user, login_user
 from sqlalchemy_searchable import search, inspect_search_vectors
@@ -385,7 +385,7 @@ def lan_games_proposal_submit(game_id: int) -> Response:
         if discord.can_send_lan_messages():
             discord.send_game_proposal_message(
                 current_user,
-                db.session.get(Game, game_id)
+                db.session.get(LanGameProposal, game_id)
             )
 
         anchor = f'g={game_id}'
@@ -495,6 +495,9 @@ def lan_accommodations_proposal() -> Union[str, Response]:
         form.populate_obj(lan_accommodation_proposal)
 
         db.session.add(lan_accommodation_proposal)
+
+        LanAccommodationProposalVote.vote(current_user, lan_accommodation_proposal.id, VoteType.YES)
+
         db.session.commit()
 
         if discord.can_send_organizer_messages():
@@ -693,12 +696,12 @@ def admin_lan_games() -> Union[str, Response]:
 @logout_if_must_relogin
 @to_home_if_not_admin
 def admin_lan_games_proposal_resend(game_id: int) -> Response:
-    game = db.get_or_404(Game, game_id)
+    game_proposal = db.get_or_404(LanGameProposal, game_id)
 
     if discord.can_send_lan_messages():
         discord.send_game_proposal_message(
             current_user,
-            game
+            game_proposal
         )
 
         flash('C\'est renvoyé.', 'success')

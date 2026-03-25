@@ -44,7 +44,7 @@
                             <td>{{ avatar(current_user) }} {{ proposal.user.display_name }}</td>
                             <td>{{ proposal.created_at|datetimeformat }}</td>
                             <td class="actions">
-                                <a href="{{ url_for('admin_lan_accommodation_proposal_resend', accommodation_proposal_id=proposal.id) }}" onclick="return confirm('{{ proposal.title }} sera renvoyé sur le canal Discord #lan-orga. Confirmer ? Ne fait ça que si le message n\'a jamais été envoyé.')" data-tooltip="Renvoyer"><i class="bi bi-send"></i></a>
+                                <a href="{{ url_for('admin_lan_accommodation_proposal_resend', accommodation_proposal_id=proposal.id) }}" onclick="return confirm('{{ proposal.title }} sera renvoyé sur le canal Discord #lan-orga ou mis à jour. Confirmer ?')" data-tooltip="Renvoyer"><i class="bi bi-send"></i></a>
                                 <a href="{{ url_for('admin_lan_accommodation_proposal_delete', accommodation_proposal_id=proposal.id) }}" onclick="return confirm('{{ proposal.title }} et les votes associés seront supprimés. Confirmer ?')" data-tooltip="Supprimer"><i class="bi bi-x-lg"></i></a>
                                 <a href="{{ url_for('admin_lan_accommodation_proposal_delete_votes', accommodation_proposal_id=proposal.id) }}" onclick="return confirm('Les votes de {{ proposal.title }} seront supprimés. Confirmer ?')" data-tooltip="Supprimer les votes"><i class="bi bi-journal-x"></i></a>
                             </td>

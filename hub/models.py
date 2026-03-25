@@ -128,6 +128,7 @@ class LanGameProposal(VotableMixin, CreatedAtMixin, db.Model):
     __tablename__ = 'lan_game_proposals'
 
     game_id = mapped_column(sa.BigInteger, sa.ForeignKey('games.id', ondelete='cascade'), primary_key=True, autoincrement=False)
+    message_id = mapped_column(sa.BigInteger)
 
     votes = relationship('LanGameProposalVote', back_populates='proposal')
     game = relationship('Game', uselist=False, back_populates='proposal')
@@ -190,6 +191,7 @@ class LanAccommodationProposal(VotableMixin, UpdatedAtMixin, CreatedAtMixin, db.
     has_private_parking = mapped_column(sa.Boolean)
     total_price = mapped_column(sa.Numeric(6, 2), nullable=False)
     notes = mapped_column(sa.Text)
+    message_id = mapped_column(sa.BigInteger)
 
     votes = relationship('LanAccommodationProposalVote', back_populates='proposal')
     user = relationship('User', uselist=False, back_populates='accommodation_proposals')

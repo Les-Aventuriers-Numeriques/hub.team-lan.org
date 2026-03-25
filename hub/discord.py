@@ -306,11 +306,11 @@ def top_games_command(ctx: Context) -> Message:
     return _handle_top_games(ctx)
 
 
-def send_game_proposal_message(user: User, game: Game) -> None:
+def send_game_proposal_message(user: User, game_proposal: LanGameProposal) -> None:
     components = [
         Button(
             style=ButtonStyles.PRIMARY,
-            custom_id=[_handle_game_vote_button, game.id, vote_type.value],
+            custom_id=[_handle_game_vote_button, game_proposal.game.id, vote_type.value],
             emoji={
                 'name': _vote_type_emoji(vote_type),
             }
@@ -333,11 +333,11 @@ def send_game_proposal_message(user: User, game: Game) -> None:
     data, content_type = Message(
         f'**{user.display_name}** a proposé un nouveau jeu :',
         embed=Embed(
-            title=game.name,
+            title=game_proposal.game.name,
             color=EMBEDS_COLOR,
-            url=game.url,
-            image=Media(game.image_url),
-            footer=Footer('👤 Un seul détenteur suffit potentiellement !') if game.single_owner_enough else None
+            url=game_proposal.game.url,
+            image=Media(game_proposal.game.image_url),
+            footer=Footer('👤 Un seul détenteur suffit potentiellement !') if game_proposal.game.single_owner_enough else None
         ),
         components=[
             ActionRow(
@@ -346,15 +346,22 @@ def send_game_proposal_message(user: User, game: Game) -> None:
         ]
     ).encode(True)
 
-    response = _send_message(app.config['DISCORD_LAN_CHANNEL_ID'], data, content_type)
+    if game_proposal.message_id:
+        _update_message(app.config['DISCORD_LAN_CHANNEL_ID'], game_proposal.message_id, data, content_type)
+    else:
+        message_id = _send_message(app.config['DISCORD_LAN_CHANNEL_ID'], data, content_type).json().get('id')
 
-    json = response.json()
+        game_proposal.message_id = message_id
 
-    _start_thread(
-        app.config['DISCORD_LAN_CHANNEL_ID'],
-        json.get('id'),
-        game.name
-    )
+        db.session.add(game_proposal)
+
+        db.session.commit()
+
+        _start_thread(
+            app.config['DISCORD_LAN_CHANNEL_ID'],
+            message_id,
+            game_proposal.game.name
+        )
 
 
 def send_accommodation_proposal_message(user: User, accommodation_proposal: LanAccommodationProposal) -> None:
@@ -448,20 +455,38 @@ def send_accommodation_proposal_message(user: User, accommodation_proposal: LanA
         ]
     ).encode(True)
 
-    response = _send_message(app.config['DISCORD_LAN_ORGANIZER_CHANNEL_ID'], data, content_type)
+    if accommodation_proposal.message_id:
+        _update_message(app.config['DISCORD_LAN_CHANNEL_ID'], accommodation_proposal.message_id, data, content_type)
+    else:
+        message_id = _send_message(app.config['DISCORD_LAN_ORGANIZER_CHANNEL_ID'], data, content_type).json().get('id')
 
-    json = response.json()
+        accommodation_proposal.message_id = message_id
 
-    _start_thread(
-        app.config['DISCORD_LAN_ORGANIZER_CHANNEL_ID'],
-        json.get('id'),
-        accommodation_proposal.title
-    )
+        db.session.add(accommodation_proposal)
+
+        db.session.commit()
+
+        _start_thread(
+            app.config['DISCORD_LAN_ORGANIZER_CHANNEL_ID'],
+            message_id,
+            accommodation_proposal.title
+        )
 
 
 def _send_message(channel_id: int, data: Dict, content_type: str) -> Response:
     return requests.post(
         '{API_BASE_URL}/channels/{channel_id}/messages'.format(API_BASE_URL=API_BASE_URL, channel_id=channel_id, **app.config),
+        data=data,
+        headers={
+            'Content-Type': content_type,
+            'Authorization': 'Bot {DISCORD_BOT_TOKEN}'.format(**app.config),
+        }
+    )
+
+
+def _update_message(channel_id: int, message_id: int, data: Dict, content_type: str) -> Response:
+    return requests.patch(
+        '{API_BASE_URL}/channels/{channel_id}/messages/{message_id}'.format(API_BASE_URL=API_BASE_URL, channel_id=channel_id, message_id=message_id, **app.config),
         data=data,
         headers={
             'Content-Type': content_type,
