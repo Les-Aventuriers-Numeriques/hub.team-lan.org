@@ -456,7 +456,7 @@ def send_accommodation_proposal_message(user: User, accommodation_proposal: LanA
     ).encode(True)
 
     if accommodation_proposal.message_id:
-        _update_message(app.config['DISCORD_LAN_CHANNEL_ID'], accommodation_proposal.message_id, data, content_type)
+        _update_message(app.config['DISCORD_LAN_ORGANIZER_CHANNEL_ID'], accommodation_proposal.message_id, data, content_type)
     else:
         message_id = _send_message(app.config['DISCORD_LAN_ORGANIZER_CHANNEL_ID'], data, content_type).json().get('id')
 
