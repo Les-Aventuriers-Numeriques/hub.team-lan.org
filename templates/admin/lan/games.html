@@ -27,29 +27,31 @@
             <a href="{{ url_for('admin_lan_game_proposals_reset_all') }}" role="button" class="secondary" onclick="return confirm('Toutes les propositions et votes seront supprimés. Confirmer ?')">Réinitialiser tout</a>
         </p>
 
-        <table class="striped mb-0">
-            <thead>
-                <tr>
-                    <th>Jeu</th>
-                    <th>Proposé par</th>
-                    <th>Proposé le</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for proposal in proposals %}
+        <div class="overflow-x-auto">
+            <table class="striped mb-0">
+                <thead>
                     <tr>
-                        <td>{{ proposal.game.name }} <code>{{ proposal.game.id }}</code></td>
-                        <td>{{ avatar(current_user) }} {{ proposal.user.display_name }}</td>
-                        <td>{{ proposal.created_at|datetimeformat }}</td>
-                        <td class="actions">
-                            <a href="{{ url_for('admin_lan_game_proposal_delete', game_id=proposal.game_id) }}" onclick="return confirm('{{ proposal.game.name }} et les votes associés seront supprimés. Confirmer ?')"><i class="bi bi-x-lg"></i></a>
-                            <a href="{{ url_for('admin_lan_game_proposal_delete_votes', game_id=proposal.game_id) }}" onclick="return confirm('Les votes de {{ proposal.game.name }} seront supprimés. Confirmer ?')"><i class="bi bi-journal-x"></i></a>
-                        </td>
+                        <th>Jeu</th>
+                        <th>Proposé par</th>
+                        <th>Proposé le</th>
+                        <th></th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {% for proposal in proposals %}
+                        <tr>
+                            <td>{{ proposal.game.name }} <code>{{ proposal.game.id }}</code></td>
+                            <td>{{ avatar(current_user) }} {{ proposal.user.display_name }}</td>
+                            <td>{{ proposal.created_at|datetimeformat }}</td>
+                            <td class="actions">
+                                <a href="{{ url_for('admin_lan_game_proposal_delete', game_id=proposal.game_id) }}" onclick="return confirm('{{ proposal.game.name }} et les votes associés seront supprimés. Confirmer ?')"><i class="bi bi-x-lg"></i></a>
+                                <a href="{{ url_for('admin_lan_game_proposal_delete_votes', game_id=proposal.game_id) }}" onclick="return confirm('Les votes de {{ proposal.game.name }} seront supprimés. Confirmer ?')"><i class="bi bi-journal-x"></i></a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     {% else %}
         <p class="mb-0"><strong>Aucune proposition pour l'instant.</strong></p>
     {% endif %}

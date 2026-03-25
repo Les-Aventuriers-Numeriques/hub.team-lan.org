@@ -44,6 +44,10 @@ img.avatar {
     color: var(--pico-form-element-invalid-active-border-color);
 }
 
+.overflow-x-auto {
+    overflow-x: auto;
+}
+
 /************************************************************************
  * En-tête */
 

@@ -27,29 +27,31 @@
             <a href="{{ url_for('admin_lan_accommodation_proposals_reset_all') }}" role="button" class="secondary" onclick="return confirm('Toutes les propositions et votes seront supprimés. Confirmer ?')">Réinitialiser tout</a>
         </p>
 
-        <table class="striped mb-0">
-            <thead>
-                <tr>
-                    <th>Titre</th>
-                    <th>Proposé par</th>
-                    <th>Proposé le</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for proposal in proposals %}
+        <div class="overflow-x-auto">
+            <table class="striped mb-0">
+                <thead>
                     <tr>
-                        <td>{{ proposal.title }}</td>
-                        <td>{{ avatar(current_user) }} {{ proposal.user.display_name }}</td>
-                        <td>{{ proposal.created_at|datetimeformat }}</td>
-                        <td class="actions">
-                            <a href="{{ url_for('admin_lan_accommodation_proposal_delete', accommodation_proposal_id=proposal.id) }}" onclick="return confirm('{{ proposal.title }} et les votes associés seront supprimés. Confirmer ?')"><i class="bi bi-x-lg"></i></a>
-                            <a href="{{ url_for('admin_lan_accommodation_proposal_delete_votes', accommodation_proposal_id=proposal.id) }}" onclick="return confirm('Les votes de {{ proposal.title }} seront supprimés. Confirmer ?')"><i class="bi bi-journal-x"></i></a>
-                        </td>
+                        <th>Titre</th>
+                        <th>Proposé par</th>
+                        <th>Proposé le</th>
+                        <th></th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {% for proposal in proposals %}
+                        <tr>
+                            <td>{{ proposal.title }}</td>
+                            <td>{{ avatar(current_user) }} {{ proposal.user.display_name }}</td>
+                            <td>{{ proposal.created_at|datetimeformat }}</td>
+                            <td class="actions">
+                                <a href="{{ url_for('admin_lan_accommodation_proposal_delete', accommodation_proposal_id=proposal.id) }}" onclick="return confirm('{{ proposal.title }} et les votes associés seront supprimés. Confirmer ?')"><i class="bi bi-x-lg"></i></a>
+                                <a href="{{ url_for('admin_lan_accommodation_proposal_delete_votes', accommodation_proposal_id=proposal.id) }}" onclick="return confirm('Les votes de {{ proposal.title }} seront supprimés. Confirmer ?')"><i class="bi bi-journal-x"></i></a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     {% else %}
         <p class="mb-0"><strong>Aucune proposition pour l'instant.</strong></p>
     {% endif %}

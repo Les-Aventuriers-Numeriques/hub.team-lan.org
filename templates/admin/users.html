@@ -14,49 +14,51 @@
             <a href="{{ url_for('admin_users_lan_organizers_force_relogin') }}" role="button" class="secondary" onclick="return confirm('Tous les organisateurs de la LAN (y compris toi, si tu en fait partie) seront forcés de se reconnecter afin de synchroniser leurs rôles Discord. Confirmer ?')">Déconnecter les organisateurs de la LAN</a>
         </p>
 
-        <table class="striped mb-0">
-            <thead>
-                <tr>
-                    <th>Pseudo</th>
-                    <th>Membre ?</th>
-                    <th>Participant LAN ?</th>
-                    <th>Orga LAN ?</th>
-                    <th>Admin ?</th>
-                    <th>Création</th>
-                    <th>Mise à jour</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for user in users %}
+        <div class="overflow-x-auto">
+            <table class="striped mb-0">
+                <thead>
                     <tr>
-                        <td>
-                            {{ avatar(user) }}
-                            {{ user.display_name }}<br><code>{{ user.id }}</code>
-                        </td>
-                        <td>{{ 'Oui' if user.is_member else 'Non' }}</td>
-                        <td>{{ 'Oui' if user.is_lan_participant else 'Non' }}</td>
-                        <td>{{ 'Oui' if user.is_lan_organizer else 'Non' }}</td>
-                        <td>{{ 'Oui' if user.is_admin else 'Non' }}</td>
-                        <td>{{ user.created_at|datetimeformat }}</td>
-                        <td>{{ user.updated_at|datetimeformat }}</td>
-                        <td class="actions">
-                            {% if user.id != current_user.id %}
-                                <a href="{{ url_for('admin_user_delete', user_id=user.id) }}" onclick="return confirm('{{ user.display_name }} et tout ce qui lui est lié sera supprimé. Confirmer ?')">
-                                    <i class="bi bi-x-lg"></i>
-                                </a>
-                            {% endif %}
-
-                            {% if not user.must_relogin %}
-                                <a href="{{ url_for('admin_user_force_relogin', user_id=user.id) }}" onclick="return confirm('{{ user.display_name }} va être forcé de se reconnecter afin de synchroniser ses rôles Discord. Confirmer ?')">
-                                    <i class="bi bi-box-arrow-in-right"></i>
-                                </a>
-                            {% endif %}
-                        </td>
+                        <th>Pseudo</th>
+                        <th>Membre ?</th>
+                        <th>Participant LAN ?</th>
+                        <th>Orga LAN ?</th>
+                        <th>Admin ?</th>
+                        <th>Création</th>
+                        <th>Mise à jour</th>
+                        <th></th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                        <tr>
+                            <td>
+                                {{ avatar(user) }}
+                                {{ user.display_name }}<br><code>{{ user.id }}</code>
+                            </td>
+                            <td>{{ 'Oui' if user.is_member else 'Non' }}</td>
+                            <td>{{ 'Oui' if user.is_lan_participant else 'Non' }}</td>
+                            <td>{{ 'Oui' if user.is_lan_organizer else 'Non' }}</td>
+                            <td>{{ 'Oui' if user.is_admin else 'Non' }}</td>
+                            <td>{{ user.created_at|datetimeformat }}</td>
+                            <td>{{ user.updated_at|datetimeformat }}</td>
+                            <td class="actions">
+                                {% if user.id != current_user.id %}
+                                    <a href="{{ url_for('admin_user_delete', user_id=user.id) }}" onclick="return confirm('{{ user.display_name }} et tout ce qui lui est lié sera supprimé. Confirmer ?')">
+                                        <i class="bi bi-x-lg"></i>
+                                    </a>
+                                {% endif %}
+
+                                {% if not user.must_relogin %}
+                                    <a href="{{ url_for('admin_user_force_relogin', user_id=user.id) }}" onclick="return confirm('{{ user.display_name }} va être forcé de se reconnecter afin de synchroniser ses rôles Discord. Confirmer ?')">
+                                        <i class="bi bi-box-arrow-in-right"></i>
+                                    </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     {% else %}
         <p class="mb-0"><strong>Aucun utilisateurs.</strong></p>
     {% endif %}
