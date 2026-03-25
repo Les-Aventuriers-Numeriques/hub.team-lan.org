@@ -422,7 +422,7 @@ def send_accommodation_proposal_message(user: User, accommodation_proposal: LanA
             )
         )
 
-    if accommodation_proposal.has_fiber is not None:
+    if accommodation_proposal.has_private_parking is not None:
         fields.append(
             Field(
                 name='Parking privé ?',
