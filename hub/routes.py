@@ -384,7 +384,6 @@ def lan_games_proposal_submit(game_id: int) -> Response:
 
         if discord.can_send_lan_messages():
             discord.send_game_proposal_message(
-                current_user,
                 db.session.get(LanGameProposal, game_id)
             )
 
@@ -501,10 +500,7 @@ def lan_accommodations_proposal() -> Union[str, Response]:
         db.session.commit()
 
         if discord.can_send_organizer_messages():
-            discord.send_accommodation_proposal_message(
-                current_user,
-                lan_accommodation_proposal
-            )
+            discord.send_accommodation_proposal_message(lan_accommodation_proposal)
 
         flash('Merci pour ta proposition !', 'success')
 
@@ -530,7 +526,13 @@ def lan_accommodations_proposal_edit(accommodation_proposal_id: int) -> Union[st
         form.populate_obj(lan_accommodation_proposal)
 
         db.session.add(lan_accommodation_proposal)
+
+        modified = db.session.is_modified(lan_accommodation_proposal)
+
         db.session.commit()
+
+        if modified and discord.can_send_organizer_messages():
+            discord.send_accommodation_proposal_message(lan_accommodation_proposal)
 
         flash('Proposition mise à jour.', 'success')
 
@@ -699,10 +701,7 @@ def admin_lan_games_proposal_resend(game_id: int) -> Response:
     game_proposal = db.get_or_404(LanGameProposal, game_id)
 
     if discord.can_send_lan_messages():
-        discord.send_game_proposal_message(
-            current_user,
-            game_proposal
-        )
+        discord.send_game_proposal_message(game_proposal)
 
         flash('C\'est renvoyé.', 'success')
     else:
@@ -822,10 +821,7 @@ def admin_lan_accommodation_proposal_resend(accommodation_proposal_id: int) -> R
     accommodation_proposal = db.get_or_404(LanAccommodationProposal, accommodation_proposal_id)
 
     if discord.can_send_organizer_messages():
-        discord.send_accommodation_proposal_message(
-            current_user,
-            accommodation_proposal
-        )
+        discord.send_accommodation_proposal_message(accommodation_proposal)
 
         flash('C\'est renvoyé.', 'success')
     else:

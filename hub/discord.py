@@ -306,7 +306,7 @@ def top_games_command(ctx: Context) -> Message:
     return _handle_top_games(ctx)
 
 
-def send_game_proposal_message(user: User, game_proposal: LanGameProposal) -> None:
+def send_game_proposal_message(game_proposal: LanGameProposal) -> None:
     components = [
         Button(
             style=ButtonStyles.PRIMARY,
@@ -331,7 +331,7 @@ def send_game_proposal_message(user: User, game_proposal: LanGameProposal) -> No
     ])
 
     data, content_type = Message(
-        f'**{user.display_name}** a proposé un nouveau jeu :',
+        f'**{game_proposal.user.display_name}** a proposé un nouveau jeu :',
         embed=Embed(
             title=game_proposal.game.name,
             color=EMBEDS_COLOR,
@@ -364,7 +364,7 @@ def send_game_proposal_message(user: User, game_proposal: LanGameProposal) -> No
         )
 
 
-def send_accommodation_proposal_message(user: User, accommodation_proposal: LanAccommodationProposal) -> None:
+def send_accommodation_proposal_message(accommodation_proposal: LanAccommodationProposal) -> None:
     components = [
         Button(
             style=ButtonStyles.PRIMARY,
@@ -439,7 +439,7 @@ def send_accommodation_proposal_message(user: User, accommodation_proposal: LanA
         )
 
     data, content_type = Message(
-        f'**{user.display_name}** a proposé un nouveau logement :',
+        f'**{accommodation_proposal.user.display_name}** a proposé un nouveau logement :',
         embed=Embed(
             title=accommodation_proposal.title,
             description=accommodation_proposal.notes,
