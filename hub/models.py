@@ -5,9 +5,9 @@ from sqlalchemy_utils.types import TSVectorType
 from sqlalchemy.util import memoized_property
 from sqlalchemy.dialects import postgresql
 from urllib.parse import quote_plus
-from enum import Enum as PythonEnum
 from datetime import UTC, datetime
 from flask_login import UserMixin
+from enum import StrEnum
 from app import db
 import sqlalchemy as sa
 
@@ -55,7 +55,7 @@ class VotableMixin:
 
 
 # ATTENTION : Ne jamais modifier cette liste. Il est possible d'ajouter des éléments, à la fin de la liste uniquement.
-class VoteType(PythonEnum):
+class VoteType(StrEnum):
     YES = 'YES'
     NEUTRAL = 'NEUTRAL'
     NO = 'NO'
@@ -65,6 +65,177 @@ class VoteType(PythonEnum):
         return ','.join([
             e.value for e in cls
         ])
+
+
+# ATTENTION : Ne jamais modifier cette liste. Il est possible d'ajouter des éléments, à la fin de la liste uniquement.
+class UserKitchenPreference(StrEnum):
+    COOK = 'cook'
+    ASSISTANT = 'assistant'
+    ANY = 'any'
+
+    def label(self) -> str:
+        if self == UserKitchenPreference.COOK:
+            return 'Cuisinier'
+        elif self == UserKitchenPreference.ASSISTANT:
+            return 'Commis'
+        elif self == UserKitchenPreference.ANY:
+            return 'Peu importe'
+
+        return '?'
+
+
+# ATTENTION : Ne jamais modifier cette liste. Il est possible d'ajouter des éléments, à la fin de la liste uniquement.
+class UserWaterPreference(StrEnum):
+    STILL = 'still'
+    SPARKLING = 'sparkling'
+    ANY = 'any'
+
+    def label(self) -> str:
+        if self == UserWaterPreference.STILL:
+            return 'Plate'
+        elif self == UserWaterPreference.SPARKLING:
+            return 'Gazeuse'
+        elif self == UserWaterPreference.ANY:
+            return 'Peu importe'
+
+        return '?'
+
+
+# ATTENTION : Ne jamais modifier cette liste. Il est possible d'ajouter des éléments, à la fin de la liste uniquement.
+class UserHotDrinksPreference(StrEnum):
+    COFFEE = 'coffee'
+    TEA = 'tea'
+    HOT_CHOCOLATE = 'hot-chocolate'
+    ANY = 'any'
+    NONE = 'none'
+
+    def label(self) -> str:
+        if self == UserHotDrinksPreference.COFFEE:
+            return 'Café'
+        elif self == UserHotDrinksPreference.TEA:
+            return 'Thé'
+        elif self == UserHotDrinksPreference.HOT_CHOCOLATE:
+            return 'Chocolat chaud'
+        elif self == UserHotDrinksPreference.ANY:
+            return 'Peu importe'
+        elif self == UserHotDrinksPreference.NONE:
+            return 'Rien'
+
+        return '?'
+
+
+# ATTENTION : Ne jamais modifier cette liste. Il est possible d'ajouter des éléments, à la fin de la liste uniquement.
+class UserBreakfastPreference(StrEnum):
+    SWEET = 'sweet'
+    SALTY = 'salty'
+    ANY = 'any'
+
+    def label(self) -> str:
+        if self == UserBreakfastPreference.SWEET:
+            return 'Sucré'
+        elif self == UserBreakfastPreference.SALTY:
+            return 'Salé'
+        elif self == UserBreakfastPreference.ANY:
+            return 'Peu importe'
+
+        return '?'
+
+
+# ATTENTION : Ne jamais modifier cette liste. Il est possible d'ajouter des éléments, à la fin de la liste uniquement.
+class UserBreadsPreference(StrEnum):
+    WHITE = 'white'
+    WHOLE_GRAIN = 'whole-grain'
+    ANY = 'any'
+
+    def label(self) -> str:
+        if self == UserBreadsPreference.WHITE:
+            return 'Blanc'
+        elif self == UserBreadsPreference.WHOLE_GRAIN:
+            return 'Complet'
+        elif self == UserBreadsPreference.ANY:
+            return 'Peu importe'
+
+        return '?'
+
+
+# ATTENTION : Ne jamais modifier cette liste. Il est possible d'ajouter des éléments, à la fin de la liste uniquement.
+class UserAlcoholPreference(StrEnum):
+    WINE = 'wine'
+    BEER = 'beer'
+    ANY = 'any'
+    NONE = 'none'
+
+    def label(self) -> str:
+        if self == UserAlcoholPreference.WINE:
+            return 'Vin'
+        elif self == UserAlcoholPreference.BEER:
+            return 'Bière'
+        elif self == UserAlcoholPreference.ANY:
+            return 'Peu importe'
+        elif self == UserAlcoholPreference.NONE:
+            return 'Rien'
+
+        return '?'
+
+
+# ATTENTION : Ne jamais modifier cette liste. Il est possible d'ajouter des éléments, à la fin de la liste uniquement.
+class UserChickenPreference(StrEnum):
+    THIGHS = 'thighs'
+    BREAST = 'breast'
+    ANY = 'any'
+    NONE = 'none'
+
+    def label(self) -> str:
+        if self == UserChickenPreference.THIGHS:
+            return 'Cuisses'
+        elif self == UserChickenPreference.BREAST:
+            return 'Blanc'
+        elif self == UserChickenPreference.ANY:
+            return 'Peu importe'
+        elif self == UserChickenPreference.NONE:
+            return 'Rien'
+
+        return '?'
+
+
+# ATTENTION : Ne jamais modifier cette liste. Il est possible d'ajouter des éléments, à la fin de la liste uniquement.
+class UserDrySausagePreference(StrEnum):
+    REGULAR = 'regular'
+    CHORIZO = 'chorizo'
+    ANY = 'any'
+    NONE = 'none'
+
+    def label(self) -> str:
+        if self == UserDrySausagePreference.REGULAR:
+            return 'Normal'
+        elif self == UserDrySausagePreference.CHORIZO:
+            return 'Chorizo'
+        elif self == UserDrySausagePreference.ANY:
+            return 'Peu importe'
+        elif self == UserDrySausagePreference.NONE:
+            return 'Rien'
+
+        return '?'
+
+
+# ATTENTION : Ne jamais modifier cette liste. Il est possible d'ajouter des éléments, à la fin de la liste uniquement.
+class UserPatePreference(StrEnum):
+    REGULAR = 'regular'
+    RILLETTES = 'rillettes'
+    ANY = 'any'
+    NONE = 'none'
+
+    def label(self) -> str:
+        if self == UserPatePreference.REGULAR:
+            return 'Normal'
+        elif self == UserPatePreference.RILLETTES:
+            return 'Rillettes'
+        elif self == UserPatePreference.ANY:
+            return 'Peu importe'
+        elif self == UserPatePreference.NONE:
+            return 'Rien'
+
+        return '?'
 
 
 class User(CreatedAtMixin, UpdatedAtMixin, UserMixin, db.Model):
@@ -83,19 +254,19 @@ class User(CreatedAtMixin, UpdatedAtMixin, UserMixin, db.Model):
     allergies = mapped_column(sa.String(255))
     special_diet = mapped_column(sa.String(255))
     is_vegetarian = mapped_column(sa.Boolean)
-    # kitchen = mapped_column(sa.Enum())
-    # water = mapped_column(sa.Enum())
-    # hot_drinks = mapped_column(sa.Enum())
-    # breakfast = mapped_column(sa.Enum())
-    # breads = mapped_column(sa.Enum())
+    kitchen = mapped_column(sa.Enum(UserKitchenPreference))
+    water = mapped_column(sa.Enum(UserWaterPreference))
+    hot_drinks = mapped_column(sa.Enum(UserHotDrinksPreference))
+    breakfast = mapped_column(sa.Enum(UserBreakfastPreference))
+    breads = mapped_column(sa.Enum(UserBreadsPreference))
     cheeses = mapped_column(sa.String(255))
     spicy_dishes = mapped_column(sa.Boolean)
-    # alcohol = mapped_column(sa.Enum())
-    # meat = mapped_column(sa.Enum())
-    # chicken = mapped_column(sa.Enum())
-    # sausage = mapped_column(sa.Enum())
+    alcohol = mapped_column(sa.Enum(UserAlcoholPreference))
+    meat = mapped_column(sa.String(255))
+    chicken = mapped_column(sa.Enum(UserChickenPreference))
+    dry_sausage = mapped_column(sa.Enum(UserDrySausagePreference))
     thai_cuisine = mapped_column(sa.Boolean)
-    # dough = mapped_column(sa.Enum())
+    pate = mapped_column(sa.Enum(UserPatePreference))
     other_preferences = mapped_column(sa.String(255))
 
     game_proposals = relationship('LanGameProposal', back_populates='user')
