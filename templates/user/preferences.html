@@ -1,0 +1,21 @@
+{% extends 'layout.html' %}
+
+{% from 'macros.html' import field with context %}
+
+{% block title %}Préférences{% endblock %}
+
+{% block cssfiles %}
+    {% assets 'css_base' %}<link rel="stylesheet" href="{{ ASSET_URL }}">{% endassets %}
+{% endblock %}
+
+{% block content %}
+    <form method="post" action="{{ url_for('user_preferences') }}">
+        {{ form.csrf_token }}
+
+        {{ field(form.allergies) }}
+        {{ field(form.special_diet) }}
+        {{ field(form.is_vegetarian) }}
+
+        <button type="submit" class="mb-0">Enregistrer</button>
+    </form>
+{% endblock %}

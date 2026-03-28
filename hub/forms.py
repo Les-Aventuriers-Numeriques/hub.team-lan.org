@@ -1,4 +1,4 @@
-from wtforms import SearchField, SelectField, StringField, URLField, IntegerField, DecimalField, TextAreaField
+from wtforms import SearchField, SelectField, StringField, URLField, IntegerField, DecimalField, TextAreaField, BooleanField
 from flask_wtf import FlaskForm
 import wtforms.validators as validators
 
@@ -175,4 +175,27 @@ class LanAccommodationsSettingsForm(FlaskForm):
         ],
         default='disabled',
         description='<strong>Désactivée</strong> : aucun accès, période creuse ; <strong>Activée</strong> : accès normal, période de choix des logements ; <strong>Lecture seule</strong> : consultation uniquement.'
+    )
+
+
+class UserPreferencesForm(FlaskForm):
+    allergies = StringField(
+        'Allergies',
+        [validators.Optional(), validators.Length(max=255)],
+        render_kw={
+            'placeholder': 'Par exemple "Céleri"',
+        }
+    )
+
+    special_diet = StringField(
+        'Régime spécial',
+        [validators.Optional(), validators.Length(max=255)],
+        render_kw={
+            'placeholder': 'Par exemple "Pas de poisson" ou "Uniquement du houblon"',
+        }
+    )
+
+    is_vegetarian = BooleanField(
+        'Végétarien ?',
+        [validators.Optional()]
     )

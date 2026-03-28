@@ -1,4 +1,4 @@
-from hub.forms import LanGamesProposalSearchForm, LanGamesSettingsForm, LanGamesVoteFilterForm, LanAccommodationsSettingsForm, LanAccommodationsVoteFilterForm, LanGamesProposalForm
+from hub.forms import LanGamesProposalSearchForm, LanGamesSettingsForm, LanGamesVoteFilterForm, LanAccommodationsSettingsForm, LanAccommodationsVoteFilterForm, LanGamesProposalForm, UserPreferencesForm
 from hub.models import User, Game, LanGameProposal, LanGameProposalVote, VoteType, Setting, LanAccommodationProposal, LanAccommodationProposalVote
 from flask import render_template, redirect, url_for, flash, session, request, g
 from flask_login import login_required, current_user, logout_user, login_user
@@ -237,6 +237,28 @@ def logout() -> Response:
 @logout_if_must_relogin
 def home() -> str:
     return render_template('home.html')
+
+
+@app.route('/preferences', methods=['GET', 'POST'])
+@login_required
+@logout_if_must_relogin
+def user_preferences() -> Union[str, Response]:
+    form = UserPreferencesForm(obj=current_user)
+
+    if form.validate_on_submit():
+        form.populate_obj(current_user)
+
+        db.session.add(current_user)
+        db.session.commit()
+
+        flash('Tes préférences ont été enregistrées.', 'success')
+
+        return redirect(url_for('user_preferences'))
+
+    return render_template(
+        'user/preferences.html',
+        form=form
+    )
 
 
 @app.route('/lan/jeux/voter')
