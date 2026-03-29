@@ -149,7 +149,6 @@ assets.register('css_base', Bundle('css/base.css', filters='rcssmin', output='cs
 assets.register('css_lan_games_vote', Bundle('css/base.css', 'css/lan_games.css', 'css/lan_games_vote.css', filters='rcssmin', output='css/lan_games_vote.min.css'))
 assets.register('css_lan_games_proposal', Bundle('css/base.css', 'css/lan_games.css', 'css/lan_games_proposal.css', filters='rcssmin', output='css/lan_games_proposal.min.css'))
 assets.register('css_lan_accommodations_vote', Bundle('css/base.css', 'css/lan_accommodations_vote.css', filters='rcssmin', output='css/lan_accommodations_vote.min.css'))
-assets.register('css_lan_accommodations_proposal', Bundle('css/base.css', 'css/lan_accommodations_proposal.css', filters='rcssmin', output='css/lan_accommodations_proposal.min.css'))
 
 # Flask-Babel
 babel = Babel(app)

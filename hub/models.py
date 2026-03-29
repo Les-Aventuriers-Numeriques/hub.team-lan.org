@@ -74,14 +74,11 @@ class UserKitchenPreference(StrEnum):
     ANY = 'any'
 
     def label(self) -> str:
-        if self == UserKitchenPreference.COOK:
-            return 'Cuisinier'
-        elif self == UserKitchenPreference.ASSISTANT:
-            return 'Commis'
-        elif self == UserKitchenPreference.ANY:
-            return 'Peu importe'
-
-        return '?'
+        return {
+            UserKitchenPreference.COOK: 'Cuisinier',
+            UserKitchenPreference.ASSISTANT: 'Commis',
+            UserKitchenPreference.ANY: 'Peu importe',
+        }.get(self, '')
 
 
 # ATTENTION : Ne jamais modifier cette liste. Il est possible d'ajouter des éléments, à la fin de la liste uniquement.
@@ -91,14 +88,11 @@ class UserWaterPreference(StrEnum):
     ANY = 'any'
 
     def label(self) -> str:
-        if self == UserWaterPreference.STILL:
-            return 'Plate'
-        elif self == UserWaterPreference.SPARKLING:
-            return 'Gazeuse'
-        elif self == UserWaterPreference.ANY:
-            return 'Peu importe'
-
-        return '?'
+        return {
+            UserWaterPreference.STILL: 'Plate',
+            UserWaterPreference.SPARKLING: 'Gazeuse',
+            UserWaterPreference.ANY: 'Peu importe',
+        }.get(self, '')
 
 
 # ATTENTION : Ne jamais modifier cette liste. Il est possible d'ajouter des éléments, à la fin de la liste uniquement.
@@ -110,18 +104,13 @@ class UserHotDrinksPreference(StrEnum):
     NONE = 'none'
 
     def label(self) -> str:
-        if self == UserHotDrinksPreference.COFFEE:
-            return 'Café'
-        elif self == UserHotDrinksPreference.TEA:
-            return 'Thé'
-        elif self == UserHotDrinksPreference.HOT_CHOCOLATE:
-            return 'Chocolat chaud'
-        elif self == UserHotDrinksPreference.ANY:
-            return 'Peu importe'
-        elif self == UserHotDrinksPreference.NONE:
-            return 'Rien'
-
-        return '?'
+        return {
+            UserHotDrinksPreference.COFFEE: 'Café',
+            UserHotDrinksPreference.TEA: 'Thé',
+            UserHotDrinksPreference.HOT_CHOCOLATE: 'Chocolat chaud',
+            UserHotDrinksPreference.ANY: 'Peu importe',
+            UserHotDrinksPreference.NONE: 'Rien',
+        }.get(self, '')
 
 
 # ATTENTION : Ne jamais modifier cette liste. Il est possible d'ajouter des éléments, à la fin de la liste uniquement.
@@ -131,14 +120,11 @@ class UserBreakfastPreference(StrEnum):
     ANY = 'any'
 
     def label(self) -> str:
-        if self == UserBreakfastPreference.SWEET:
-            return 'Sucré'
-        elif self == UserBreakfastPreference.SALTY:
-            return 'Salé'
-        elif self == UserBreakfastPreference.ANY:
-            return 'Peu importe'
-
-        return '?'
+        return {
+            UserBreakfastPreference.SWEET: 'Sucré',
+            UserBreakfastPreference.SALTY: 'Salé',
+            UserBreakfastPreference.ANY: 'Peu importe',
+        }.get(self, '')
 
 
 # ATTENTION : Ne jamais modifier cette liste. Il est possible d'ajouter des éléments, à la fin de la liste uniquement.
@@ -148,14 +134,11 @@ class UserBreadsPreference(StrEnum):
     ANY = 'any'
 
     def label(self) -> str:
-        if self == UserBreadsPreference.WHITE:
-            return 'Blanc'
-        elif self == UserBreadsPreference.WHOLE_GRAIN:
-            return 'Complet'
-        elif self == UserBreadsPreference.ANY:
-            return 'Peu importe'
-
-        return '?'
+        return {
+            UserBreadsPreference.WHITE: 'Blanc',
+            UserBreadsPreference.WHOLE_GRAIN: 'Complet',
+            UserBreadsPreference.ANY: 'Peu importe',
+        }.get(self, '')
 
 
 # ATTENTION : Ne jamais modifier cette liste. Il est possible d'ajouter des éléments, à la fin de la liste uniquement.
@@ -166,16 +149,12 @@ class UserAlcoholPreference(StrEnum):
     NONE = 'none'
 
     def label(self) -> str:
-        if self == UserAlcoholPreference.WINE:
-            return 'Vin'
-        elif self == UserAlcoholPreference.BEER:
-            return 'Bière'
-        elif self == UserAlcoholPreference.ANY:
-            return 'Peu importe'
-        elif self == UserAlcoholPreference.NONE:
-            return 'Rien'
-
-        return '?'
+        return {
+            UserAlcoholPreference.WINE: 'Vin',
+            UserAlcoholPreference.BEER: 'Bière',
+            UserAlcoholPreference.ANY: 'Peu importe',
+            UserAlcoholPreference.NONE: 'Rien',
+        }.get(self, '')
 
 
 # ATTENTION : Ne jamais modifier cette liste. Il est possible d'ajouter des éléments, à la fin de la liste uniquement.
@@ -186,16 +165,12 @@ class UserChickenPreference(StrEnum):
     NONE = 'none'
 
     def label(self) -> str:
-        if self == UserChickenPreference.THIGHS:
-            return 'Cuisses'
-        elif self == UserChickenPreference.BREAST:
-            return 'Blanc'
-        elif self == UserChickenPreference.ANY:
-            return 'Peu importe'
-        elif self == UserChickenPreference.NONE:
-            return 'Rien'
-
-        return '?'
+        return {
+            UserChickenPreference.THIGHS: 'Cuisses',
+            UserChickenPreference.BREAST: 'Blanc',
+            UserChickenPreference.ANY: 'Peu importe',
+            UserChickenPreference.NONE: 'Rien',
+        }.get(self, '')
 
 
 # ATTENTION : Ne jamais modifier cette liste. Il est possible d'ajouter des éléments, à la fin de la liste uniquement.
@@ -206,16 +181,12 @@ class UserDrySausagePreference(StrEnum):
     NONE = 'none'
 
     def label(self) -> str:
-        if self == UserDrySausagePreference.REGULAR:
-            return 'Normal'
-        elif self == UserDrySausagePreference.CHORIZO:
-            return 'Chorizo'
-        elif self == UserDrySausagePreference.ANY:
-            return 'Peu importe'
-        elif self == UserDrySausagePreference.NONE:
-            return 'Rien'
-
-        return '?'
+        return {
+            UserDrySausagePreference.REGULAR: 'Normal',
+            UserDrySausagePreference.CHORIZO: 'Chorizo',
+            UserDrySausagePreference.ANY: 'Peu importe',
+            UserDrySausagePreference.NONE: 'Rien',
+        }.get(self, '')
 
 
 # ATTENTION : Ne jamais modifier cette liste. Il est possible d'ajouter des éléments, à la fin de la liste uniquement.
@@ -226,16 +197,12 @@ class UserPatePreference(StrEnum):
     NONE = 'none'
 
     def label(self) -> str:
-        if self == UserPatePreference.REGULAR:
-            return 'Normal'
-        elif self == UserPatePreference.RILLETTES:
-            return 'Rillettes'
-        elif self == UserPatePreference.ANY:
-            return 'Peu importe'
-        elif self == UserPatePreference.NONE:
-            return 'Rien'
-
-        return '?'
+        return {
+            UserPatePreference.REGULAR: 'Normal',
+            UserPatePreference.RILLETTES: 'Rillettes',
+            UserPatePreference.ANY: 'Peu importe',
+            UserPatePreference.NONE: 'Rien',
+        }.get(self, '')
 
 
 class User(CreatedAtMixin, UpdatedAtMixin, UserMixin, db.Model):

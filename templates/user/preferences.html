@@ -12,9 +12,67 @@
     <form method="post" action="{{ url_for('user_preferences') }}">
         {{ form.csrf_token }}
 
-        {{ field(form.allergies) }}
-        {{ field(form.special_diet) }}
-        {{ field(form.is_vegetarian) }}
+        <div class="row">
+            <div>
+                {{ field(form.allergies) }}
+            </div>
+            <div>
+                {{ field(form.special_diet) }}
+            </div>
+        </div>
+
+        <div class="row">
+            <div>
+                {{ field(form.is_vegetarian) }}
+            </div>
+            <div>
+                {{ field(form.spicy_dishes) }}
+            </div>
+            <div>
+                {{ field(form.thai_cuisine) }}
+            </div>
+        </div>
+
+        <div class="row">
+            <div>
+                {{ field(form.water) }}
+            </div>
+            <div>
+                {{ field(form.hot_drinks) }}
+            </div>
+            <div>
+                {{ field(form.alcohol) }}
+            </div>
+        </div>
+
+        <div class="row">
+            <div>
+                {{ field(form.breakfast) }}
+            </div>
+            <div>
+                {{ field(form.breads) }}
+            </div>
+            <div>
+                {{ field(form.kitchen) }}
+            </div>
+        </div>
+
+        {{ field(form.meat) }}
+
+        <div class="row">
+            <div>
+                {{ field(form.pate) }}
+            </div>
+            <div>
+                {{ field(form.chicken) }}
+            </div>
+            <div>
+                {{ field(form.dry_sausage) }}
+            </div>
+        </div>
+
+        {{ field(form.cheeses) }}
+        {{ field(form.other_preferences) }}
 
         <button type="submit" class="mb-0">Enregistrer</button>
     </form>
