@@ -16,8 +16,6 @@ def coerce_nullable_boolean(value):
 def coerce_nullable(value):
     if value == 'None':
         return None
-    elif value is None:
-        return 'None'
 
     return value
 
