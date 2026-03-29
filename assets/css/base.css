@@ -108,6 +108,11 @@ body > header > div > div > div {
 /************************************************************************
  * Contenu */
 
+body.full-width > main {
+    max-width: initial;
+    padding: var(--pico-spacing);
+}
+
 body > main h1:before,
 body > main h2:before {
     content: '• ';

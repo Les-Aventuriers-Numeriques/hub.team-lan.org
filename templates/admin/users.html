@@ -32,8 +32,7 @@
                     {% for user in users %}
                         <tr>
                             <td>
-                                {{ avatar(user) }}
-                                {{ user.display_name }}<br><code>{{ user.id }}</code>
+                                {{ avatar(user) }} {{ user.display_name }}<br><code>{{ user.id }}</code>
                             </td>
                             <td>{{ 'Oui' if user.is_member else 'Non' }}</td>
                             <td>{{ 'Oui' if user.is_lan_participant else 'Non' }}</td>

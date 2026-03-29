@@ -1,0 +1,132 @@
+{% extends 'layout.html' %}
+
+{% block title %}Admin : LAN party : préférences{% endblock %}
+
+{% block body_class %}full-width{% endblock %}
+
+{% block cssfiles %}
+    {% assets 'css_base' %}<link rel="stylesheet" href="{{ ASSET_URL }}">{% endassets %}
+{% endblock %}
+
+{% block content %}
+    {% if users %}
+        <div class="overflow-x-auto">
+            <table class="striped mb-0">
+                <thead>
+                    <tr>
+                        <th>Préférence</th>
+                        {% for user in users %}
+                            <th>{{ avatar(user) }} {{ user.display_name }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th>Allergies</th>
+                        {% for user in users %}
+                            <td class="text-error">{{ user.allergies or '' }}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <th>Régime spécial</th>
+                        {% for user in users %}
+                            <td>{{ user.special_diet or '' }}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <th>Végétarien ?</th>
+                        {% for user in users %}
+                            <td>{{ 'Oui' if user.is_vegetarian is true else 'Non' if user.is_vegetarian is false }}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <th>Plats épicés ?</th>
+                        {% for user in users %}
+                            <td>{{ 'Oui' if user.spicy_dishes is true else 'Non' if user.spicy_dishes is false }}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <th>Cuisine thaï ?</th>
+                        {% for user in users %}
+                            <td>{{ 'Oui' if user.thai_cuisine is true else 'Non' if user.thai_cuisine is false }}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <th>Eau</th>
+                        {% for user in users %}
+                            <td>{{ user.water.label() if user.water }}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <th>Boissons chaudes</th>
+                        {% for user in users %}
+                            <td>{{ user.hot_drinks.label() if user.hot_drinks }}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <th>Alcool</th>
+                        {% for user in users %}
+                            <td>{{ user.alcohol.label() if user.alcohol }}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <th>Petit déjeuner</th>
+                        {% for user in users %}
+                            <td>{{ user.breakfast.label() if user.breakfast }}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <th>Pains</th>
+                        {% for user in users %}
+                            <td>{{ user.breads.label() if user.breads }}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <th>Place dans la cuisine</th>
+                        {% for user in users %}
+                            <td>{{ user.kitchen.label() if user.kitchen }}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <th>Viande</th>
+                        {% for user in users %}
+                            <td>{{ user.meat or '' }}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <th>Pâté</th>
+                        {% for user in users %}
+                            <td>{{ user.pate.label() if user.pate }}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <th>Poulet</th>
+                        {% for user in users %}
+                            <td>{{ user.chicken.label() if user.chicken }}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <th>Saucisson</th>
+                        {% for user in users %}
+                            <td>{{ user.dry_sausage.label() if user.dry_sausage }}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <th>Fromages</th>
+                        {% for user in users %}
+                            <td>{{ user.cheeses or '' }}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <th>Autres préférences</th>
+                        {% for user in users %}
+                            <td>{{ user.other_preferences or '' }}</td>
+                        {% endfor %}
+                    </tr>
+               </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="mb-0"><strong>Aucun participant à la LAN pour l'instant.</strong></p>
+    {% endif %}
+{% endblock %}

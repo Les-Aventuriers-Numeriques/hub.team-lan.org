@@ -920,3 +920,18 @@ def admin_lan_accommodation_proposals_reset_votes() -> Response:
     flash('Votes réinitialisés.', 'success')
 
     return redirect(url_for('admin_lan_accommodations'))
+
+
+@app.route('/admin/lan/preferences')
+@login_required
+@logout_if_must_relogin
+@to_home_if_not_lan_organizer
+def admin_lan_preferences() -> Union[str, Response]:
+    users = db.session.execute(
+        sa.select(User).where(User.is_lan_participant == True).order_by(User.display_name.asc())
+    ).scalars().all()
+
+    return render_template(
+        'admin/lan/preferences.html',
+        users=users
+    )
