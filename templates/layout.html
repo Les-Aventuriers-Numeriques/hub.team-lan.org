@@ -78,6 +78,8 @@
                         <details class="dropdown">
                             <summary>{{ avatar(current_user) }} <span>{{ current_user.display_name }}</span></summary>
                             <ul>
+                                <li><a href="{{ url_for('user_preferences') }}">Préférences</a></li>
+                                <li class="separator"></li>
                                 <li><a href="{{ url_for('logout') }}">Déconnexion</a></li>
                             </ul>
                         </details>

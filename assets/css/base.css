@@ -119,6 +119,24 @@ body > main details > summary {
     font-weight: bolder;
 }
 
+body > main .row {
+    display: flex;
+    flex-direction: row;
+    column-gap: var(--pico-grid-column-gap);
+    row-gap: var(--pico-grid-row-gap);
+}
+
+body > main .row > * {
+    flex-grow: 1;
+    flex-basis: 0;
+}
+
+@media (max-width: 768px) {
+    body > main .row {
+        flex-direction: column;
+    }
+}
+
 /************************************************************************
  * Formulaires */
 

@@ -1,0 +1,79 @@
+{% extends 'layout.html' %}
+
+{% from 'macros.html' import field with context %}
+
+{% block title %}Préférences{% endblock %}
+
+{% block cssfiles %}
+    {% assets 'css_base' %}<link rel="stylesheet" href="{{ ASSET_URL }}">{% endassets %}
+{% endblock %}
+
+{% block content %}
+    <form method="post" action="{{ url_for('user_preferences') }}">
+        {{ form.csrf_token }}
+
+        <div class="row">
+            <div>
+                {{ field(form.allergies) }}
+            </div>
+            <div>
+                {{ field(form.special_diet) }}
+            </div>
+        </div>
+
+        <div class="row">
+            <div>
+                {{ field(form.is_vegetarian) }}
+            </div>
+            <div>
+                {{ field(form.spicy_dishes) }}
+            </div>
+            <div>
+                {{ field(form.thai_cuisine) }}
+            </div>
+        </div>
+
+        <div class="row">
+            <div>
+                {{ field(form.water) }}
+            </div>
+            <div>
+                {{ field(form.hot_drinks) }}
+            </div>
+            <div>
+                {{ field(form.alcohol) }}
+            </div>
+        </div>
+
+        <div class="row">
+            <div>
+                {{ field(form.breakfast) }}
+            </div>
+            <div>
+                {{ field(form.breads) }}
+            </div>
+            <div>
+                {{ field(form.kitchen) }}
+            </div>
+        </div>
+
+        {{ field(form.meat) }}
+
+        <div class="row">
+            <div>
+                {{ field(form.pate) }}
+            </div>
+            <div>
+                {{ field(form.chicken) }}
+            </div>
+            <div>
+                {{ field(form.dry_sausage) }}
+            </div>
+        </div>
+
+        {{ field(form.cheeses) }}
+        {{ field(form.other_preferences) }}
+
+        <button type="submit" class="mb-0">Enregistrer</button>
+    </form>
+{% endblock %}

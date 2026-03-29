@@ -1,4 +1,5 @@
-from wtforms import SearchField, SelectField, StringField, URLField, IntegerField, DecimalField, TextAreaField
+from hub.models import UserKitchenPreference, UserWaterPreference, UserHotDrinksPreference, UserBreakfastPreference, UserBreadsPreference, UserAlcoholPreference, UserChickenPreference, UserDrySausagePreference, UserPatePreference
+from wtforms import SearchField, SelectField, StringField, URLField, IntegerField, DecimalField, TextAreaField, BooleanField
 from flask_wtf import FlaskForm
 import wtforms.validators as validators
 
@@ -10,6 +11,13 @@ def coerce_nullable_boolean(value):
         return value
 
     return None
+
+
+def coerce_nullable(value):
+    if value == 'None':
+        return None
+
+    return value
 
 
 class LanGamesProposalSearchForm(FlaskForm):
@@ -175,4 +183,139 @@ class LanAccommodationsSettingsForm(FlaskForm):
         ],
         default='disabled',
         description='<strong>Désactivée</strong> : aucun accès, période creuse ; <strong>Activée</strong> : accès normal, période de choix des logements ; <strong>Lecture seule</strong> : consultation uniquement.'
+    )
+
+
+class UserPreferencesForm(FlaskForm):
+    allergies = StringField(
+        'Allergies',
+        [validators.Optional(), validators.Length(max=255)],
+        render_kw={
+            'placeholder': 'Par exemple "Céleri"',
+        }
+    )
+
+    special_diet = StringField(
+        'Régime spécial',
+        [validators.Optional(), validators.Length(max=255)],
+        render_kw={
+            'placeholder': 'Par exemple "Pas de gluten" ou "Uniquement du houblon"',
+        }
+    )
+
+    is_vegetarian = BooleanField(
+        'Végétarien ?',
+        [validators.Optional()]
+    )
+
+    kitchen = SelectField(
+        'Place dans la cuisine',
+        [validators.Optional()],
+        choices=[(None, '')] + [
+            (item, item.label()) for item in UserKitchenPreference
+        ],
+        coerce=coerce_nullable
+    )
+
+    water = SelectField(
+        'Eau',
+        [validators.Optional()],
+        choices=[(None, '')] + [
+            (item, item.label()) for item in UserWaterPreference
+        ],
+        coerce=coerce_nullable
+    )
+
+    hot_drinks = SelectField(
+        'Boissons chaudes',
+        [validators.Optional()],
+        choices=[(None, '')] + [
+            (item, item.label()) for item in UserHotDrinksPreference
+        ],
+        coerce=coerce_nullable
+    )
+
+    breakfast = SelectField(
+        'Petit déjeuner',
+        [validators.Optional()],
+        choices=[(None, '')] + [
+            (item, item.label()) for item in UserBreakfastPreference
+        ],
+        coerce=coerce_nullable
+    )
+
+    breads = SelectField(
+        'Pains',
+        [validators.Optional()],
+        choices=[(None, '')] + [
+            (item, item.label()) for item in UserBreadsPreference
+        ],
+        coerce=coerce_nullable
+    )
+
+    cheeses = StringField(
+        'Fromages',
+        [validators.Optional(), validators.Length(max=255)],
+        render_kw={
+            'placeholder': 'Par exemple "Pas de bleu"',
+        }
+    )
+
+    spicy_dishes = BooleanField(
+        'Plats épicés ?',
+        [validators.Optional()]
+    )
+
+    alcohol = SelectField(
+        'Alcool',
+        [validators.Optional()],
+        choices=[(None, '')] + [
+            (item, item.label()) for item in UserAlcoholPreference
+        ],
+        coerce=coerce_nullable
+    )
+
+    meat = StringField(
+        'Viande',
+        [validators.Optional(), validators.Length(max=255)],
+        render_kw={
+            'placeholder': 'Par exemple "Pas d\'agneau" ou "Pas de pièces chiantes"',
+        }
+    )
+
+    chicken = SelectField(
+        'Poulet',
+        [validators.Optional()],
+        choices=[(None, '')] + [
+            (item, item.label()) for item in UserChickenPreference
+        ],
+        coerce=coerce_nullable
+    )
+
+    dry_sausage = SelectField(
+        'Saucisson',
+        [validators.Optional()],
+        choices=[(None, '')] + [
+            (item, item.label()) for item in UserDrySausagePreference
+        ],
+        coerce=coerce_nullable
+    )
+
+    thai_cuisine = BooleanField(
+        'Cuisine thaï ?',
+        [validators.Optional()]
+    )
+
+    pate = SelectField(
+        'Pâté',
+        [validators.Optional()],
+        choices=[(None, '')] + [
+            (item, item.label()) for item in UserPatePreference
+        ],
+        coerce=coerce_nullable
+    )
+
+    other_preferences = StringField(
+        'Autres préférences',
+        [validators.Optional(), validators.Length(max=255)]
     )
