@@ -19,7 +19,8 @@ Il s'agit d'une application web propulsée par [Flask](https://flask.palletsproj
   - Un navigateur web moderne
   - Un [bot Discord](https://discord.com/developers) avec les accès qui vont bien
   - Un accès à l'[API IGDB](https://api-docs.igdb.com/#getting-started)
-  - (Production **et** développement) Un serveur PostgreSQL (via Docker en développement)
+  - Un serveur PostgreSQL (via Docker en développement)
+  - (Production) Un serveur web
   - (Production) Un serveur WSGI
 
 ## Installation
@@ -38,7 +39,7 @@ Configurer un serveur web / WSGI est hors du périmètre de ce document, toutefo
   - Le fichier WSGI est `./wsgi.py`
   - Le "callable" WSGI est `application`
   - N'oubliez pas de définir `FLASK_DEBUG` à `false` (ou de le supprimer carrément, c'est désactivé par défaut)
-  - Mappez le répertoire des fichiers statiques `./static` vers `/static`
+  - Mappez le répertoire des fichiers statiques `./static` vers `/static`. Ou mieux, servez ce répertoire par le serveur web
   - Mappez les fichiers statiques suivants (ils doivent être trouvés dans la racine de l'URL du site) :
     - `./static/favicon.ico` vers `/favicon.ico` pour qu'une belle icône soit affichée dans votre navigateur
     - `./static/robots.txt` vers `/robots.txt` pour que rien ne soit indexé par les moteurs de recherche
