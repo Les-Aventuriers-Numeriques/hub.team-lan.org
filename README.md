@@ -42,4 +42,6 @@ Configurer un serveur web / WSGI est hors du périmètre de ce document, toutefo
   - Mappez le répertoire des fichiers statiques `./static` vers `/static`. Ou mieux, servez ce répertoire par le serveur web
   - Mappez les fichiers statiques suivants (ils doivent être trouvés dans la racine de l'URL du site) :
     - `./static/favicon.ico` vers `/favicon.ico` pour qu'une belle icône soit affichée dans votre navigateur
+    - `./static/favicon.svg` vers `/favicon.svg`
+    - `./static/apple-touch-icon.png` vers `/apple-touch-icon.png`
     - `./static/robots.txt` vers `/robots.txt` pour que rien ne soit indexé par les moteurs de recherche
