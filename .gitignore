@@ -3,7 +3,6 @@ instance/webassets-cache/*
 instance/cache/*
 static/css/*.css
 static/js/*.js
-.python-version
 .env
 
 ### JetBrains template

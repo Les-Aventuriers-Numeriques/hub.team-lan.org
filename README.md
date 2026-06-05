@@ -16,6 +16,7 @@ Il s'agit d'une application web propulsée par [Flask](https://flask.palletsproj
 ## Prérequis
 
   - Python >= 3.10 (développé sous 3.14)
+  - [Pipenv](https://pipenv.pypa.io/en/latest/)
   - Un navigateur web moderne
   - Un [bot Discord](https://discord.com/developers) avec les accès qui vont bien
   - Un accès à l'[API IGDB](https://api-docs.igdb.com/#getting-started)
@@ -27,10 +28,10 @@ Il s'agit d'une application web propulsée par [Flask](https://flask.palletsproj
 
   1. Clonez ce dépôt quelque part 
   2. Copiez `.env.example` vers `.env` puis remplissez les variables requises / souhaitées (elles peuvent également être définies dans l'environnement)
-  3. `pip install -r requirements-dev.txt` (`requirements-prod.txt` est à utiliser dans un environnement de production)
+  3. `pipenv install --dev`
   4. `docker compose up -d`
-  5. `flask db upgrade`
-  6. `flask update-games` (c'est long)
+  5. `pipenv run flask db upgrade`
+  6. `pipenv run flask update-games` (c'est long)
 
 ## Déploiement
 
