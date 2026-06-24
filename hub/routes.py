@@ -517,6 +517,8 @@ def lan_accommodations_proposal() -> Union[str, Response]:
 
         db.session.add(lan_accommodation_proposal)
 
+        db.session.commit()
+
         LanAccommodationProposalVote.vote(current_user, lan_accommodation_proposal.id, VoteType.YES)
 
         db.session.commit()
