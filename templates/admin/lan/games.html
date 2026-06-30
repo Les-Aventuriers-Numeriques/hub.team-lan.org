@@ -41,7 +41,7 @@
                     {% for proposal in proposals %}
                         <tr>
                             <td>{{ proposal.game.name }} <code>{{ proposal.game.id }}</code></td>
-                            <td>{{ avatar(current_user) }} {{ proposal.user.display_name }}</td>
+                            <td>{{ avatar(proposal.user) }} {{ proposal.user.display_name }}</td>
                             <td>{{ proposal.created_at|datetimeformat }}</td>
                             <td class="actions">
                                 <a href="{{ url_for('admin_lan_games_proposal_resend', game_id=proposal.game_id) }}" onclick="return confirm('{{ proposal.game.name }} sera renvoyé sur le canal Discord #lan ou mis à jour. Confirmer ?')" data-tooltip="Renvoyer"><i class="bi bi-send"></i></a>
