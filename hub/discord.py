@@ -255,8 +255,7 @@ def submit_game_proposal_command(ctx: Context, jeu: Autocomplete(int)) -> Messag
 
             if can_send_lan_messages():
                 send_game_proposal_message(
-                    user,
-                    db.session.get(Game, jeu)
+                    db.session.get(LanGameProposal, jeu)
                 )
 
             message = 'Merci pour ta proposition !'
