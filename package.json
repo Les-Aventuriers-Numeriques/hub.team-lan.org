@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@picocss/pico": "~2.1",
+    "bootstrap-icons": "~1.13",
+    "sass": "~1.103"
+  }
+}

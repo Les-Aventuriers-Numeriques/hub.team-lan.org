@@ -12,6 +12,7 @@ from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_caching import Cache
 from typing import Tuple, Dict
+from pathlib import Path
 from environs import Env
 
 # -----------------------------------------------------------
@@ -96,6 +97,9 @@ app.config.update(
     IGDB_API_FORCED_GAMES=[
         3102, # Kerbal Space Program
     ],
+
+    SASS_BIN=str(Path(__file__).parent / 'node_modules' / '.bin' / 'sass'),
+    SASS_LOAD_PATHS=[str(Path(__file__).parent / 'node_modules')],
 )
 
 # -----------------------------------------------------------
@@ -145,10 +149,10 @@ except ImportError:
 assets = Environment(app)
 assets.append_path('assets')
 
-assets.register('css_base', Bundle('css/base.css', filters='rcssmin', output='css/base.min.css'))
-assets.register('css_lan_games_vote', Bundle('css/base.css', 'css/lan_games.css', 'css/lan_games_vote.css', filters='rcssmin', output='css/lan_games_vote.min.css'))
-assets.register('css_lan_games_proposal', Bundle('css/base.css', 'css/lan_games.css', 'css/lan_games_proposal.css', filters='rcssmin', output='css/lan_games_proposal.min.css'))
-assets.register('css_lan_accommodations_vote', Bundle('css/base.css', 'css/lan_accommodations_vote.css', filters='rcssmin', output='css/lan_accommodations_vote.min.css'))
+assets.register('css_base', Bundle('scss/base.scss', filters='scss,rcssmin', output='css/base.min.css', depends='**/*.scss'))
+assets.register('css_lan_games_vote', Bundle('css/lan_games_vote.css', filters='scss,rcssmin', output='css/lan_games_vote.min.css', depends='**/*.scss'))
+assets.register('css_lan_games_proposal', Bundle('css/lan_games_proposal.css', filters='scss,rcssmin', output='css/lan_games_proposal.min.css', depends='**/*.scss'))
+assets.register('css_lan_accommodations_vote', Bundle('css/lan_accommodations_vote.css', filters='scss,rcssmin', output='css/lan_accommodations_vote.min.css', depends='**/*.scss'))
 
 # Flask-Babel
 babel = Babel(app)
