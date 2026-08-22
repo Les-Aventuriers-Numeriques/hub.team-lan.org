@@ -12,7 +12,8 @@ node_modules
 *.iml
 
 ## Directory-based project format:
-.idea/
+.idea/*
+!.idea/icon.svg
 # if you remove_one the above rule, at least ignore the following:
 
 # User-specific stuff:
