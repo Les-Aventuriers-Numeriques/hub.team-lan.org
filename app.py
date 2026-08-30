@@ -150,9 +150,9 @@ assets = Environment(app)
 assets.append_path('assets')
 
 assets.register('css_base', Bundle('scss/base.scss', filters='scss,rcssmin', output='css/base.min.css', depends='**/*.scss'))
-assets.register('css_lan_games_vote', Bundle('css/lan_games_vote.css', filters='scss,rcssmin', output='css/lan_games_vote.min.css', depends='**/*.scss'))
-assets.register('css_lan_games_proposal', Bundle('css/lan_games_proposal.css', filters='scss,rcssmin', output='css/lan_games_proposal.min.css', depends='**/*.scss'))
-assets.register('css_lan_accommodations_vote', Bundle('css/lan_accommodations_vote.css', filters='scss,rcssmin', output='css/lan_accommodations_vote.min.css', depends='**/*.scss'))
+assets.register('css_lan_games_vote', Bundle('scss/lan_games_vote.scss', filters='scss,rcssmin', output='css/lan_games_vote.min.css', depends='**/*.scss'))
+assets.register('css_lan_games_proposal', Bundle('scss/lan_games_proposal.scss', filters='scss,rcssmin', output='css/lan_games_proposal.min.css', depends='**/*.scss'))
+assets.register('css_lan_accommodations_vote', Bundle('scss/lan_accommodations_vote.scss', filters='scss,rcssmin', output='css/lan_accommodations_vote.min.css', depends='**/*.scss'))
 
 # Flask-Babel
 babel = Babel(app)
