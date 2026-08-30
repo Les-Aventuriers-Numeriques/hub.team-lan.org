@@ -116,6 +116,12 @@ def logout_if_must_relogin(f):
     return decorated
 
 
+if app.debug:
+    @app.route('/<any("apple-touch-icon.png","favicon.ico","favicon.svg","robots.txt"):filename>')
+    def rooted_statics(filename: str) -> Response:
+        return app.send_static_file(filename)
+
+
 @app.route('/connexion')
 @to_home_if_authenticated
 def login() -> Union[str, Response]:
@@ -927,7 +933,7 @@ def admin_lan_accommodation_proposals_reset_votes() -> Response:
 @app.route('/admin/lan/preferences')
 @login_required
 @logout_if_must_relogin
-@to_home_if_not_lan_organizer
+@to_home_if_not_admin
 def admin_lan_preferences() -> Union[str, Response]:
     users = db.session.execute(
         sa.select(User).where(User.is_lan_participant == True).order_by(User.display_name.asc())

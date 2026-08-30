@@ -16,6 +16,7 @@ Il s'agit d'une application web propulsée par [Flask](https://flask.palletsproj
 ## Prérequis
 
   - Python >= 3.10 (développé sous 3.14)
+  - Node.js et n'importe quel gestionnaire de paquets à la mode actuellement
   - [Pipenv](https://pipenv.pypa.io/en/latest/)
   - Un navigateur web moderne
   - Un [bot Discord](https://discord.com/developers) avec les accès qui vont bien
@@ -26,12 +27,13 @@ Il s'agit d'une application web propulsée par [Flask](https://flask.palletsproj
 
 ## Installation
 
-  1. Clonez ce dépôt quelque part 
+  1. Clonez ce dépôt
   2. Copiez `.env.example` vers `.env` puis remplissez les variables requises / souhaitées (elles peuvent également être définies dans l'environnement)
   3. `pipenv install --dev`
-  4. `docker compose up -d`
-  5. `pipenv run flask db upgrade`
-  6. `pipenv run flask update-games` (c'est long)
+  4. `npm install`
+  5. `docker compose up -d`
+  6. `pipenv run flask db upgrade`
+  7. `pipenv run flask update-games` (c'est long)
 
 ## Déploiement
 
